@@ -21,10 +21,10 @@ all:			CXXFLAGS += -g -fno-limit-debug-info
 all:			$(NAME)
 
 release:		CXXFLAGS += -O3
-release:		$(NAME)
+release:		fclean $(NAME)
 
 $(OBJ_DIR)/%.o:	%.cpp
-	$(CXX) $(CXXFLAGS) -I$(INC_DIR) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -I$(INC_DIR) -c -o $@ $<
 
 $(NAME):		$(OBJ_DIR) $(OBJS)
 	$(CXX) $(OBJS) -o $(NAME)
