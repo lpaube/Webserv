@@ -9,11 +9,13 @@ MKDIR		=	mkdir -p
 SRC_DIR		=	src
 INC_DIR		=	include
 OBJ_DIR		=	obj
-INCS		=	$(wildcard $(INC_DIR)/*.hpp)
-SRCS		=	main.cpp Server.cpp Request.cpp RequestLine.cpp
-OBJS		=	$(addprefix $(OBJ_DIR)/, $(SRCS:.cpp=.o))
+DIRS		=	$(shell find $(SRC_DIR) -type d)
+INCS		=	$(shell find $(INC_DIR) -type f -name *.hpp)
+SRCS		=	$(shell find $(SRC_DIR) -type f -name *.cpp)
+SRCS_BASE	=	$(foreach file, $(SRCS), $(shell basename -a $(file)))
+OBJS		=	$(addprefix $(OBJ_DIR)/, $(SRCS_BASE:.cpp=.o))
 
-VPATH		=	$(SRC_DIR)
+VPATH		=	$(SRC_DIR) $(DIRS)
 
 all:			CXXFLAGS += -g -fno-limit-debug-info
 all:			$(NAME)
@@ -33,12 +35,12 @@ $(OBJ_DIR):
 clean:
 	@$(RM) $(OBJS)
 
-fclean:		clean
+fclean:			clean
 	@$(RM) $(NAME)
 
-re:			fclean all
+re:				fclean all
 
 fmt:
-	clang-format -i $(addprefix $(SRC_DIR)/, $(SRCS)) $(INCS)
+	clang-format -i $(SRCS) $(INCS)
 
-.PHONY:		all release clean fclean re fmt
+.PHONY:			all release clean fclean re fmt
