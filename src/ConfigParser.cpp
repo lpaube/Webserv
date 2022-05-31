@@ -1,17 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   configparser.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/30 16:51:00 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/05/31 19:21:24 by mafortin         ###   ########.fr       */
+/*   Created: 2022/05/31 19:08:15 by mafortin          #+#    #+#             */
+/*   Updated: 2022/05/31 19:22:08 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
+#include "../include/ConfigParser.hpp"
+#include <fstream>
+#include <iostream>
 
-class Server
-{
-};
+ConfigParser::ConfigParser(std::string config_file){
+	std::ofstream	file;
+	file.open(config_file, std::ofstream::in);
+	if (file.is_open() == false)
+		throw ConfigFileException();
+
+}
+
+const char* ConfigParser::ConfigFileException::what() const throw(){
+				return ("Error: Config file\n");
+}
