@@ -20,4 +20,5 @@ class ServerParser{
 	private:
 		std::vector<std::string> server_content;
 		std::vector<LocationContent>	location;
+		std::string	str_content;
 };

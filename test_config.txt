@@ -1,10 +1,9 @@
-asd
-asdfa
-sdfasdfa
 
-asdfaf
 
-forf
-fas
-dfa
-sdfasdfa
+
+
+
+server{ceci est
+	un test
+}
+

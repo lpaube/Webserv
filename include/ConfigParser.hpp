@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:07:03 by mafortin          #+#    #+#             */
-/*   Updated: 2022/05/31 22:16:52 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/05/31 23:12:37 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,16 @@ public:
 		public:
 			virtual const char* what() const throw();
 	};
+	class ConfigSyntaxException : public std::exception{
+		public:
+			virtual const char* what() const throw();
+	};
 private:
 	std::string					getContent(std::fstream& file);
 	std::string					file_content;
 	void						createConfig();
 	std::vector<ServerParser>	serverparser;
+	void findServerStart(std::string::iterator& start);
+	std::string::iterator findServerEnd(std::string::iterator start, std::string::iterator& end);
 };
 
-std::string::iterator	findServerSep(std::string& content);

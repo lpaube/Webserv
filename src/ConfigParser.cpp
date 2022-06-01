@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:08:15 by mafortin          #+#    #+#             */
-/*   Updated: 2022/05/31 22:19:12 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/05/31 23:25:45 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-
 
 ConfigParser::ConfigParser(std::string config_file){
 	std::fstream	file;
@@ -33,8 +32,38 @@ void	ConfigParser::createConfig(){
 	std::string::iterator server_end;
 
 	while(start != end){
-		start = findServerSep(this->file_content);
+		findServerStart(start);
+		server_end = findServerEnd(start, end);
+		ServerParser add(start, server_end);
+		serverparser.push_back(add);
 	}
+}
+
+std::string::iterator ConfigParser::findServerEnd(std::string::iterator start, std::string::iterator& end){
+	bool	open = false;
+	while (start != end){
+		if (*start == '{')
+			open = true;
+		else if (*start == '}' && open == true)
+			open = false;
+		else if (*start == '}')
+			return start - 1;
+		start++;
+	}
+	return end;
+}
+
+void ConfigParser::findServerStart(std::string::iterator& start){
+	std::size_t	i =  this->file_content.find("server") + 6;
+	start += static_cast<long>(i);
+	while(*start == ' ')
+			start++;
+	if (*start != '{')
+	{
+		throw ConfigSyntaxException();
+	}
+	else
+		start++;
 }
 
 std::string ConfigParser::getContent(std::fstream& file){
@@ -53,11 +82,9 @@ std::string ConfigParser::getContent(std::fstream& file){
 const char* ConfigParser::ConfigFileException::what() const throw(){
 				return ("Error: Config file\n");
 }
-
+const char* ConfigParser::ConfigSyntaxException::what() const throw(){
+				return ("Error: Syntax error in config file\n");
+}
 ConfigParser::~ConfigParser(){}
 
-std::string::iterator	findServerSep(std::string& content){
-	std::size_t i = content.find("server");
-	(void)i;
-	return content.begin();
-}
+
