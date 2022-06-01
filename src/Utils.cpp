@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:40:28 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/01 01:59:32 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/01 15:31:19 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,16 @@
 
 std::string trim(const std::string& str, char sep)
 {
-    std::string::size_type start = 0;
-    std::string::size_type end = str.length();
-
-    while (start < str.length() && str[start] == sep) {
+    std::string::const_iterator start = str.begin();
+    while (start != str.end() && *start == sep) {
         ++start;
     }
-    while (end > start && str[end] == sep) {
+
+    std::string::const_iterator end = str.end();
+    while (end != start && *(end - 1) == sep) {
         --end;
     }
-    return str.substr(start, end - start);
+    return std::string(start, end);
 }
 
 std::string get_next_word(std::string& str, const std::string& sep)
