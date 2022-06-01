@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:21:49 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/01 02:04:39 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/01 15:01:57 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,9 @@
 #include <strings.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <sys/time.h>
+#include <sys/errno.h>
 
 #include "http/Request.hpp"
 
@@ -37,6 +40,8 @@ int main()
     int res = bind(sock, (struct sockaddr*)&servaddr, sizeof(servaddr));
     (void)res;
 
+    // fcntl(sock, O_NONBLOCK);
+
     listen(sock, 10);
 
     while (true) {
@@ -45,6 +50,12 @@ int main()
         socklen_t addrlen;
 
         connfd = accept(sock, (struct sockaddr*)&addr, &addrlen);
+
+        struct timeval timeout;
+        timeout.tv_sec = 5;
+        timeout.tv_usec = 0;
+        setsockopt(connfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+        // fcntl(connfd, O_NONBLOCK);
 
         char buff[2049] = {};
         ssize_t n;
@@ -56,6 +67,12 @@ int main()
 
             if (req_str.find("\r\n\r\n") != std::string::npos) {
                 break;
+            }
+        }
+
+        if (n == -1) {
+            if (errno == EAGAIN) {
+                // timeout
             }
         }
 
@@ -78,10 +95,9 @@ int main()
         }
 
         snprintf(buff, sizeof(buff),
-                 "HTTP/1.0 200 OK\r\n\r\nHello World Rust is the best language ever made");
+                 "HTTP/1.0 200 OK\r\n\r\n<h1>Hello World Rust is the best language ever made</h1>");
         write(connfd, buff, std::strlen(buff));
         close(connfd);
-        break;
     }
 
     close(sock);
