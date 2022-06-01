@@ -6,26 +6,36 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 20:40:40 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/05/31 20:40:44 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/05/31 22:25:31 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http/Query.hpp"
 #include "Utils.hpp"
-#include <stdexcept>
 
 namespace http
 {
-Query::Query(const std::string& str)
+
+Query::Exception::Exception(const char* msg) : ExceptionBase(msg)
 {
-    std::string::size_type pos = str.find('=');
+}
+
+static void query_exception(const std::string& param)
+{
+    std::string msg = "Bad query param: '" + param + "'";
+    throw Query::Exception(msg.c_str());
+}
+
+Query::Query(const std::string& param)
+{
+    std::string::size_type pos = param.find('=');
     if (pos == std::string::npos) {
-        throw std::runtime_error("Bad query value");
+        query_exception(param);
     }
-    name_ = str.substr(0, pos);
-    value_ = str.substr(pos + 1);
+    name_ = param.substr(0, pos);
+    value_ = param.substr(pos + 1);
     if (name_.empty()) {
-        throw std::runtime_error("Bad query name");
+        query_exception(param);
     }
 }
 

@@ -1,42 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Query.hpp                                          :+:      :+:    :+:   */
+/*   ExceptionBase.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/31 17:24:45 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/05/31 22:16:47 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/05/31 22:02:26 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/05/31 22:05:45 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
-
 #include "ExceptionBase.hpp"
-#include <map>
-#include <string>
+#include <cstring>
 
-namespace http
+ExceptionBase::ExceptionBase(const char* msg)
 {
-class Query
+    strncpy(msg_, msg, MSG_SIZE);
+    msg_[MSG_SIZE - 1] = 0;
+}
+
+const char* ExceptionBase::what() const throw()
 {
-public:
-    class Exception : public ExceptionBase
-    {
-    public:
-        Exception(const char* msg);
-    };
-
-public:
-    Query(const std::string& param);
-
-public:
-    const std::string& name() const;
-    const std::string& value() const;
-
-private:
-    std::string name_;
-    std::string value_;
-};
-
-} // namespace http
+    return msg_;
+}

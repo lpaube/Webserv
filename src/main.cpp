@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:21:49 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/05/31 20:41:13 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/05/31 22:35:46 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,6 @@
 #include <netinet/in.h>
 #include <string>
 #include <strings.h>
-#include <sys/_types/_socklen_t.h>
-#include <sys/_types/_ssize_t.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -34,14 +32,14 @@ int main()
 
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servaddr.sin_port = htons(9000);
+    servaddr.sin_port = htons(8000);
 
     int res = bind(sock, (struct sockaddr*)&servaddr, sizeof(servaddr));
     (void)res;
 
     listen(sock, 10);
 
-    for (;;) {
+    while (true) {
         int connfd;
         struct sockaddr_in addr;
         socklen_t addrlen;
@@ -68,7 +66,8 @@ int main()
             std::cerr << ex.what() << std::endl;
         }
 
-        snprintf(buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nHello World Rust is the best language ever made");
+        snprintf(buff, sizeof(buff),
+                 "HTTP/1.0 200 OK\r\n\r\nHello World Rust is the best language ever made");
         write(connfd, buff, strlen(buff));
         close(connfd);
     }
