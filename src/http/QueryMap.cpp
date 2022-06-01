@@ -11,8 +11,8 @@
 /* ************************************************************************** */
 
 #include "http/QueryMap.hpp"
-#include "http/QueryParam.hpp"
 #include "Utils.hpp"
+#include "http/QueryParam.hpp"
 
 namespace http
 {
@@ -33,7 +33,6 @@ QueryMap::QueryMap(std::string query_str)
     QueryParam param = QueryParam(query_str);
     params_[param.name()] = param.value();
 }
-
 
 QueryMap::const_iterator QueryMap::begin() const
 {

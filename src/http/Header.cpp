@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:34:57 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/05/31 22:17:50 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/01 01:59:46 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ Header::Header(const std::string& str)
         throw Exception(msg.c_str());
     }
     name_ = str.substr(0, pos);
+    to_lower(name_);
     value_ = trim(str.substr(pos + 1), ' ');
 }
 

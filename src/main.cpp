@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:21:49 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/01 00:42:20 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/01 02:04:39 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,11 +64,9 @@ int main()
 
             req_str.erase(0, req_str.find("\r\n\r\n") + 4);
             ssize_t bytes_left = request.content_length();
-            if (bytes_left == -1) {
-                // Error
-            }
             bytes_left -= (ssize_t)req_str.length();
-            while (bytes_left > 0 && (n = read(connfd, buff, bytes_left < 10 ? (size_t)bytes_left : 10)) > 0) {
+            while (bytes_left > 0 &&
+                   (n = read(connfd, buff, bytes_left < 10 ? (size_t)bytes_left : 10)) > 0) {
                 bytes_left -= n;
                 buff[n] = 0;
                 req_str.append(buff);

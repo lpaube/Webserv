@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:19:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/01 00:31:17 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/01 01:41:15 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,17 @@ public:
     void print() const;
 
 private:
+    void parse_header(const Header& header);
+    void parse_content_length(const std::string& value);
+
+private:
     Method method_;
     std::string path_;
     QueryMap query_;
     std::string http_version_;
     HeaderMap headers_;
     std::string body_;
+    ssize_t content_length_;
 };
 
 } // namespace http

@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:09 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/01 01:24:59 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/01 02:05:30 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ Request::Exception::Exception(const char* msg) : ExceptionBase(msg)
 {
 }
 
-Request::Request(std::string request_str)
+Request::Request(std::string request_str) : method_(BAD_METHOD), content_length_(0)
 {
     std::string request_line = get_next_word(request_str, "\r\n");
     std::string str = get_next_word(request_line, " ");
@@ -48,25 +48,15 @@ Request::Request(std::string request_str)
         if (pos == 0) {
             break;
         }
-        headers_.add(Header(get_next_word(request_str, "\r\n")));
+        Header header(get_next_word(request_str, "\r\n"));
+        headers_.add(header);
+        parse_header(header);
     }
 }
 
 ssize_t Request::content_length() const
 {
-    HeaderMap::const_iterator it = headers_.get(CONTENT_LENGTH_HEADER);
-    if (it == headers_.end()) {
-        return 0;
-    }
-
-    ssize_t size = 0;
-    std::istringstream ss(it->second);
-    ss >> size;
-
-    if (ss.fail()) {
-        return -1;
-    }
-    return size;
+    return content_length_;
 }
 
 void Request::set_body(const std::string& body)
@@ -88,6 +78,26 @@ void Request::print() const
         std::cout << '\t' << it->first << ": " << it->second << '\n';
     }
     std::cout << "Body: " << body_ << std::endl;
+}
+
+void Request::parse_header(const Header& header)
+{
+    if (header.name() == CONTENT_LENGTH_HEADER) {
+        parse_content_length(header.value());
+    }
+}
+
+void Request::parse_content_length(const std::string& value)
+{
+    ssize_t size = 0;
+    std::istringstream ss(value);
+    ss >> size;
+
+    if (ss.fail()) {
+        std::string msg = "Bad value for " CONTENT_LENGTH_HEADER ": " + value;
+        throw Exception(msg.c_str());
+    }
+    content_length_ = size;
 }
 
 } // namespace http
