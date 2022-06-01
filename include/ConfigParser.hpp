@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:07:03 by mafortin          #+#    #+#             */
-/*   Updated: 2022/05/31 23:12:37 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/01 14:46:35 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,12 @@ public:
 			virtual const char* what() const throw();
 	};
 private:
+	bool						min_server;
 	std::string					getContent(std::fstream& file);
 	std::string					file_content;
 	void						createConfig();
 	std::vector<ServerParser>	serverparser;
+	unsigned int				nb_server;
 	void findServerStart(std::string::iterator& start);
-	std::string::iterator findServerEnd(std::string::iterator start, std::string::iterator& end);
+	std::string::iterator findServerEnd(std::string::iterator start, std::string::iterator end);
 };
-
