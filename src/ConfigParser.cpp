@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:08:15 by mafortin          #+#    #+#             */
-/*   Updated: 2022/05/31 21:07:31 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/05/31 22:19:12 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 
 ConfigParser::ConfigParser(std::string config_file){
 	std::fstream	file;
-	(void)this->config_content;
+	(void)this->serverparser;
 	file.open(config_file, std::fstream::in);
 	 if (file.is_open() == false)
 		throw ConfigFileException();
@@ -27,11 +27,15 @@ ConfigParser::ConfigParser(std::string config_file){
 	createConfig();
 }
 
-void	ConfigParser::createConfig()[
-	while(true){
-		
+void	ConfigParser::createConfig(){
+	std::string::iterator start = this->file_content.begin();
+	std::string::iterator end = this->file_content.end();
+	std::string::iterator server_end;
+
+	while(start != end){
+		start = findServerSep(this->file_content);
 	}
-]
+}
 
 std::string ConfigParser::getContent(std::fstream& file){
 	file.seekg(0, file.end);
@@ -51,3 +55,9 @@ const char* ConfigParser::ConfigFileException::what() const throw(){
 }
 
 ConfigParser::~ConfigParser(){}
+
+std::string::iterator	findServerSep(std::string& content){
+	std::size_t i = content.find("server");
+	(void)i;
+	return content.begin();
+}
