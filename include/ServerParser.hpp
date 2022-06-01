@@ -18,6 +18,7 @@ class ServerParser{
 		ServerParser(std::string::iterator beg, std::string::iterator end);
 		~ServerParser(){};
 	private:
+		void	buildContent();
 		std::vector<std::string> server_content;
 		std::vector<LocationContent>	location;
 		std::string	str_content;

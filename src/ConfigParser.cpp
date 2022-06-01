@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:08:15 by mafortin          #+#    #+#             */
-/*   Updated: 2022/05/31 23:25:45 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/05/31 23:46:22 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,13 @@ void	ConfigParser::createConfig(){
 	std::string::iterator end = this->file_content.end();
 	std::string::iterator server_end;
 
-	while(start != end){
+	//while(start != end){
 		findServerStart(start);
 		server_end = findServerEnd(start, end);
 		ServerParser add(start, server_end);
 		serverparser.push_back(add);
-	}
+		start = server_end;
+	//}
 }
 
 std::string::iterator ConfigParser::findServerEnd(std::string::iterator start, std::string::iterator& end){
@@ -50,6 +51,7 @@ std::string::iterator ConfigParser::findServerEnd(std::string::iterator start, s
 			return start - 1;
 		start++;
 	}
+	throw ConfigSyntaxException();
 	return end;
 }
 
