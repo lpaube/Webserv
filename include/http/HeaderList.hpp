@@ -1,25 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Header.hpp                                         :+:      :+:    :+:   */
+/*   HeaderList.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/31 16:38:07 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/05/31 16:54:02 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/05/31 19:48:00 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/05/31 20:04:18 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include "Header.hpp"
+#include <map>
 #include <string>
 
 namespace http
 {
-class Header
+class HeaderList
 {
-    std::string name;
-    std::string value;
+public:
+    typedef std::map<std::string, std::string>::const_iterator const_iterator;
+
+public:
+    void add(const Header& header);
+    HeaderList::const_iterator get(const std::string& name) const;
+
+private:
+    std::map<std::string, std::string> headers_;
 };
 
 } // namespace http

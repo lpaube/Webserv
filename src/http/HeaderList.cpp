@@ -1,27 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Method.hpp                                         :+:      :+:    :+:   */
+/*   HeaderList.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/31 15:23:54 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/05/31 16:58:40 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/05/31 19:50:17 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/05/31 20:40:27 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
-
-#include <string>
+#include "http/HeaderList.hpp"
 
 namespace http
 {
-enum Method {
-    GET,
-    POST,
-    DELETE,
-};
+void HeaderList::add(const Header& header)
+{
+    headers_.insert(std::make_pair(header.name(), header.value()));
+}
 
-const std::string& method_str(Method);
-
+HeaderList::const_iterator HeaderList::get(const std::string& name) const
+{
+    return headers_.find(name);
+}
 } // namespace http
