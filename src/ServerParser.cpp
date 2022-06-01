@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ServerParser.cpp                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/01 10:47:58 by mafortin          #+#    #+#             */
+/*   Updated: 2022/06/01 12:54:37 by mafortin         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/ServerParser.hpp"
 #include <iostream>
 
@@ -14,10 +26,6 @@ void	ServerParser::buildContent(){
 			server_content.push_back(add);
 			start = current + 1;
 			current = start;
-		}
-		else if (*current == "l")
-		{
-			
 		}
 		else
 			current++;

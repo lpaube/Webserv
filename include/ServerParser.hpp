@@ -13,6 +13,7 @@
 #pragma once
 #include <string>
 #include "LocationContent.hpp"
+
 class ServerParser{
 	public:
 		ServerParser(std::string::iterator beg, std::string::iterator end);

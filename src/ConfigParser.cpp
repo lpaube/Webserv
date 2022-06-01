@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:08:15 by mafortin          #+#    #+#             */
-/*   Updated: 2022/05/31 23:46:22 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/01 10:49:12 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,5 @@ const char* ConfigParser::ConfigFileException::what() const throw(){
 const char* ConfigParser::ConfigSyntaxException::what() const throw(){
 				return ("Error: Syntax error in config file\n");
 }
+
 ConfigParser::~ConfigParser(){}
-
-
