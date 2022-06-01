@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:48:00 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/01 02:05:52 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/01 02:29:54 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ public:
 
 public:
     void add(const Header& header);
-    const_iterator get(const std::string& name) const;
+    const_iterator get(std::string name) const;
     const_iterator begin() const;
     const_iterator end() const;
 
