@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Query.hpp                                          :+:      :+:    :+:   */
+/*   QueryParam.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 17:24:45 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/05/31 22:16:47 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/01 01:24:38 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 
 namespace http
 {
-class Query
+class QueryParam
 {
 public:
     class Exception : public ExceptionBase
@@ -28,7 +28,7 @@ public:
     };
 
 public:
-    Query(const std::string& param);
+    QueryParam(const std::string& param);
 
 public:
     const std::string& name() const;

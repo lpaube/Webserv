@@ -6,14 +6,14 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:09 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/01 00:42:03 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/01 01:24:59 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http/Request.hpp"
 #include "Utils.hpp"
 #include "http/Method.hpp"
-#include "http/Query.hpp"
+#include "http/QueryParam.hpp"
 #include <iostream>
 #include <sstream>
 

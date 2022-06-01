@@ -6,12 +6,12 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 20:29:05 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/01 00:31:06 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/01 01:27:37 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http/QueryMap.hpp"
-#include "http/Query.hpp"
+#include "http/QueryParam.hpp"
 #include "Utils.hpp"
 
 namespace http
@@ -27,11 +27,11 @@ QueryMap::QueryMap(std::string query_str)
     }
 
     while (query_str.find('&') != std::string::npos) {
-        Query query = Query(get_next_word(query_str, "&"));
-        params_.insert(std::make_pair(query.name(), query.value()));
+        QueryParam param = QueryParam(get_next_word(query_str, "&"));
+        params_[param.name()] = param.value();
     }
-    Query query = Query(query_str);
-    params_.insert(std::make_pair(query.name(), query.value()));
+    QueryParam param = QueryParam(query_str);
+    params_[param.name()] = param.value();
 }
 
 
