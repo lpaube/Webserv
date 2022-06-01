@@ -1,6 +1,6 @@
 
-server{    super;          
-	listen 10.23.45:54
+server{    
+
 }
 
 server{

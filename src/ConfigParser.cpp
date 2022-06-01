@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:08:15 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/01 14:46:57 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/01 16:32:11 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,10 @@ ConfigParser::ConfigParser(std::string config_file){
 	this->file_content = getContent(file);
 	file.close();
 	createConfig();
+	for(unsigned int i = 0; i < this->nb_server; i++){
+		this->serverparser[i].printContent();
+	}
+	
 }
 
 void	ConfigParser::createConfig(){

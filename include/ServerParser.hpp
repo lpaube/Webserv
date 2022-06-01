@@ -18,8 +18,21 @@ class ServerParser{
 	public:
 		ServerParser(std::string::iterator beg, std::string::iterator end);
 		~ServerParser(){};
+		void	printContent() const;
+		class NoSepException : public std::exception{
+			public:
+				virtual const char* what() const throw();
+		};
+		class SyntaxException : public std::exception{
+			public:
+				virtual const char* what() const throw();
+		};
 	private:
-		void	buildContent();
+		void		buildContent();
+		void		buildLocation();
+		std::size_t	findLocStart(std::size_t i);
+		std::size_t	findLocEnd(std::size_t i, std::size_t end);
+
 		std::vector<std::string> server_content;
 		std::vector<LocationContent>	location;
 		std::string	str_content;
