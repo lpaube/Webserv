@@ -1,30 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   QueryList.hpp                                      :+:      :+:    :+:   */
+/*   HeaderList.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/31 20:12:05 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/05/31 22:36:19 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/05/31 19:50:17 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/06/01 00:30:52 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
-
-#include <map>
-#include <string>
+#include "http/HeaderMap.hpp"
 
 namespace http
 {
-class QueryList
+void HeaderMap::add(const Header& header)
 {
-public:
-    QueryList();
-    QueryList(std::string query_str);
+    headers_.insert(std::make_pair(header.name(), header.value()));
+}
 
-private:
-    std::map<std::string, std::string> params_;
-};
+HeaderMap::const_iterator HeaderMap::get(const std::string& name) const
+{
+    return headers_.find(name);
+}
+
+
+HeaderMap::const_iterator HeaderMap::begin() const
+{
+    return headers_.begin();
+}
+
+
+HeaderMap::const_iterator HeaderMap::end() const
+{
+    return headers_.end();
+}
 
 } // namespace http

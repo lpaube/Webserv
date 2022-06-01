@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:48:00 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/05/31 20:04:18 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/01 00:30:38 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,20 @@
 #include <map>
 #include <string>
 
+#define CONTENT_LENGTH_HEADER "Content-Length"
+
 namespace http
 {
-class HeaderList
+class HeaderMap
 {
 public:
     typedef std::map<std::string, std::string>::const_iterator const_iterator;
 
 public:
     void add(const Header& header);
-    HeaderList::const_iterator get(const std::string& name) const;
+    const_iterator get(const std::string& name) const;
+    const_iterator begin() const;
+    const_iterator end() const;
 
 private:
     std::map<std::string, std::string> headers_;

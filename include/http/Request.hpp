@@ -6,16 +6,17 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:19:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/05/31 22:21:01 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/01 00:31:17 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #include "ExceptionBase.hpp"
-#include "HeaderList.hpp"
+#include "HeaderMap.hpp"
 #include "Method.hpp"
-#include "QueryList.hpp"
+#include "QueryMap.hpp"
+#include <unistd.h>
 
 namespace http
 {
@@ -31,12 +32,17 @@ public:
 public:
     Request(std::string request_str);
 
+public:
+    ssize_t content_length() const;
+    void set_body(const std::string& body);
+    void print() const;
+
 private:
     Method method_;
     std::string path_;
-    QueryList query_;
+    QueryMap query_;
     std::string http_version_;
-    HeaderList headers_;
+    HeaderMap headers_;
     std::string body_;
 };
 
