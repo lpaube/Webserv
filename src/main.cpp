@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:21:49 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/05/31 16:36:40 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/05/31 20:10:21 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,18 @@
 #include <sys/_types/_ssize_t.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include "../include/ConfigParser.hpp"
 
-int main()
+int main(int argc, char **argv)
 {
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (argc != 2)
+	{
+		std::cout << "Error, program argument\n" << std::endl;
+		return 1;
+	}
+	std::string	config_file(argv[1]);
+	ConfigParser config_parser(config_file);
+   /* int sock = socket(AF_INET, SOCK_STREAM, 0);
 
     struct sockaddr_in servaddr;
 
@@ -58,5 +66,5 @@ int main()
         snprintf(buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nHello World Rust is the best language ever made");
         write(connfd, buff, strlen(buff));
         close(connfd);
-    }
+    }*/
 }
