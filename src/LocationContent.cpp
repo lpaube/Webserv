@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   LocationContent.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/30 16:51:00 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/02 16:05:49 by mafortin         ###   ########.fr       */
+/*   Created: 2022/06/01 19:12:14 by mafortin          #+#    #+#             */
+/*   Updated: 2022/06/02 13:44:53 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
+#include "LocationContent.hpp"
+#include "Utils.hpp"
+LocationContent::LocationContent(){
 
-class Server
-{
-};
+}

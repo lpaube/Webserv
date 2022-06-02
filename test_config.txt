@@ -1,0 +1,22 @@
+<<<<<<< HEAD
+=======
+
+server{
+	listen 10.25.143.36;
+	location test/{
+		content1;
+		content2;
+		content3;
+	}
+	location test2/super/coucou{
+		content3;
+	}
+	test 1234;
+}
+
+>>>>>>> config_parsing
+server{
+	listen 10.23.45:54;
+  server_name testing;
+  ffff;
+}

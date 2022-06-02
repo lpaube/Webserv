@@ -3,16 +3,53 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:40:28 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/01 15:31:19 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/02 16:05:35 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Utils.hpp"
 #include <algorithm>
 #include <ctype.h>
+#include <vector>
+#include <string>
+
+bool	vectorize_content(std::vector<std::string>& content, std::string& content_str){
+	std::string::iterator start = content_str.begin();
+	std::string::iterator end = content_str.end();
+	std::string::iterator current = start;
+
+	while (start != end){
+		while (*start > 0 && *start < 33)
+			start++;
+		current = start;
+		if (start != end){
+			while(*current != ';'){
+				if (current == end)
+					return false;
+				current++;
+			}
+			std::string add(start, current);
+			content.push_back(trim_white_spaces(add));
+			start = current + 1;
+			}
+	}
+	return true;
+}
+
+std::string	trim_white_spaces(std::string str){
+	std::string::iterator start = str.begin();
+	std::string::iterator end = str.end();
+
+	while (*start > 0 && *start < 33)
+		++start;
+	while (*end > 0 && *end < 33)
+		--end;
+	std::string ret(start, end);
+	return ret;
+}
 
 std::string trim(const std::string& str, char sep)
 {
