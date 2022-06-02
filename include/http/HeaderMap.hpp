@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:48:00 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/01 02:29:54 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/02 11:29:05 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <string>
 
 #define CONTENT_LENGTH_HEADER "content-length"
+#define TRANSFER_ENCODING_HEADER "transfer-encoding"
 
 namespace http
 {

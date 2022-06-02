@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:09 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/01 02:05:30 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/02 11:52:45 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,8 @@ Request::Exception::Exception(const char* msg) : ExceptionBase(msg)
 {
 }
 
-Request::Request(std::string request_str) : method_(BAD_METHOD), content_length_(0)
+Request::Request(std::string request_str)
+    : method_(BAD_METHOD), content_length_(0), is_chunked_(false)
 {
     std::string request_line = get_next_word(request_str, "\r\n");
     std::string str = get_next_word(request_line, " ");
@@ -84,6 +85,8 @@ void Request::parse_header(const Header& header)
 {
     if (header.name() == CONTENT_LENGTH_HEADER) {
         parse_content_length(header.value());
+    } else if (header.name() == TRANSFER_ENCODING_HEADER) {
+        parse_transfer_encoding(header.value());
     }
 }
 
@@ -98,6 +101,14 @@ void Request::parse_content_length(const std::string& value)
         throw Exception(msg.c_str());
     }
     content_length_ = size;
+}
+
+void Request::parse_transfer_encoding(std::string value)
+{
+    to_lower(value);
+    if (value == "chunked") {
+        is_chunked_ = true;
+    }
 }
 
 } // namespace http

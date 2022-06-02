@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:21:49 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/01 15:01:57 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/02 11:26:58 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,15 @@
 #include <cstdlib>
 #include <cstring>
 #include <exception>
+#include <fcntl.h>
 #include <iostream>
 #include <netinet/in.h>
 #include <string>
 #include <strings.h>
-#include <sys/socket.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/time.h>
 #include <sys/errno.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <unistd.h>
 
 #include "http/Request.hpp"
 
@@ -40,7 +40,11 @@ int main()
     int res = bind(sock, (struct sockaddr*)&servaddr, sizeof(servaddr));
     (void)res;
 
-    // fcntl(sock, O_NONBLOCK);
+    int enable = 1;
+    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable));
+    setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(enable));
+
+    // fcntl(sock, F_SETFL, O_NONBLOCK);
 
     listen(sock, 10);
 
@@ -64,7 +68,9 @@ int main()
         while ((n = read(connfd, buff, 10)) > 0) {
             buff[n] = 0;
             req_str.append(buff);
+            std::cout << buff;
 
+            // Handle chunked requests
             if (req_str.find("\r\n\r\n") != std::string::npos) {
                 break;
             }
