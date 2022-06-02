@@ -1,21 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Response.hpp                                       :+:      :+:    :+:   */
+/*   ExceptionBase.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/31 15:22:23 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/05/31 16:54:47 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/05/31 22:02:26 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/05/31 22:05:45 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
+#include "ExceptionBase.hpp"
+#include <cstring>
 
-namespace http
+ExceptionBase::ExceptionBase(const char* msg)
 {
-class Response
-{
-};
+    strncpy(msg_, msg, MSG_SIZE);
+    msg_[MSG_SIZE - 1] = 0;
+}
 
-} // namespace
+const char* ExceptionBase::what() const throw()
+{
+    return msg_;
+}

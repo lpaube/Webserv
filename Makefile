@@ -27,7 +27,7 @@ $(OBJ_DIR)/%.o:	%.cpp
 	$(CXX) $(CXXFLAGS) -I$(INC_DIR) -c -o $@ $<
 
 $(NAME):		$(OBJ_DIR) $(OBJS)
-	$(CXX) $(OBJS) -o $(NAME)
+	$(CXX) -o $(NAME) $(OBJS)
 
 $(OBJ_DIR):
 	@$(MKDIR) $(OBJ_DIR)
