@@ -19,6 +19,7 @@ class ServerParser{
 		ServerParser(std::string::iterator beg, std::string::iterator end);
 		~ServerParser(){};
 		void	printContent() const;
+		void	printLocation() const;
 		class NoSepException : public std::exception{
 			public:
 				virtual const char* what() const throw();
@@ -36,4 +37,5 @@ class ServerParser{
 		std::vector<std::string> server_content;
 		std::vector<LocationContent>	location;
 		std::string	str_content;
+		int								nb_location;
 };
