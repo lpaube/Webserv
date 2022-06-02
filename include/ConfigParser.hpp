@@ -16,7 +16,6 @@
 #include <map>
 #include <ServerParser.hpp>
 
-
 class ConfigParser
 {
 public:
@@ -35,8 +34,10 @@ private:
 	std::string					getContent(std::fstream& file);
 	std::string					file_content;
 	void						createConfig();
-	std::vector<ServerParser>	serverparser;
 	unsigned int				nb_server;
 	void findServerStart(std::string::iterator& start);
 	std::string::iterator findServerEnd(std::string::iterator start, std::string::iterator end);
+
+public:
+	std::vector<ServerParser>	serverparser;
 };

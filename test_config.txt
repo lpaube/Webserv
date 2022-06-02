@@ -1,8 +1,5 @@
-
-server{    super;          
-	listen 10.23.45:54
-}
-
 server{
-	a;
+	listen 10.23.45:54;
+  server_name testing;
+  ffff;
 }
