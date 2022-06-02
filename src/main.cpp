@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../include/ConfigParser.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -23,7 +24,6 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <unistd.h>
-#include "../include/ConfigParser.hpp"
 
 #include "http/Request.hpp"
 
@@ -38,22 +38,19 @@ std::string first_line(std::string& str)
     return line;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-	if (argc != 2)
-	{
-		std::cout << "Error, program argument\n" << std::endl;
-		return 1;
-	}
-	std::string	config_file(argv[1]);
-	ConfigParser config_parser(config_file);
+    if (argc != 2) {
+        std::cout << "Error, program argument\n" << std::endl;
+        return 1;
+    }
+    std::string config_file(argv[1]);
+    ConfigParser config_parser(config_file);
 
-  config_parser.serverparser[0].generate_fake_config();
-  Config fake_config = config_parser.serverparser[0].config;
-  fake_config.print_config();
+    config_parser.serverparser[0].generate_fake_config();
+    Config fake_config = config_parser.serverparser[0].config;
+    fake_config.print_config();
 
-
-  
     int sock = socket(AF_INET, SOCK_STREAM, 0);
 
     struct sockaddr_in servaddr;

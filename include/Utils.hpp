@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:37:34 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/02 16:06:00 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/02 17:21:07 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,9 @@
 
 #include <string>
 
-std::string trim(const std::string& str, char sep);
+#define WHITESPACE "\t\n\v\f\r "
+
+std::string trim(const std::string& str, const std::string& sep);
 std::string get_next_word(std::string& str, const std::string& sep);
 void to_lower(std::string& str);
-std::string	trim_white_spaces(std::string str);
-bool	vectorize_content(std::vector<std::string>& content, std::string& content_str);
+bool vectorize_content(std::vector<std::string>& content, std::string& content_str);

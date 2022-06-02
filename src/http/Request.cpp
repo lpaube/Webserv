@@ -20,12 +20,15 @@
 namespace http
 {
 
-Request::Exception::Exception(const char* msg) : ExceptionBase(msg)
+Request::Exception::Exception(const char* msg)
+    : ExceptionBase(msg)
 {
 }
 
 Request::Request(const RequestLine& request_line, std::string request_str)
-    : request_line_(request_line), content_length_(0), is_chunked_(false)
+    : request_line_(request_line),
+      content_length_(0),
+      is_chunked_(false)
 {
     std::string::size_type pos;
     while ((pos = request_str.find("\r\n")) != std::string::npos) {

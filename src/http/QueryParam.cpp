@@ -16,7 +16,8 @@
 namespace http
 {
 
-QueryParam::Exception::Exception(const char* msg) : ExceptionBase(msg)
+QueryParam::Exception::Exception(const char* msg)
+    : ExceptionBase(msg)
 {
 }
 
