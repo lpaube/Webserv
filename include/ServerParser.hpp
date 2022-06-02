@@ -21,7 +21,7 @@ class Config
     struct Listen
     {
       std::string address;
-      std::string port;
+      int port;
     };
 
     struct Error_page
