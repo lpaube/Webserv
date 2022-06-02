@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/01 10:47:58 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/01 19:46:29 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/02 13:59:01 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,17 +20,25 @@
 ServerParser::ServerParser(std::string::iterator beg, std::string::iterator end) : str_content(beg, end){
 	nb_location = 0;
 	buildLocation();
-	buildContent();
-	printContent();
-	printLocation();
+	for (unsigned long i = 0; i < static_cast<unsigned long>(this->nb_location); i++){
+		std::string line = this->location[i].loc_content_str;
+		vectorize_content(this->location[i].loc_content, line);
+	}
+	if (vectorize_content(this->server_content, str_content) == false)
+		throw NoSepException();
+	//DEBUGING SERVER/LOCATION PARSER
+	//printContent();
+	//printLocation();
 }
 
 void	ServerParser::printLocation() const{
-	int size = location.size();
+	unsigned long size = location.size();
 	std::cout << "PRINTING LOCATION CONTENT\n"; 
-	for (int i = 0; i < size; i++){
-		std::cout << i;
-		std::cout << location[static_cast<unsigned long>(i)].loc_content_str << std::endl;
+	for (unsigned long i = 0; i < size; i++){
+		std::cout << "LOCATION : " << location[i].path << '\n';
+		for(unsigned long j = 0; j < location[i].loc_content.size(); j++){
+			std::cout << location[i].loc_content[j] << '\n';
+		}
 	}
 }
 void	ServerParser::printContent() const{
@@ -79,8 +87,9 @@ void	ServerParser::buildLocation(){
 	std::size_t end = str_content.length();
 	while (i != end){
 		i = findLocStart(i);
-		if (i == std::string::npos)
+		if (i == std::string::npos){
 			return ;
+		}
 		scope_end = findLocEnd(i, end);
 		this->location[static_cast<unsigned long>(nb_location - 1)].loc_content_str = str_content.substr(i, scope_end - i);
 		i = str_content.find("location");
@@ -88,9 +97,6 @@ void	ServerParser::buildLocation(){
 		i = 0;
 		end = str_content.length();
 	}
-
-
-
 }
 
 void	ServerParser::buildContent(){
