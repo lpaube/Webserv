@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:21:49 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/02 11:26:58 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/02 15:05:46 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,17 @@
 #include <unistd.h>
 
 #include "http/Request.hpp"
+
+std::string first_line(std::string& str)
+{
+    std::string::size_type pos = str.find("\r\n");
+    if (pos == std::string::npos) {
+        return "";
+    }
+    std::string line = str.substr(0, pos + 2);
+    str.erase(0, pos + 2);
+    return line;
+}
 
 int main()
 {
@@ -61,19 +72,29 @@ int main()
         setsockopt(connfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
         // fcntl(connfd, O_NONBLOCK);
 
-        char buff[2049] = {};
-        ssize_t n;
+        // Read request line
+        char buff[http::RequestLine::MAX_REQUEST_LINE_SIZE + 1] = {};
+        ssize_t n = read(connfd, buff, http::RequestLine::MAX_REQUEST_LINE_SIZE);
+        if (n == -1) {
+            // error or timeout
+            exit(1);
+        }
+        buff[n] = 0;
 
-        std::string req_str;
-        while ((n = read(connfd, buff, 10)) > 0) {
+        std::string raw_str(buff);
+        std::string line = first_line(raw_str);
+        http::RequestLine request_line;
+        try {
+            request_line = http::RequestLine(line);
+        } catch (std::exception& ex) {
+            std::cerr << ex.what() << std::endl;
+        }
+
+        // Read headers
+        while (raw_str.find("\r\n\r\n") == std::string::npos &&
+               (n = read(connfd, buff, http::RequestLine::MAX_REQUEST_LINE_SIZE)) > 0) {
             buff[n] = 0;
-            req_str.append(buff);
-            std::cout << buff;
-
-            // Handle chunked requests
-            if (req_str.find("\r\n\r\n") != std::string::npos) {
-                break;
-            }
+            raw_str.append(buff);
         }
 
         if (n == -1) {
@@ -83,18 +104,25 @@ int main()
         }
 
         try {
-            http::Request request(req_str);
+            http::Request request(request_line, raw_str);
 
-            req_str.erase(0, req_str.find("\r\n\r\n") + 4);
+            raw_str.erase(0, raw_str.find("\r\n\r\n") + 4);
+
+            // TODO: handle chunked request
             ssize_t bytes_left = request.content_length();
-            bytes_left -= (ssize_t)req_str.length();
+            bytes_left -= (ssize_t)raw_str.length();
+
+            // read body
             while (bytes_left > 0 &&
-                   (n = read(connfd, buff, bytes_left < 10 ? (size_t)bytes_left : 10)) > 0) {
+                   (n = read(connfd, buff,
+                             (std::size_t)bytes_left < http::RequestLine::MAX_REQUEST_LINE_SIZE
+                                 ? (std::size_t)bytes_left
+                                 : http::RequestLine::MAX_REQUEST_LINE_SIZE)) > 0) {
                 bytes_left -= n;
                 buff[n] = 0;
-                req_str.append(buff);
+                raw_str.append(buff);
             }
-            request.set_body(req_str);
+            request.set_body(raw_str);
             request.print();
         } catch (std::exception& ex) {
             std::cerr << ex.what() << std::endl;

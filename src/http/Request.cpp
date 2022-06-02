@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:09 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/02 11:52:45 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/02 13:20:46 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,26 +24,9 @@ Request::Exception::Exception(const char* msg) : ExceptionBase(msg)
 {
 }
 
-Request::Request(std::string request_str)
-    : method_(BAD_METHOD), content_length_(0), is_chunked_(false)
+Request::Request(const RequestLine& request_line, std::string request_str)
+    : request_line_(request_line), content_length_(0), is_chunked_(false)
 {
-    std::string request_line = get_next_word(request_str, "\r\n");
-    std::string str = get_next_word(request_line, " ");
-
-    method_ = method_from_str(str);
-    if (method_ == BAD_METHOD) {
-        std::string msg = "Bad http method: '" + str + "'";
-        throw Exception(msg.c_str());
-    }
-    str = get_next_word(request_line, "?");
-    if (!str.empty()) {
-        path_ = str;
-        query_ = QueryMap(get_next_word(request_line, " "));
-    } else {
-        path_ = get_next_word(request_line, " ");
-    }
-    http_version_ = request_line;
-
     std::string::size_type pos;
     while ((pos = request_str.find("\r\n")) != std::string::npos) {
         if (pos == 0) {
@@ -67,11 +50,12 @@ void Request::set_body(const std::string& body)
 
 void Request::print() const
 {
-    std::cout << "Method: " << method_str(method_) << '\n';
-    std::cout << "Path: " << path_ << '\n';
-    std::cout << "Http version: " << http_version_ << '\n';
+    std::cout << "Method: " << method_str(request_line_.method()) << '\n';
+    std::cout << "Path: " << request_line_.path() << '\n';
+    std::cout << "Http version: " << request_line_.http_version() << '\n';
     std::cout << "Query params: \n";
-    for (QueryMap::const_iterator it = query_.begin(); it != query_.end(); ++it) {
+    for (QueryMap::const_iterator it = request_line_.query().begin();
+         it != request_line_.query().end(); ++it) {
         std::cout << '\t' << it->first << " = " << it->second << '\n';
     }
     std::cout << "Headers: \n";

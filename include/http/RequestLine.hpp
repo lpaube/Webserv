@@ -1,26 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Request.hpp                                        :+:      :+:    :+:   */
+/*   RequestLine.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/30 16:19:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/02 13:14:58 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/06/02 12:59:13 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/06/02 14:28:10 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #include "ExceptionBase.hpp"
-#include "HeaderMap.hpp"
-#include "RequestLine.hpp"
-#include <unistd.h>
+#include "Method.hpp"
+#include "QueryMap.hpp"
+#include <cstddef>
+#include <string>
+
+#define SUPPORTED_HTTP_VERSION "HTTP/1.1"
 
 namespace http
 {
-class Request
+class RequestLine
 {
+public:
+    static const std::size_t MAX_REQUEST_LINE_SIZE = 1024 * 8;
+
 public:
     class Exception : public ExceptionBase
     {
@@ -29,24 +35,20 @@ public:
     };
 
 public:
-    Request(const RequestLine& request_line, std::string request_str);
+    RequestLine();
+    RequestLine(std::string request_str);
 
 public:
-    ssize_t content_length() const;
-    void set_body(const std::string& body);
-    void print() const;
+    Method method() const;
+    const std::string& path() const;
+    const QueryMap& query() const;
+    const std::string& http_version() const;
 
 private:
-    void parse_header(const Header& header);
-    void parse_content_length(const std::string& value);
-    void parse_transfer_encoding(std::string value);
-
-private:
-    RequestLine request_line_;
-    HeaderMap headers_;
-    std::string body_;
-    ssize_t content_length_;
-    bool is_chunked_;
+    Method method_;
+    std::string path_;
+    QueryMap query_;
+    std::string http_version_;
 };
 
 } // namespace http
