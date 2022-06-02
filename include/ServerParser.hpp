@@ -154,6 +154,7 @@ class ServerParser{
 
 		void	printContent() const;
 		void	printLocation() const;
+    void  generate_fake_config();
 		class NoSepException : public std::exception{
 			public:
 				virtual const char* what() const throw();
