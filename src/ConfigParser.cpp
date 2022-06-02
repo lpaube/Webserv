@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:08:15 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/01 14:46:57 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/01 19:43:21 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,8 @@ void	ConfigParser::createConfig(){
 std::string::iterator ConfigParser::findServerEnd(std::string::iterator start, std::string::iterator end){
 	bool	open = false;
 	while (start != end){
+		if (*start == '{' && open == true)
+			throw ConfigSyntaxException();
 		if (*start == '{')
 			open = true;
 		else if (*start == '}' && open == true)

@@ -152,92 +152,28 @@ class ServerParser{
 		ServerParser(std::string::iterator beg, std::string::iterator end);
 		~ServerParser(){};
 
-    /*
-     * Parsing of vector server_content
-     */
-    void parse_config_vars()
-    {
-      std::vector<std::string>::iterator beg_ite = server_content.begin();
-      std::vector<std::string>::iterator end_ite = server_content.end();
-      for (; beg_ite != end_ite; ++beg_ite)
-      {
-        std::string directive = (beg_ite->substr(0, beg_ite->find(" ")));
-        if (directive == "listen")
-        {
-          std::cout << "Listen!" << std::endl;
-        }
-        else if (directive == "server_name")
-          std::cout << "SERVER_NAME!" << std::endl;
-        else
-          std::cout << "Nothing!" << std::endl;
-      }
-    }
-
-    void generate_fake_config()
-    {
-      // listen
-      config.listen.address = "127.0.0.1";
-      config.listen.port = "8000";
-
-      // server_name
-      config.server_name.push_back("example.com");
-      config.server_name.push_back("www.example.com");
-
-      // error_page
-      Config::Error_page error_page1;
-      error_page1.code.push_back(404);
-      error_page1.code.push_back(442);
-      error_page1.uri = "/40x.html";
-
-      Config::Error_page error_page2;
-      error_page2.code.push_back(505);
-      error_page2.code.push_back(506);
-      error_page2.uri = "/50x.html";
-
-      config.error_page.push_back(error_page1);
-      config.error_page.push_back(error_page2);
-
-      // client_max_body_size
-      config.client_max_body_size = 8000000;
-
-      // limit_except
-      config.limit_except.push_back("GET");
-      config.limit_except.push_back("POST");
-
-      // return
-      config.return_redirect.code = 404;
-      config.return_redirect.url = "/error404";
-
-      // root
-      config.root = "/data/w5";
-
-      // autoindex
-      config.autoindex = true;
-
-      // index
-      config.index.push_back("index");
-      config.index.push_back("index.html");
-
-      // cgi_ext
-      Config::Cgi_ext cgi_ext1;
-      cgi_ext1.extension = ".php";
-      cgi_ext1.bin_path = "/usr/bin/php";
-
-      Config::Cgi_ext cgi_ext2;
-      cgi_ext2.extension = ".py";
-      cgi_ext2.bin_path = "/usr/bin/python";
-
-      config.cgi_ext.push_back(cgi_ext1);
-      config.cgi_ext.push_back(cgi_ext2);
-    }
-
+		void	printContent() const;
+		void	printLocation() const;
+		class NoSepException : public std::exception{
+			public:
+				virtual const char* what() const throw();
+		};
+		class SyntaxException : public std::exception{
+			public:
+				virtual const char* what() const throw();
+		};
 	private:
-		void	buildContent();
+		void		buildContent();
+		void		buildLocation();
+		std::size_t	findLocStart(std::size_t i);
+		std::size_t	findLocEnd(std::size_t i, std::size_t end);
+
 		std::vector<std::string> server_content;
 		std::vector<LocationContent>	location;
 		std::string	str_content;
 
   public:
     Config config;
+		int								nb_location;
 };
 
