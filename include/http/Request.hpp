@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:19:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/02 13:14:58 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/02 20:38:22 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,14 +35,13 @@ public:
     ssize_t content_length() const;
     void set_body(const std::string& body);
     void print() const;
-
+	RequestLine request_line_;
 private:
     void parse_header(const Header& header);
     void parse_content_length(const std::string& value);
     void parse_transfer_encoding(std::string value);
 
 private:
-    RequestLine request_line_;
     HeaderMap headers_;
     std::string body_;
     ssize_t content_length_;
