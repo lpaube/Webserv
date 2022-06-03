@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParser.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:07:03 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/02 17:13:40 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/03 11:43:34 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,21 +19,14 @@
 class ConfigParser
 {
 public:
+	class Exception : public ExceptionBase
+	{
+    	public:
+        Exception(const char* msg);
+    };
+public:
     ConfigParser(std::string config_file);
     ~ConfigParser();
-
-    class ConfigFileException : public std::exception
-    {
-    public:
-        virtual const char* what() const throw();
-    };
-
-    class ConfigSyntaxException : public std::exception
-    {
-    public:
-        virtual const char* what() const throw();
-    };
-
 private:
     std::string getContent(std::fstream& file);
     void createConfig();

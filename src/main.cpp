@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:21:49 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/02 16:07:39 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/03 11:41:42 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,7 @@ int main(int argc, char** argv)
         }
 
         snprintf(buff, sizeof(buff),
-                 "HTTP/1.0 200 OK\r\n\r\n<h1>Hello World Rust is the best language ever made</h1>");
+                 "HTTP/1.0 200 OK\r\n\r\n<h1>Hello World, Rust is NOT the best language ever made. It's over rated</h1>");
         write(connfd, buff, std::strlen(buff));
         close(connfd);
     }

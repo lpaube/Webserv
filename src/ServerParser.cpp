@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerParser.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/01 10:47:58 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/02 17:21:47 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/03 11:39:01 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,11 @@
 #include "Utils.hpp"
 #include <iostream>
 #include <string>
+
+ServerParser::Exception::Exception(const char* msg)
+    : ExceptionBase(msg)
+{
+}
 
 ServerParser::ServerParser(std::string::iterator beg, std::string::iterator end)
     : str_content(beg, end)
@@ -27,7 +32,7 @@ ServerParser::ServerParser(std::string::iterator beg, std::string::iterator end)
         vectorize_content(this->location[i].loc_content, line);
     }
     if (vectorize_content(this->server_content, str_content) == false)
-        throw NoSepException();
+        throw Exception("Error: No ';' found after value\n");
     // DEBUGING SERVER/LOCATION PARSER
     // printContent();
     // printLocation();
@@ -71,7 +76,7 @@ std::size_t ServerParser::findLocStart(std::size_t i)
     while (str_content[i] > 0 && str_content[i] < 33)
         i++;
     if (str_content[i] != '{')
-        throw SyntaxException();
+        throw Exception("Error: Syntax error in config file\n");
     i++;
     return i;
 }
@@ -80,12 +85,12 @@ std::size_t ServerParser::findLocEnd(std::size_t i, std::size_t end)
 {
     while (i != end) {
         if (this->str_content[i] == '{')
-            throw SyntaxException();
+            throw Exception("Error: Syntax error in config file\n");
         if (this->str_content[i] == '}')
             return i - 1;
         i++;
     }
-    throw SyntaxException();
+   throw Exception("Error: Syntax error in config file\n");
 }
 
 void ServerParser::buildLocation()
@@ -121,7 +126,7 @@ void ServerParser::buildContent()
         if (start != end) {
             while (*current != ';') {
                 if (current == end)
-                    throw NoSepException();
+                    throw Exception("Error: No ';' found after value\n");
                 current++;
             }
             std::string add(start, current);
@@ -190,14 +195,4 @@ void ServerParser::generate_fake_config()
 
     config.cgi_ext.push_back(cgi_ext1);
     config.cgi_ext.push_back(cgi_ext2);
-}
-
-const char* ServerParser::NoSepException::what() const throw()
-{
-    return ("Error: No ';' found after value\n");
-}
-
-const char* ServerParser::SyntaxException::what() const throw()
-{
-    return ("Error: Syntax error in config file\n");
 }

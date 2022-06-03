@@ -15,9 +15,16 @@
 #include "ExceptionBase.hpp"
 #include <iostream>
 #include <string>
+#include "ExceptionBase.hpp"
 
 class Config
 {
+public:
+	class Exception : public ExceptionBase
+	{
+    	public:
+        Exception(const char* msg);
+    };
 public:
     struct Listen {
         std::string address;
@@ -132,6 +139,12 @@ public:
 
 class ServerParser
 {
+	public:
+	class Exception : public ExceptionBase
+	{
+    	public:
+        Exception(const char* msg);
+    };
 public:
     ServerParser(std::string::iterator beg, std::string::iterator end);
     ~ServerParser(){};
@@ -139,18 +152,6 @@ public:
     void printContent() const;
     void printLocation() const;
     void generate_fake_config();
-
-    class NoSepException : public std::exception
-    {
-    public:
-        virtual const char* what() const throw();
-    };
-
-    class SyntaxException : public std::exception
-    {
-    public:
-        virtual const char* what() const throw();
-    };
 
 private:
     void buildContent();

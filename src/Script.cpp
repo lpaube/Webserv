@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:08 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/02 21:18:18 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/03 14:56:19 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,17 +14,48 @@
 #include <string>
 #include "http/RequestLine.hpp"
 #include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
-Script::Script(Config& config, http::Request& request, int fd_in, int fd_out) : fd_in(fd_in), fd_out(fd_out){
+Script::Exception::Exception(const char* msg)
+    : ExceptionBase(msg)
+{
+}
+
+Script::Script(Config& config, http::Request& request) {
 	(void)this->envp;
-	(void)this->cmd;
-	(void)this->fd_in;
-	(void)this->fd_out;
+	this->cmd = new char *[3];
 	http::RequestLine	requestline = request.requestLine();
 	build_cmd(requestline.path(), config);
 }
 
-std::string get_ext(std::string path){
+Script::~Script(){
+	delete[] cmd;
+}
+
+void	Script::exec() const{
+	pid_t	id;
+	int		status;
+	int		save[2];
+	save[0] = dup(STDIN_FILENO);
+	save[1] = dup(STDOUT_FILENO);
+	dup2(fd[1], STDOUT_FILENO);
+	dup2(fd[0], STDIN_FILENO);
+	pipe((int *)fd);
+	id = fork();
+	if (id < 0)
+		throw Exception("Error fatal, fork");
+	if (id == 0){
+		execve(cmd[0], cmd, envp);
+		throw Exception("Error fatal, execve");
+	}
+	else
+		waitpid(id, &status, 0);
+	//READ
+}
+
+std::string Script::get_ext(std::string& path){
 	unsigned long	len = path.length();
 	unsigned long	save = 0;
 	unsigned long	i = 0;
@@ -40,8 +71,8 @@ std::string get_ext(std::string path){
 		else
 			save++;
 	}
-	//if (save == len)
-		//throw NomDexception
+	if (save == len)
+		throw Exception("Error: No script extention found");
 	save++;
 	ext = path.substr(save);
 	return ext;
@@ -60,8 +91,9 @@ void Script::build_cmd(std::string path, Config& config){
 		}
 		i++;
 	}
-	//if (found == false)
-		//throw Exception;
+	std::string msg = "Error: script extension ." + path_ext;
+	if (found == false)
+		throw Exception(msg.c_str());
 	this->cmd = new char *[3];
 	this->cmd[0] = strncpy(this->cmd[0], config.cgi_ext[i].bin_path.c_str(), config.cgi_ext[i].bin_path.length());
 	std::cout << this->cmd[0] << std::endl;
