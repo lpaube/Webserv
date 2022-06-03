@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:01 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/02 20:36:29 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/02 21:07:15 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,6 @@ class Script
 		char	**cmd;
 		int		fd_in;
 		int		fd_out;
+	private:
+		void build_cmd(std::string path, Config& config);
 };
-
-char	**build_cmd(std::string path, Config& config);
