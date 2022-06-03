@@ -12,6 +12,7 @@
 
 #pragma once
 #include "LocationContent.hpp"
+#include <cstdint>
 #include <iostream>
 #include <string>
 
@@ -20,7 +21,7 @@ class Config
 public:
     struct Listen {
         std::string address;
-        std::string port;
+        uint16_t port;
     };
 
     struct Error_page {

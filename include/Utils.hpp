@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:37:34 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/02 17:21:07 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/03 18:37:54 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,3 +20,10 @@ std::string trim(const std::string& str, const std::string& sep);
 std::string get_next_word(std::string& str, const std::string& sep);
 void to_lower(std::string& str);
 bool vectorize_content(std::vector<std::string>& content, std::string& content_str);
+
+template <typename Exception>
+void exception_errno(std::string msg)
+{
+    msg.append(strerror(errno));
+    throw Exception(msg.c_str());
+}
