@@ -6,14 +6,13 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:09 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/02 13:20:46 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/03 16:42:28 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http/Request.hpp"
 #include "Utils.hpp"
 #include "http/Method.hpp"
-#include "http/QueryParam.hpp"
 #include <iostream>
 #include <sstream>
 
@@ -56,11 +55,7 @@ void Request::print() const
     std::cout << "Method: " << method_str(request_line_.method()) << '\n';
     std::cout << "Path: " << request_line_.path() << '\n';
     std::cout << "Http version: " << request_line_.http_version() << '\n';
-    std::cout << "Query params: \n";
-    for (QueryMap::const_iterator it = request_line_.query().begin();
-         it != request_line_.query().end(); ++it) {
-        std::cout << '\t' << it->first << " = " << it->second << '\n';
-    }
+    std::cout << "Query string: " << request_line_.query() << '\n';
     std::cout << "Headers: \n";
     for (HeaderMap::const_iterator it = headers_.begin(); it != headers_.end(); ++it) {
         std::cout << '\t' << it->first << ": " << it->second << '\n';

@@ -6,12 +6,13 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 13:06:08 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/02 14:33:23 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/03 16:42:25 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http/RequestLine.hpp"
 #include "Utils.hpp"
+#include <algorithm>
 
 namespace http
 {
@@ -38,7 +39,7 @@ RequestLine::RequestLine(std::string request_str)
     word = get_next_word(request_str, "?");
     if (!word.empty()) {
         path_ = word;
-        query_ = QueryMap(get_next_word(request_str, " "));
+        query_str_ = get_next_word(request_str, " ");
     } else {
         path_ = get_next_word(request_str, " ");
     }
@@ -63,9 +64,9 @@ const std::string& RequestLine::path() const
     return path_;
 }
 
-const QueryMap& RequestLine::query() const
+const std::string& RequestLine::query() const
 {
-    return query_;
+    return query_str_;
 }
 
 const std::string& RequestLine::http_version() const

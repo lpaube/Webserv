@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 12:59:13 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/02 14:28:10 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/03 16:42:19 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 #include "ExceptionBase.hpp"
 #include "Method.hpp"
-#include "QueryMap.hpp"
 #include <cstddef>
 #include <string>
 
@@ -41,13 +40,13 @@ public:
 public:
     Method method() const;
     const std::string& path() const;
-    const QueryMap& query() const;
+    const std::string& query() const;
     const std::string& http_version() const;
 
 private:
     Method method_;
     std::string path_;
-    QueryMap query_;
+    std::string query_str_;
     std::string http_version_;
 };
 
