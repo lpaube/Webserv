@@ -6,20 +6,21 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:08 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/02 20:39:25 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/02 20:45:19 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Script.hpp"
 #include <string>
-
+#include "http/RequestLine.hpp"
 
 Script::Script(Config& config, http::Request& request, int fd_in, int fd_out) : fd_in(fd_in), fd_out(fd_out){
 	(void)this->envp;
 	(void)this->cmd;
 	(void)this->fd_in;
 	(void)this->fd_out;
-	this->cmd = build_cmd(request.request_line_.path(), config);
+	http::RequestLine	requestline = request.requestLine();
+	this->cmd = build_cmd(requestline.path(), config);
 }
 
 std::string get_ext(std::string path){

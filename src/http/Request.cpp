@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:09 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/02 13:20:46 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/02 20:45:00 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,10 @@ void Request::print() const
         std::cout << '\t' << it->first << ": " << it->second << '\n';
     }
     std::cout << "Body: " << body_ << std::endl;
+}
+
+RequestLine&	Request::requestLine() {
+	return this->request_line_;
 }
 
 void Request::parse_header(const Header& header)
