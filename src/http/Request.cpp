@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:09 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/04 11:34:57 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/04 15:16:13 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,12 @@ void Request::print() const
     std::cout << "Body: " << body_ << std::endl;
 }
 
-RequestLine&	Request::requestLine() {
+
+std::string&	Request::body() {
+	return this->body_;
+}
+
+RequestLine&	Request::requestLine(){
 	return this->request_line_;
 }
 

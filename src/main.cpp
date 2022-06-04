@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:21:49 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/03 11:41:42 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/04 16:18:55 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,9 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <unistd.h>
-
+#include "Script.hpp"
 #include "http/Request.hpp"
+#include "Utils.hpp"
 
 std::string first_line(std::string& str)
 {
@@ -140,11 +141,18 @@ int main(int argc, char** argv)
             std::cerr << ex.what() << std::endl;
         }
 
+		//SCRIPT EXEC
+		/*if (request_line.path().find("/cgi-bin/") == true)
+		{
+			Script script(fake_config, http::request);
+			std::cout << "SCRIPT RESULT" << script.exec() << std::endl;
+		}*/
+		
         snprintf(buff, sizeof(buff),
                  "HTTP/1.0 200 OK\r\n\r\n<h1>Hello World, Rust is NOT the best language ever made. It's over rated</h1>");
         write(connfd, buff, std::strlen(buff));
         close(connfd);
-    }
+	}
 
     close(sock);
 }

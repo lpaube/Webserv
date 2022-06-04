@@ -6,13 +6,14 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:01 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/03 14:24:26 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/04 16:00:34 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 #include "ServerParser.hpp"
 #include "http/Request.hpp"
+#include "http/Method.hpp"
 #include "ExceptionBase.hpp"
 
 class Script
@@ -26,11 +27,11 @@ class Script
 	public:
 		Script(Config& config,  http::Request& request);
 		~Script();
-		void	exec() const;
+		std::string	exec() const;
 	private:
 		char	**envp;
 		char	**cmd;
-		int		fd[2];
+		http::Request& request;
 	private:
 		void build_cmd(std::string path, Config& config);
 		std::string get_ext(std::string& path);

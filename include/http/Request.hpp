@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:19:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/03 11:14:56 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/04 15:16:19 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,10 +33,11 @@ public:
     Request(const RequestLine& request_line, std::string request_str);
 
 public:
+	std::string&	body();
+	RequestLine& requestLine();
     ssize_t content_length() const;
     void set_body(const std::string& body);
     void print() const;
-	RequestLine& requestLine();
 private:
     void parse_header(const Header& header);
     void parse_content_length(const std::string& value);

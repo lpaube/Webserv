@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:08 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/03 14:56:19 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/04 16:19:49 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,16 +17,19 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include "Utils.hpp"
+
+#define BUFFER_SIZE 50
 
 Script::Exception::Exception(const char* msg)
     : ExceptionBase(msg)
 {
 }
 
-Script::Script(Config& config, http::Request& request) {
+Script::Script(Config& config, http::Request& request) : request(request){
 	(void)this->envp;
 	this->cmd = new char *[3];
-	http::RequestLine	requestline = request.requestLine();
+	http::RequestLine	requestline = this->request.requestLine();
 	build_cmd(requestline.path(), config);
 }
 
@@ -34,15 +37,29 @@ Script::~Script(){
 	delete[] cmd;
 }
 
-void	Script::exec() const{
-	pid_t	id;
-	int		status;
-	int		save[2];
+std::string	Script::exec() const{
+	pid_t		id;
+	int			status;
+	int			save[2];
+	int			pipe_fd[2];
+	int			read_fd[2];
+
+	http::RequestLine request_line = this->request.requestLine();
+	http::Method method = request_line.method();
+
 	save[0] = dup(STDIN_FILENO);
 	save[1] = dup(STDOUT_FILENO);
-	dup2(fd[1], STDOUT_FILENO);
-	dup2(fd[0], STDIN_FILENO);
-	pipe((int *)fd);
+	pipe(pipe_fd);
+	dup2(pipe_fd[1], STDOUT_FILENO);
+
+	if (method == http::POST){
+		pipe(read_fd);
+		putstr_fd(this->request.body(), static_cast<std::size_t>(read_fd[1]));
+		close(read_fd[1]);
+		dup2(read_fd[0], STDIN_FILENO);
+		putstr_fd(this->request.body(), static_cast<std::size_t>(pipe_fd[0]));
+	}
+
 	id = fork();
 	if (id < 0)
 		throw Exception("Error fatal, fork");
@@ -52,7 +69,22 @@ void	Script::exec() const{
 	}
 	else
 		waitpid(id, &status, 0);
-	//READ
+	close (pipe_fd[1]);
+	if (method == http::POST){
+		dup2(STDIN_FILENO, save[0]);
+		close(read_fd[0]);
+	}
+	dup2(STDOUT_FILENO, save[1]);
+	char buf[BUFFER_SIZE];
+	std::string	script_ret;
+	int	ret = 1;
+	while (ret > 0){
+		ret = read(pipe_fd[0], buf, BUFFER_SIZE - 2);
+		buf[BUFFER_SIZE - 1] = 0;
+		script_ret.append(buf);
+	}
+	close(pipe_fd[0]);
+	return script_ret;
 }
 
 std::string Script::get_ext(std::string& path){
