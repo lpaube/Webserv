@@ -12,8 +12,8 @@
 
 #pragma once
 #include "LocationContent.hpp"
-#include <stdint.h>
 #include <iostream>
+#include <stdint.h>
 #include <string>
 
 class Config

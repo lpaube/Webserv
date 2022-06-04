@@ -16,13 +16,11 @@
 
 namespace http
 {
-RequestLine::Exception::Exception(const char* msg)
-    : ExceptionBase(msg)
+RequestLine::Exception::Exception(const char* msg) : ExceptionBase(msg)
 {
 }
 
-RequestLine::RequestLine()
-    : method_(BAD_METHOD)
+RequestLine::RequestLine() : method_(BAD_METHOD)
 {
 }
 

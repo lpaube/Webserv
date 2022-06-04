@@ -12,10 +12,10 @@
 
 #pragma once
 
-#include <vector>
-#include <string>
 #include <cstring>
+#include <string>
 #include <sys/errno.h>
+#include <vector>
 
 #define WHITESPACE "\t\n\v\f\r "
 

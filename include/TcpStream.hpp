@@ -1,26 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Client.hpp                                         :+:      :+:    :+:   */
+/*   TcpStream.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/03 22:44:04 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/03 23:54:08 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/06/03 20:13:55 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/06/04 18:29:51 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #include "ExceptionBase.hpp"
-#include <sys/socket.h>
+#include "Socket.hpp"
+#include <netinet/in.h>
 #include <vector>
 
-class Client
+class TcpStream : public Socket
 {
-public:
-    typedef std::vector<char>::const_iterator data_iter;
-
 public:
     class Exception : public ExceptionBase
     {
@@ -29,27 +27,23 @@ public:
     };
 
 public:
-    Client();
-    ~Client();
+    TcpStream(in_addr address, uint16_t port);
 
 public:
+    bool operator==(const TcpStream& rhs) const;
     bool operator==(int fd) const;
 
 public:
-    void accept(int server_fd, timeval timeout);
-    int fd() const;
-    data_iter data_begin() const;
-    data_iter data_end() const;
-    template <typename Iter>
-    void append_data(Iter first, Iter last)
-    {
-        data_.insert(data_.end(), first, last);
-    }
+    virtual void init();
+
+public:
+    void bind();
+    void listen();
+    // Port in host byte order
+    uint16_t port() const;
+    in_addr address() const;
 
 private:
-    int fd_;
-    sockaddr addr_;
-    socklen_t addrlen_;
-    bool is_init_;
-    std::vector<char> data_;
+    in_addr addr_;
+    uint16_t port_;
 };

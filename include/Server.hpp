@@ -12,10 +12,10 @@
 
 #pragma once
 
+#include "Client.hpp"
 #include "ExceptionBase.hpp"
 #include "ServerParser.hpp"
 #include "Socket.hpp"
-#include "Client.hpp"
 #include <poll.h>
 #include <vector>
 
