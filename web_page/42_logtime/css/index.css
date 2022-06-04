@@ -1,0 +1,42 @@
+
+
+body {
+	background-image: url(../background.jpg);
+	align-content: center;
+}
+
+
+
+
+  h1.header {
+	font-family: "Futura-bold";
+	color: white;
+	font-size: 4em;
+	text-align: center;
+	padding-top: 0.25em;
+  }
+  
+  .box1 {
+	vertical-align: middle;
+	width: 11%;
+	height: 2.75em;
+	background-color: #00babc;
+	text-align: center;
+	padding-left: 6%;
+	padding-top: 1px;
+	padding-right: 6%;
+	padding-bottom: 23px;
+	margin: auto;
+  }
+  
+  /*overflow: hidden; hides "content here" text as you squeeze down the window—set box heights to "auto" and remove overflow hidden as you add content*/
+  
+  p {
+	font-family: futura-bold;
+	color: white;
+	font-size: 1.45em;
+	text-align: center;
+	vertical-align: middle;
+  }
+  
+
