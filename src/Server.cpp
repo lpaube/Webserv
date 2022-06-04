@@ -6,26 +6,28 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/03 18:49:25 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/03 23:57:08 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+#include "Client.hpp"
 #include "Utils.hpp"
 #include "http/Request.hpp"
+#include <algorithm>
 #include <arpa/inet.h>
+#include <cstdio>
 #include <sys/errno.h>
 #include <sys/time.h>
 #include <unistd.h>
 
-Server::Exception::Exception(const char* msg)
-    : ExceptionBase(msg)
+Server::Exception::Exception(const char* msg) : ExceptionBase(msg)
 {
 }
 
 void Server::configure(const std::vector<Config>& blocks)
 {
-    sockets_ = SocketArray();
+    sockets_.clear();
 
     if (blocks.empty()) {
         throw Exception("No server configuration");
@@ -39,76 +41,98 @@ void Server::configure(const std::vector<Config>& blocks)
             throw Exception(msg.c_str());
         }
 
-        if (sockets_.find_match(it->listen.port, address) != sockets_.end()) {
-            sockets_.add(it->listen.port, address);
+        if (std::find(sockets_.begin(), sockets_.end(), Socket(it->listen.port, address)) ==
+            sockets_.end()) {
+
+            sockets_.push_back(Socket(it->listen.port, address));
+            Socket& socket = sockets_.back();
+            socket.init();
+            socket.bind();
+            socket.listen();
+
+            pollfd pfd = {};
+            pfd.fd = socket.fd();
+            pfd.events = POLLIN;
+            pfds_.push_back(pfd);
         }
     }
-}
-
-static std::string first_line(std::string& str)
-{
-    std::string::size_type pos = str.find("\r\n");
-    if (pos == std::string::npos) {
-        return "";
-    }
-    std::string line = str.substr(0, pos + 2);
-    str.erase(0, pos + 2);
-    return line;
 }
 
 void Server::run()
 {
     while (true) {
-        int presult = poll(sockets_.pfd_array(), sockets_.pfd_size(), POLL_TIMEOUT);
+        int presult = poll(pfds_.data(), pfds_.size(), POLL_TIMEOUT);
         if (presult == -1) {
             exception_errno<Exception>("Error while polling sockets: ");
         }
 
-        for (SocketArray::poll_iterator it = sockets_.pfd_begin(); it != sockets_.pfd_end(); ++it) {
+        std::vector<int> to_add;
+        std::vector<int> to_remove;
+        for (std::vector<pollfd>::const_iterator it = pfds_.begin(); it != pfds_.end(); ++it) {
             if (it->revents & POLLIN) {
-                sockaddr_in addr;
-                socklen_t addrlen;
-                int conn_fd = accept(it->fd, reinterpret_cast<sockaddr*>(&addr), &addrlen);
-                if (conn_fd == -1) {
-                    std::cerr << "Connection error: " << strerror(errno) << std::endl;
-                }
+                if (is_host(it->fd)) {
+                    timeval timeout = {};
+                    timeout.tv_sec = CONNECTION_TIMEOUT;
 
-                timeval timeout = {};
-                timeout.tv_sec = CONNECTION_TIMEOUT;
-                if (setsockopt(conn_fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) == -1) {
-                    exception_errno<Exception>("Error while setting socket timeout: ");
-                }
+                    clients_.push_back(Client());
+                    Client& client = clients_.back();
 
-                char buf[http::RequestLine::MAX_REQUEST_LINE_SIZE + 1];
-                ssize_t bytes = read(conn_fd, buf, http::RequestLine::MAX_REQUEST_LINE_SIZE);
-                if (bytes == -1) {
-                    std::cerr << "Error reading socket" << std::endl;
-                    continue;
-                }
-                buf[bytes] = 0;
+                    try {
+                        client.accept(it->fd, timeout);
+                    } catch (const std::exception& ex) {
+                        clients_.pop_back();
+                        std::cerr << ex.what() << std::endl;
+                        continue;
+                    }
 
-                std::string raw_req(buf);
-                std::string line = first_line(raw_req);
-                http::RequestLine request_line;
-                try {
-                    request_line = http::RequestLine(raw_req);
-                } catch (std::exception& ex) {
-                    std::cerr << ex.what() << std::endl;
-                    continue;
-                }
+                    to_add.push_back(client.fd());
+                } else {
+                    char buf[BUFFER_SIZE];
+                    ssize_t nbytes = recv(it->fd, buf, BUFFER_SIZE, 0);
+                    if (nbytes <= 0) {
+                        if (nbytes == 0) {
+                            std::cerr << "Connection closed: socket " << it->fd << std::endl;
+                        } else {
+                            perror("recv");
+                        }
 
-                // Read headers
-                while (raw_req.find("\r\n\r\n") == std::string::npos &&
-                       (bytes = read(conn_fd, buf, http::RequestLine::MAX_REQUEST_LINE_SIZE)) > 0) {
-                    buf[bytes] = 0;
-                    raw_req.append(buf);
-                }
+                        close(it->fd);
+                        to_remove.push_back(it->fd);
+                    }
 
-                if (bytes == -1) {
-                    std::cerr << "Error reading socket" << std::endl;
-                    continue;
+                    std::vector<Client>::iterator client_it =
+                        std::find(clients_.begin(), clients_.end(), it->fd);
+
+                    if (client_it == clients_.end()) {
+                        // Should never happen
+                        std::cerr << "Couldn't find client" << std::endl;
+                        continue;
+                    }
+
+                    client_it->append_data(buf, buf + BUFFER_SIZE);
+                }
+            } else if (it->revents & POLLOUT) {
+            }
+        }
+
+        for (std::vector<int>::const_iterator it = to_remove.begin(); it != to_remove.end(); ++it) {
+            for (std::vector<pollfd>::iterator pit = pfds_.begin(); pit != pfds_.end(); ++pit) {
+                if (pit->fd == *it) {
+                    pfds_.erase(pit);
+                    break;
                 }
             }
         }
+        for (std::vector<int>::const_iterator it = to_add.begin(); it != to_add.end(); ++it) {
+            pollfd pfd = {};
+            pfd.fd = *it;
+            pfd.events = POLLIN | POLLOUT;
+            pfds_.push_back(pfd);
+        }
     }
+}
+
+bool Server::is_host(int fd) const
+{
+    return std::find(sockets_.begin(), sockets_.end(), fd) != sockets_.end();
 }

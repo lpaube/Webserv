@@ -6,13 +6,16 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:37:34 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/03 18:37:54 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/03 21:36:37 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include <vector>
 #include <string>
+#include <cstring>
+#include <sys/errno.h>
 
 #define WHITESPACE "\t\n\v\f\r "
 

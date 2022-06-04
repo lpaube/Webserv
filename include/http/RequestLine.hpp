@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 12:59:13 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/03 16:42:19 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/03 22:16:34 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,6 @@ namespace http
 {
 class RequestLine
 {
-public:
-    static const std::size_t MAX_REQUEST_LINE_SIZE = 1024 * 8;
-
 public:
     class Exception : public ExceptionBase
     {

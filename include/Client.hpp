@@ -1,30 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/30 16:51:00 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/03 23:02:34 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/06/03 22:44:04 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/06/03 23:54:08 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #include "ExceptionBase.hpp"
-#include "ServerParser.hpp"
-#include "Socket.hpp"
-#include "Client.hpp"
-#include <poll.h>
+#include <sys/socket.h>
 #include <vector>
 
-class Server
+class Client
 {
 public:
-    static const int POLL_TIMEOUT = 10000;
-    static const int CONNECTION_TIMEOUT = 20;
-    static const size_t BUFFER_SIZE = 1024 * 4;
+    typedef std::vector<char>::const_iterator data_iter;
 
 public:
     class Exception : public ExceptionBase
@@ -34,14 +29,27 @@ public:
     };
 
 public:
-    void configure(const std::vector<Config>& blocks);
-    void run();
+    Client();
+    ~Client();
+
+public:
+    bool operator==(int fd) const;
+
+public:
+    void accept(int server_fd, timeval timeout);
+    int fd() const;
+    data_iter data_begin() const;
+    data_iter data_end() const;
+    template <typename Iter>
+    void append_data(Iter first, Iter last)
+    {
+        data_.insert(data_.end(), first, last);
+    }
 
 private:
-    bool is_host(int fd) const;
-
-private:
-    std::vector<Socket> sockets_;
-    std::vector<Client> clients_;
-    std::vector<pollfd> pfds_;
+    int fd_;
+    sockaddr addr_;
+    socklen_t addrlen_;
+    bool is_init_;
+    std::vector<char> data_;
 };

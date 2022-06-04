@@ -12,7 +12,7 @@
 
 #pragma once
 #include "LocationContent.hpp"
-#include <cstdint>
+#include <stdint.h>
 #include <iostream>
 #include <string>
 

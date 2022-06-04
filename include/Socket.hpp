@@ -1,30 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/30 16:51:00 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/03 23:02:34 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/06/03 20:13:55 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/06/03 23:49:10 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #include "ExceptionBase.hpp"
-#include "ServerParser.hpp"
-#include "Socket.hpp"
-#include "Client.hpp"
-#include <poll.h>
+#include <netinet/in.h>
 #include <vector>
 
-class Server
+class Socket
 {
 public:
-    static const int POLL_TIMEOUT = 10000;
-    static const int CONNECTION_TIMEOUT = 20;
-    static const size_t BUFFER_SIZE = 1024 * 4;
+    typedef std::vector<char>::size_type size_type;
 
 public:
     class Exception : public ExceptionBase
@@ -34,14 +29,28 @@ public:
     };
 
 public:
-    void configure(const std::vector<Config>& blocks);
-    void run();
+    Socket(uint16_t port, in_addr address);
+    ~Socket();
+
+public:
+    bool operator==(const Socket& rhs) const;
+    bool operator==(int fd) const;
+
+public:
+    void init();
+    void bind();
+    void listen();
+    int fd() const;
+    // Port in host byte order
+    uint16_t port() const;
+    in_addr address() const;
 
 private:
-    bool is_host(int fd) const;
+    void check_init() const;
 
 private:
-    std::vector<Socket> sockets_;
-    std::vector<Client> clients_;
-    std::vector<pollfd> pfds_;
+    int fd_;
+    uint16_t port_;
+    in_addr addr_;
+    bool is_init_;
 };

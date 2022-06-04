@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParser.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:08:15 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/01 19:43:21 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/03 21:37:46 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ ConfigParser::ConfigParser(std::string config_file)
     std::fstream file;
     min_server = false;
     nb_server = 0;
-    file.open(config_file, std::fstream::in);
+    file.open(config_file.c_str(), std::fstream::in);
     if (file.is_open() == false)
         throw ConfigFileException();
     this->file_content = getContent(file);
