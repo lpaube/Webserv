@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:37:34 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/02 17:21:07 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/04 11:32:56 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #include <string>
+#include <vector>
 
 #define WHITESPACE "\t\n\v\f\r "
 

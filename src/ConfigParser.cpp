@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:08:15 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/01 19:43:21 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/04 11:32:22 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ ConfigParser::ConfigParser(std::string config_file)
     std::fstream file;
     min_server = false;
     nb_server = 0;
-    file.open(config_file, std::fstream::in);
+    file.open(config_file.c_str(), std::fstream::in);
     if (file.is_open() == false)
         throw ConfigFileException();
     this->file_content = getContent(file);
