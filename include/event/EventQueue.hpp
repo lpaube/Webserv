@@ -1,50 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Socket.hpp                                         :+:      :+:    :+:   */
+/*   EventQueue.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/04 18:14:57 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/04 20:32:21 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/06/04 19:05:05 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/06/04 19:12:52 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "ExceptionBase.hpp"
+#include "Event.hpp"
+#include <queue>
 
-enum SocketType
-{
-    TCP_STREAM,
-    CONNECTION
-};
-
-class Socket
+class EventQueue
 {
 public:
-    class Exception : public ExceptionBase
-    {
-    public:
-        Exception(const char* msg);
-    };
+    typedef std::queue<Event*>::reference reference;
 
 public:
-    Socket();
-    virtual ~Socket();
+    ~EventQueue();
 
 public:
-    virtual void init() = 0;
-    virtual SocketType type() const = 0;
+    reference front();
+    void pop();
+    void push(Event* event);
 
-public:
-    int fd() const;
-    bool is_init() const;
-
-protected:
-    void check_init() const;
-
-protected:
-    int fd_;
-    bool is_init_;
+private:
+    std::queue<Event*> events_;
 };

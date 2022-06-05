@@ -6,13 +6,15 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 18:10:03 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/04 18:36:37 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/04 21:07:59 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Connection.hpp"
 #include "Utils.hpp"
 #include <unistd.h>
+
+#include <iostream>
 
 Connection::Connection(int host_fd, timeval timeout)
     : Socket(), host_fd_(host_fd), timeout_(timeout)
@@ -32,7 +34,17 @@ void Connection::init()
     }
 }
 
+SocketType Connection::type() const
+{
+    return CONNECTION;
+}
+
 int Connection::host_fd() const
 {
     return host_fd_;
+}
+
+void Connection::print_data(){
+    buf_.push_back(0);
+    std::cout << buf_.data() << std::endl;
 }

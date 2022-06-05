@@ -1,50 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Socket.hpp                                         :+:      :+:    :+:   */
+/*   Event.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/04 18:14:57 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/04 20:32:21 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/06/04 18:40:57 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/06/04 19:17:19 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "ExceptionBase.hpp"
+#include "Socket.hpp"
 
-enum SocketType
+enum EventType
 {
-    TCP_STREAM,
-    CONNECTION
+    TCP_STREAM_EVENT,
+    CONNECTION_EVENT
 };
 
-class Socket
+class Event
 {
 public:
-    class Exception : public ExceptionBase
-    {
-    public:
-        Exception(const char* msg);
-    };
+    Event(const Socket* socket, bool read);
+    virtual ~Event();
 
 public:
-    Socket();
-    virtual ~Socket();
+    virtual EventType type() const = 0;
 
 public:
-    virtual void init() = 0;
-    virtual SocketType type() const = 0;
-
-public:
-    int fd() const;
-    bool is_init() const;
+    const Socket* data() const;
+    bool is_read() const;
 
 protected:
-    void check_init() const;
-
-protected:
-    int fd_;
-    bool is_init_;
+    const Socket* socket_;
+    bool is_read_;
 };

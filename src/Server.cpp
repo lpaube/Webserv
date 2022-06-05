@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/03 23:57:08 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/04 21:22:23 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,3 +136,137 @@ bool Server::is_host(int fd) const
 {
     return std::find(sockets_.begin(), sockets_.end(), fd) != sockets_.end();
 }
+
+// int main()
+// {
+//     SocketArray sockets;
+//     std::vector<pollfd> pfds;
+
+//     TcpStream* stream;
+//     in_addr addr;
+//     try {
+//         addr.s_addr = inet_addr("127.0.0.1");
+//         stream = new TcpStream(addr, 8000);
+//         stream->init();
+//         stream->bind();
+//         stream->listen();
+//         sockets.add(stream);
+//         addr.s_addr = inet_addr("127.0.0.1");
+//         stream = new TcpStream(addr, 9000);
+//         stream->init();
+//         stream->bind();
+//         stream->listen();
+//         sockets.add(stream);
+//         addr.s_addr = inet_addr("127.0.0.1");
+//         stream = new TcpStream(addr, 10000);
+//         stream->init();
+//         stream->bind();
+//         stream->listen();
+//         sockets.add(stream);
+//     } catch (const std::exception& ex) {
+//         std::cerr << ex.what() << std::endl;
+//         return 1;
+//     }
+
+//     for (SocketArray::iterator it = sockets.begin(); it != sockets.end(); ++it) {
+//         pollfd pfd;
+//         pfd.fd = (*it)->fd();
+//         pfd.events = POLLIN;
+//         pfd.revents = 0;
+//         pfds.push_back(pfd);
+//     }
+
+//     timeval timeout;
+//     timeout.tv_sec = 15000;
+//     timeout.tv_usec = 0;
+
+//     for (;;) {
+//         EventQueue events;
+
+//         int ready = poll(pfds.data(), pfds.size(), 10000);
+
+//         if (ready == -1) {
+//             perror("Poll");
+//             return 1;
+//         }
+
+//         std::vector<int> to_add;
+//         std::vector<int> to_erase;
+//         std::cout << "loop started" << std::endl;
+//         for (auto& it : pfds) {
+//             if (ready == 0) {
+//                 break;
+//             }
+
+//             bool found = false;
+
+//             if (it.revents & POLLIN) {
+//                 found = true;
+
+//                 SocketArray::iterator socket = sockets.find(it.fd);
+//                 if (socket == sockets.end()) {
+//                     std::cerr << "Did not find socket" << std::endl;
+//                     continue;
+//                 }
+
+//                 switch ((*socket)->type()) {
+//                     case TCP_STREAM: {
+//                         Connection* c = new Connection(it.fd, timeout);
+//                         // Maybe error
+//                         c->init();
+//                         sockets.add(c);
+//                         to_add.push_back(c->fd());
+//                         std::cout << "connection created" << std::endl;
+//                         break;
+//                     }
+//                     case CONNECTION: {
+//                         Connection& c = static_cast<Connection&>(**socket);
+//                         char buf[4096];
+//                         ssize_t bytes = recv(c.fd(), buf, 4096, 0);
+//                         c.append_data(buf, buf + 4096);
+//                         c.print_data();
+//                         std::cout << "data read" << std::endl;
+//                         break;
+//                     }
+//                 }
+//             } else if (it.revents & POLLOUT) {
+//                 found = true;
+
+//                 const char* msg = "HTTP/1.0 200 OK\r\n\r\n<h1>Hello World Rust is the best "
+//                                   "language ever made</h1>";
+//                 send(it.fd, msg, strlen(msg), 0);
+//                 to_erase.push_back(it.fd);
+//                 std::cout << "sent response" << std::endl;
+//             }
+
+//             if (found) {
+//                 --ready;
+//             }
+//         }
+
+//         for (std::vector<int>::const_iterator it = to_erase.begin(); it != to_erase.end(); ++it) {
+//             SocketArray::iterator socket = sockets.find(*it);
+//             if (socket == sockets.end()) {
+//                 std::cerr << "Can't find connection" << std::endl;
+//                 continue;
+//             }
+
+//             sockets.erase(socket);
+
+//             for (std::vector<pollfd>::iterator pfd = pfds.begin(); pfd != pfds.end(); ++pfd) {
+//                 if (pfd->fd == *it) {
+//                     pfds.erase(pfd);
+//                     break;
+//                 }
+//             }
+//         }
+
+//         for (std::vector<int>::const_iterator it = to_add.begin(); it != to_add.end(); ++it) {
+//             pollfd pfd = {};
+//             pfd.fd = *it;
+//             pfd.events = POLLIN | POLLOUT;
+//             pfd.revents = 0;
+//             pfds.push_back(pfd);
+//         }
+//     }
+// }

@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/03 20:13:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/04 18:29:51 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/04 20:03:13 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ public:
 
 public:
     virtual void init();
+    virtual SocketType type() const;
 
 public:
     void bind();

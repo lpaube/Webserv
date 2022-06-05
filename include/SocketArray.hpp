@@ -1,43 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Connection.hpp                                     :+:      :+:    :+:   */
+/*   SocketArray.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/04 16:47:12 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/04 21:07:49 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/06/04 20:07:13 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/06/04 20:54:08 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #include "Socket.hpp"
-#include <sys/socket.h>
 #include <vector>
 
-class Connection : public Socket
+class SocketArray
 {
 public:
-    Connection(int host_fd, timeval timeout);
+    typedef std::vector<Socket*>::iterator iterator;
 
 public:
-    virtual void init();
-    virtual SocketType type() const;
+    ~SocketArray();
 
 public:
-    template <typename DataIter>
-    void append_data(DataIter first, DataIter last)
-    {
-        buf_.insert(buf_.end(), first, last);
-    }
-    int host_fd() const;
-    void print_data();
+    void add(Socket* socket);
+    iterator find(int fd);
+    void erase(iterator pos);
+    iterator begin();
+    iterator end();
 
 private:
-    int host_fd_;
-    timeval timeout_;
-    sockaddr addr_;
-    socklen_t addrlen_;
-    std::vector<char> buf_;
+    std::vector<Socket*> sockets_;
 };

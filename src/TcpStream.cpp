@@ -6,15 +6,15 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/03 20:22:20 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/04 18:36:17 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/04 20:03:31 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "TcpStream.hpp"
 #include "Utils.hpp"
-#include <fcntl.h>
 #include <iostream>
 #include <unistd.h>
+#include <fcntl.h>
 
 TcpStream::Exception::Exception(const char* msg) : ExceptionBase(msg)
 {
@@ -36,7 +36,7 @@ bool TcpStream::operator==(int fd) const
 
 void TcpStream::init()
 {
-    if (is_init()) {
+        if (is_init()) {
         std::cout << "Socket already initialized" << std::endl;
         return;
     }
@@ -55,6 +55,11 @@ void TcpStream::init()
     if (setsockopt(fd(), SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable)) == -1) {
         exception_errno<Exception>("Error while setting address to reuse: ");
     }
+}
+
+SocketType TcpStream::type() const
+{
+    return TCP_STREAM;
 }
 
 void TcpStream::bind()
