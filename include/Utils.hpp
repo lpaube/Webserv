@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:37:34 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/03 21:36:37 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 07:46:12 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 #include <cstring>
 #include <string>
-#include <sys/errno.h>
+#include <cerrno>
 #include <vector>
 
 #define WHITESPACE "\t\n\v\f\r "

@@ -6,14 +6,14 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 18:10:03 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 06:26:45 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 08:38:48 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Connection.hpp"
 #include "Utils.hpp"
-#include <fcntl.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 Connection::Connection(const TcpStream* stream) : Socket(), stream_(stream)
 {
@@ -40,4 +40,11 @@ SocketType Connection::type() const
 int Connection::host_fd() const
 {
     return stream_->fd();
+}
+
+#include <iostream>
+void Connection::print()
+{
+    buf_.push_back(0);
+    std::cout << buf_.data() << std::endl;
 }

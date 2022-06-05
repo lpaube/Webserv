@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 16:47:12 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 06:26:34 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 08:13:10 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ public:
         buf_.insert(buf_.end(), first, last);
     }
     int host_fd() const;
+    void print();
 
 private:
     const TcpStream* stream_;

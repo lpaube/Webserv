@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:21:49 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 02:24:04 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 07:34:18 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,10 @@ int main(int argc, char** argv)
     fake_config.print_config();
 
     Server server;
+    std::vector<Config> configs;
+    configs.push_back(fake_config);
     try {
-        //    server.configure(const std::vector<Config> &blocks);
+        server.configure(configs);
         server.run();
     } catch (const std::exception& ex) {
         std::cerr << ex.what() << std::endl;

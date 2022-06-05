@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 06:53:54 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 08:39:02 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,8 +154,12 @@ void Server::process_event_queue()
                 break;
             }
             case event::CONNECTION_WRITE_EVENT: {
-                const Connection& c = static_cast<const Connection&>(*ev->data());
-                (void)c;
+                Connection& c = static_cast<Connection&>(*ev->data());
+                c.print();
+                const char* msg = "HTTP/1.0 200 OK\r\n\r\n<h1>Hello World Rust is the best "
+                                  "language ever made</h1>\r\n";
+                send(c.fd(), msg, strlen(msg), 0);
+                close_connection(c);
                 break;
             }
         }
@@ -189,27 +193,38 @@ void Server::receive_data(Connection& c)
     ssize_t total_read = 0;
     bool error = false;
 
-    do {
+    while (true) {
         ssize_t n = recv(c.fd(), buf, BUFFER_SIZE, 0);
+
+        if (n == 0) {
+            break;
+        }
 
         if (n < 0) {
             error = true;
             break;
         }
 
-        if (n == 0) {
-            break;
-        }
-
         total_read += n;
         c.append_data(buf, buf + n);
-    } while (!error);
+
+        if ((size_t)n < BUFFER_SIZE) {
+            break;
+        }
+    }
 
     if (error) {
         close_connection(c);
         return;
     }
 
+    // Client closed connection
+    if (total_read == 0) {
+        close_connection(c);
+        return;
+    }
+
+    // Request too big
     if (total_read > MAX_REQUEST_SIZE) {
         close_connection(c);
         return;
