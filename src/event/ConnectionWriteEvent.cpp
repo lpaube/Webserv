@@ -1,41 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Event.hpp                                          :+:      :+:    :+:   */
+/*   ConnectionWriteEvent.cpp                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/04 18:40:57 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 02:28:57 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/06/05 02:30:39 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/06/05 02:31:16 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
-
-#include "Socket.hpp"
+#include "event/ConnectionWriteEvent.hpp"
 
 namespace event
 {
-enum EventType
+ConnectionWriteEvent::ConnectionWriteEvent(const Socket* connection) : Event(connection)
 {
-    TCP_STREAM_EVENT,
-    CONNECTION_READ_EVENT,
-    CONNECTION_WRITE_EVENT
-};
+}
 
-class Event
+EventType ConnectionWriteEvent::type() const
 {
-public:
-    Event(const Socket* socket);
-    virtual ~Event();
+    return CONNECTION_WRITE_EVENT;
+}
 
-public:
-    virtual EventType type() const = 0;
-
-public:
-    const Socket* data() const;
-
-protected:
-    const Socket* socket_;
-};
 } // namespace event

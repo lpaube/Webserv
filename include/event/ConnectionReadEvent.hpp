@@ -1,41 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Event.hpp                                          :+:      :+:    :+:   */
+/*   ConnectionReadEvent.hpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/04 18:40:57 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 02:28:57 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/06/04 19:00:53 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/06/05 02:29:51 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include "Event.hpp"
 #include "Socket.hpp"
 
 namespace event
 {
-enum EventType
-{
-    TCP_STREAM_EVENT,
-    CONNECTION_READ_EVENT,
-    CONNECTION_WRITE_EVENT
-};
-
-class Event
+class ConnectionReadEvent : public Event
 {
 public:
-    Event(const Socket* socket);
-    virtual ~Event();
+    ConnectionReadEvent(const Socket* connection);
 
 public:
-    virtual EventType type() const = 0;
-
-public:
-    const Socket* data() const;
-
-protected:
-    const Socket* socket_;
+    virtual EventType type() const;
 };
+
 } // namespace event

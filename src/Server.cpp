@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 02:26:10 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 02:32:05 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 #include "Connection.hpp"
 #include "TcpStream.hpp"
 #include "Utils.hpp"
-#include "event/ConnectionEvent.hpp"
+#include "event/ConnectionReadEvent.hpp"
+#include "event/ConnectionWriteEvent.hpp"
 #include "event/TcpStreamEvent.hpp"
 #include "http/Request.hpp"
 #include <algorithm>
@@ -92,7 +93,7 @@ void Server::run()
             exception_errno<Exception>("Error while polling sockets: ");
         }
 
-        for (std::vector<pollfd>::iterator it = pfds_.begin(); it != pfds_.end(); ++it) {
+        for (std::vector<pollfd>::iterator it = pfds_.begin(); it != pfds_.end() && n_ready > 0; ++it) {
             if (n_ready == 0) {
                 break;
             }
@@ -118,14 +119,13 @@ void Server::run()
                         events_.push(new event::TcpStreamEvent(*socket));
                         break;
                     case CONNECTION:
-                        events_.push(new event::ConnectionEvent(*socket, true));
+                        events_.push(new event::ConnectionReadEvent(*socket));
                         break;
                 }
             }
             if (it->revents & POLLOUT) {
                 found = true;
-
-                events_.push(new event::ConnectionEvent(*socket, false));
+                events_.push(new event::ConnectionWriteEvent(*socket));
             }
 
             if (found) {

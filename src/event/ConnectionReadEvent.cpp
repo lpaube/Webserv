@@ -1,35 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ConnectionEvent.hpp                                :+:      :+:    :+:   */
+/*   ConnectionReadEvent.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/04 19:00:53 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 01:58:19 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/06/05 02:30:39 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/06/05 02:30:40 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
-
-#include "Event.hpp"
-#include "Socket.hpp"
+#include "event/ConnectionReadEvent.hpp"
 
 namespace event
 {
-class ConnectionEvent : public Event
+ConnectionReadEvent::ConnectionReadEvent(const Socket* connection)
+    : Event(connection)
 {
-public:
-    ConnectionEvent(const Socket* connection, bool read);
+}
 
-public:
-    virtual EventType type() const;
-
-public:
-    bool is_read() const;
-
-private:
-    bool is_read_;
-};
+EventType ConnectionReadEvent::type() const
+{
+    return CONNECTION_READ_EVENT;
+}
 
 } // namespace event
