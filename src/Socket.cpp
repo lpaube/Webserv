@@ -5,7 +5,7 @@ Socket::Exception::Exception(const char* msg) : ExceptionBase(msg)
 {
 }
 
-Socket::Socket() : is_init_(false)
+Socket::Socket() : is_init_(false), read_(true)
 {
 }
 
@@ -31,4 +31,14 @@ int Socket::fd() const
 bool Socket::is_init() const
 {
     return is_init_;
+}
+
+bool Socket::read() const
+{
+    return read_;
+}
+
+void Socket::set_write()
+{
+    read_ = false;
 }

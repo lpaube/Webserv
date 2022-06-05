@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 08:39:02 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 19:28:12 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ void Server::run()
                 // If there was an error, add POLLIN | POLLOUT to catch it in one of the handlers
                 it->revents |= POLLIN | POLLOUT;
             }
-            if (it->revents & (POLLIN | POLLRDHUP)) {
+            if ((it->revents & (POLLIN | POLLRDHUP)) && (*socket)->read()) {
                 found = true;
 
                 switch ((*socket)->type()) {
@@ -123,7 +123,7 @@ void Server::run()
                         break;
                 }
             }
-            if (it->revents & POLLOUT) {
+            if ((it->revents & POLLOUT) && !(*socket)->read()) {
                 found = true;
                 events_.push(new event::ConnectionWriteEvent(*socket));
             }
@@ -196,10 +196,6 @@ void Server::receive_data(Connection& c)
     while (true) {
         ssize_t n = recv(c.fd(), buf, BUFFER_SIZE, 0);
 
-        if (n == 0) {
-            break;
-        }
-
         if (n < 0) {
             error = true;
             break;
@@ -209,6 +205,7 @@ void Server::receive_data(Connection& c)
         c.append_data(buf, buf + n);
 
         if ((size_t)n < BUFFER_SIZE) {
+            c.set_write();
             break;
         }
     }
