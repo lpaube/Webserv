@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 18:10:03 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 00:58:16 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 03:56:31 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-Connection::Connection(int host_fd, timeval timeout)
-    : Socket(), host_fd_(host_fd), timeout_(timeout)
+Connection::Connection(int host_fd)
+    : Socket(), host_fd_(host_fd)
 {
 }
 
@@ -30,10 +30,6 @@ void Connection::init()
 
     if (fcntl(fd(), F_SETFL, O_NONBLOCK) == -1) {
         exception_errno<Exception>("Error while setting socket to non-blocking: ");
-    }
-
-    if (setsockopt(fd(), SOL_SOCKET, SO_RCVTIMEO, &timeout_, sizeof(timeout_)) == -1) {
-        exception_errno<Exception>("Error while setting timeout on connection: ");
     }
 }
 
