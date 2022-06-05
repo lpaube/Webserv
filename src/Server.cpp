@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 19:28:12 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 19:32:06 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,7 +204,7 @@ void Server::receive_data(Connection& c)
         total_read += n;
         c.append_data(buf, buf + n);
 
-        if ((size_t)n < BUFFER_SIZE) {
+        if ((size_t)n < BUFFER_SIZE || total_read > MAX_REQUEST_SIZE) {
             c.set_write();
             break;
         }
