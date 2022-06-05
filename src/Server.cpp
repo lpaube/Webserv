@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 06:33:05 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 06:53:54 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,8 @@ void Server::run()
             exception_errno<Exception>("Error while polling sockets: ");
         }
 
-        for (std::vector<pollfd>::iterator it = pfds_.begin(); it != pfds_.end() && n_ready > 0; ++it) {
+        for (std::vector<pollfd>::iterator it = pfds_.begin(); it != pfds_.end() && n_ready > 0;
+             ++it) {
             if (n_ready == 0) {
                 break;
             }
@@ -143,13 +144,13 @@ void Server::process_event_queue()
 
         switch (ev->type()) {
             case event::TCP_STREAM_EVENT: {
-                const TcpStream& s = static_cast<const TcpStream&>(*ev->data());
+                const TcpStream& s = static_cast<TcpStream&>(*ev->data());
                 accept_connection(s);
                 break;
             }
             case event::CONNECTION_READ_EVENT: {
-                const Connection& c = static_cast<const Connection&>(*ev->data());
-                (void)c;
+                Connection& c = static_cast<Connection&>(*ev->data());
+                receive_data(c);
                 break;
             }
             case event::CONNECTION_WRITE_EVENT: {
@@ -182,22 +183,53 @@ void Server::accept_connection(const TcpStream& stream)
     }
 }
 
-// void Server::poll_remove_closed_connections(const std::vector<int>& fds)
-// {
-//     for (std::vector<int>::const_iterator it = fds.begin(); it != fds.end(); ++it) {
-//         SocketArray::iterator socket = sockets_.find(*it);
-//         if (socket == sockets_.end()) {
-//             std::cerr << "Can't find connection" << std::endl;
-//             continue;
-//         }
+void Server::receive_data(Connection& c)
+{
+    char buf[BUFFER_SIZE];
+    ssize_t total_read = 0;
+    bool error = false;
 
-//         sockets_.erase(socket);
+    do {
+        ssize_t n = recv(c.fd(), buf, BUFFER_SIZE, 0);
 
-//         for (std::vector<pollfd>::iterator pfd = pfds_.begin(); pfd != pfds_.end(); ++pfd) {
-//             if (pfd->fd == *it) {
-//                 pfds_.erase(pfd);
-//                 break;
-//             }
-//         }
-//     }
-// }
+        if (n < 0) {
+            error = true;
+            break;
+        }
+
+        if (n == 0) {
+            break;
+        }
+
+        total_read += n;
+        c.append_data(buf, buf + n);
+    } while (!error);
+
+    if (error) {
+        close_connection(c);
+        return;
+    }
+
+    if (total_read > MAX_REQUEST_SIZE) {
+        close_connection(c);
+        return;
+    }
+}
+
+void Server::close_connection(Connection& c)
+{
+    SocketArray::iterator socket = sockets_.find(c.fd());
+    if (socket == sockets_.end()) {
+        std::cerr << "Can't find connection" << std::endl;
+        return;
+    }
+
+    for (std::vector<pollfd>::iterator pfd = pfds_.begin(); pfd != pfds_.end(); ++pfd) {
+        if (pfd->fd == c.fd()) {
+            pfds_.erase(pfd);
+            break;
+        }
+    }
+
+    sockets_.erase(socket);
+}

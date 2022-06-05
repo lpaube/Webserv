@@ -15,8 +15,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-Connection::Connection(const TcpStream* stream)
-    : Socket(), stream_(stream)
+Connection::Connection(const TcpStream* stream) : Socket(), stream_(stream)
 {
 }
 

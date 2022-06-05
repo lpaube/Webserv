@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 18:40:57 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 02:28:57 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 06:39:09 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,16 +26,16 @@ enum EventType
 class Event
 {
 public:
-    Event(const Socket* socket);
+    Event(Socket* socket);
     virtual ~Event();
 
 public:
     virtual EventType type() const = 0;
 
 public:
-    const Socket* data() const;
+    Socket* data();
 
 protected:
-    const Socket* socket_;
+    Socket* socket_;
 };
 } // namespace event

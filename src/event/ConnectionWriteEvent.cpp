@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/05 02:30:39 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 02:31:16 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 06:39:55 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 namespace event
 {
-ConnectionWriteEvent::ConnectionWriteEvent(const Socket* connection) : Event(connection)
+ConnectionWriteEvent::ConnectionWriteEvent(Socket* connection) : Event(connection)
 {
 }
 

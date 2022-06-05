@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 19:00:53 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 02:29:58 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 06:39:45 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ namespace event
 class ConnectionWriteEvent : public Event
 {
 public:
-    ConnectionWriteEvent(const Socket* connection);
+    ConnectionWriteEvent(Socket* connection);
 
 public:
     virtual EventType type() const;

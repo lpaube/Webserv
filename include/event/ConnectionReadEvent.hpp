@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 19:00:53 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 02:29:51 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 06:39:41 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ namespace event
 class ConnectionReadEvent : public Event
 {
 public:
-    ConnectionReadEvent(const Socket* connection);
+    ConnectionReadEvent(Socket* connection);
 
 public:
     virtual EventType type() const;

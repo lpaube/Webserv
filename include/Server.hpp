@@ -6,12 +6,13 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:51:00 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 06:29:31 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 06:51:40 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include "Connection.hpp"
 #include "ExceptionBase.hpp"
 #include "ServerParser.hpp"
 #include "SocketArray.hpp"
@@ -25,7 +26,8 @@ class Server
 public:
     static const int POLL_TIMEOUT = 5000;
     static const int CONNECTION_TIMEOUT = 20;
-    static const size_t BUFFER_SIZE = 1024 * 4;
+    static const size_t BUFFER_SIZE = 1024 * 10;
+    static const ssize_t MAX_REQUEST_SIZE = 1024 * 200;
 
 public:
     class Exception : public ExceptionBase
@@ -46,6 +48,8 @@ private:
     bool is_host(int fd) const;
     void process_event_queue();
     void accept_connection(const TcpStream& stream);
+    void receive_data(Connection& connection);
+    void close_connection(Connection& c);
 
 private:
     SocketArray sockets_;

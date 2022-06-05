@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 18:57:02 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 01:57:30 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 06:39:37 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ namespace event
 class TcpStreamEvent : public Event
 {
 public:
-    TcpStreamEvent(const Socket* stream);
+    TcpStreamEvent(Socket* stream);
 
 public:
     virtual EventType type() const;
