@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 19:05:05 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/04 19:12:52 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 01:40:12 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 #include "Event.hpp"
 #include <queue>
 
+namespace event
+{
 class EventQueue
 {
 public:
@@ -31,3 +33,4 @@ public:
 private:
     std::queue<Event*> events_;
 };
+} // namespace event

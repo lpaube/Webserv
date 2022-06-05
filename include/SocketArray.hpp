@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 20:07:13 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/04 20:54:08 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 01:15:29 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ public:
     void add(Socket* socket);
     iterator find(int fd);
     void erase(iterator pos);
+    void clear();
     iterator begin();
     iterator end();
 

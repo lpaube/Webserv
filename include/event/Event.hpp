@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 18:40:57 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/04 19:17:19 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 01:57:04 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,19 @@
 
 #include "Socket.hpp"
 
+namespace event
+{
 enum EventType
 {
     TCP_STREAM_EVENT,
-    CONNECTION_EVENT
+    CONNECTION_EVENT,
+    CONNECTION_CLOSED_EVENT
 };
 
 class Event
 {
 public:
-    Event(const Socket* socket, bool read);
+    Event(const Socket* socket);
     virtual ~Event();
 
 public:
@@ -31,9 +34,8 @@ public:
 
 public:
     const Socket* data() const;
-    bool is_read() const;
 
 protected:
     const Socket* socket_;
-    bool is_read_;
 };
+} // namespace event

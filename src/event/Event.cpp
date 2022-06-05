@@ -1,6 +1,8 @@
-#include "Event.hpp"
+#include "event/Event.hpp"
 
-Event::Event(const Socket* socket, bool read) : socket_(socket), is_read_(read)
+namespace event
+{
+Event::Event(const Socket* socket) : socket_(socket)
 {
 }
 
@@ -12,8 +14,4 @@ const Socket* Event::data() const
 {
     return socket_;
 }
-
-bool Event::is_read() const
-{
-    return is_read_;
-}
+} // namespace event

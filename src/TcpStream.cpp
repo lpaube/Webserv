@@ -6,15 +6,15 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/03 20:22:20 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/04 20:03:31 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 01:18:37 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "TcpStream.hpp"
 #include "Utils.hpp"
+#include <fcntl.h>
 #include <iostream>
 #include <unistd.h>
-#include <fcntl.h>
 
 TcpStream::Exception::Exception(const char* msg) : ExceptionBase(msg)
 {
@@ -29,14 +29,14 @@ bool TcpStream::operator==(const TcpStream& rhs) const
     return address().s_addr == rhs.address().s_addr && port() == rhs.port();
 }
 
-bool TcpStream::operator==(int fd) const
-{
-    return this->fd() == fd;
-}
+// bool TcpStream::operator==(int fd) const
+// {
+//     return this->fd() == fd;
+// }
 
 void TcpStream::init()
 {
-        if (is_init()) {
+    if (is_init()) {
         std::cout << "Socket already initialized" << std::endl;
         return;
     }

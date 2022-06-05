@@ -6,11 +6,12 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:21:49 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/03 16:59:06 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 02:24:04 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/ConfigParser.hpp"
+#include "Server.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -41,7 +42,7 @@ std::string first_line(std::string& str)
 int main(int argc, char** argv)
 {
     if (argc != 2) {
-        std::cout << "Error, program argument\n" << std::endl;
+        std::cout << "Error, program argument" << std::endl;
         return 1;
     }
     std::string config_file(argv[1]);
@@ -51,100 +52,11 @@ int main(int argc, char** argv)
     Config fake_config = config_parser.serverparser[0].config;
     fake_config.print_config();
 
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
-
-    sockaddr_in servaddr;
-    bzero(&servaddr, sizeof(servaddr));
-
-    servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servaddr.sin_port = htons(8000);
-
-    int res = bind(sock, (sockaddr*)&servaddr, sizeof(servaddr));
-    (void)res;
-
-    int enable = 1;
-    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable));
-    setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(enable));
-
-    // fcntl(sock, F_SETFL, O_NONBLOCK);
-
-    listen(sock, 10);
-
-    while (true) {
-        int connfd;
-        sockaddr_in addr;
-        socklen_t addrlen;
-
-        connfd = accept(sock, (sockaddr*)&addr, &addrlen);
-
-        struct timeval timeout;
-        timeout.tv_sec = 5;
-        timeout.tv_usec = 0;
-        setsockopt(connfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
-        // fcntl(connfd, O_NONBLOCK);
-
-        // Read request line
-        char buff[http::RequestLine::MAX_REQUEST_LINE_SIZE + 1] = {};
-        ssize_t n = read(connfd, buff, http::RequestLine::MAX_REQUEST_LINE_SIZE);
-        if (n == -1) {
-            // error or timeout
-            exit(1);
-        }
-        buff[n] = 0;
-
-        std::string raw_str(buff);
-        std::string line = first_line(raw_str);
-        http::RequestLine request_line;
-        try {
-            request_line = http::RequestLine(line);
-        } catch (std::exception& ex) {
-            std::cerr << ex.what() << std::endl;
-        }
-
-        // Read headers
-        while (raw_str.find("\r\n\r\n") == std::string::npos &&
-               (n = read(connfd, buff, http::RequestLine::MAX_REQUEST_LINE_SIZE)) > 0) {
-            buff[n] = 0;
-            raw_str.append(buff);
-        }
-
-        if (n == -1) {
-            if (errno == EAGAIN) {
-                // timeout
-            }
-        }
-
-        try {
-            http::Request request(request_line, raw_str);
-
-            raw_str.erase(0, raw_str.find("\r\n\r\n") + 4);
-
-            // TODO: handle chunked request
-            ssize_t bytes_left = request.content_length();
-            bytes_left -= (ssize_t)raw_str.length();
-
-            // read body
-            while (bytes_left > 0 &&
-                   (n = read(connfd, buff,
-                             (std::size_t)bytes_left < http::RequestLine::MAX_REQUEST_LINE_SIZE
-                                 ? (std::size_t)bytes_left
-                                 : http::RequestLine::MAX_REQUEST_LINE_SIZE)) > 0) {
-                bytes_left -= n;
-                buff[n] = 0;
-                raw_str.append(buff);
-            }
-            request.set_body(raw_str);
-            request.print();
-        } catch (std::exception& ex) {
-            std::cerr << ex.what() << std::endl;
-        }
-
-        snprintf(buff, sizeof(buff),
-                 "HTTP/1.0 200 OK\r\n\r\n<h1>Hello World Rust is the best language ever made</h1>");
-        write(connfd, buff, std::strlen(buff));
-        close(connfd);
+    Server server;
+    try {
+        //    server.configure(const std::vector<Config> &blocks);
+        server.run();
+    } catch (const std::exception& ex) {
+        std::cerr << ex.what() << std::endl;
     }
-
-    close(sock);
 }

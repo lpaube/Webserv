@@ -1,5 +1,7 @@
-#include "EventQueue.hpp"
+#include "event/EventQueue.hpp"
 
+namespace event
+{
 EventQueue::~EventQueue()
 {
     while (!events_.empty()) {
@@ -22,3 +24,4 @@ void EventQueue::push(Event* event)
 {
     events_.push(event);
 }
+} // namespace event

@@ -6,13 +6,16 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/04 21:22:23 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 02:26:10 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
-#include "Client.hpp"
+#include "Connection.hpp"
+#include "TcpStream.hpp"
 #include "Utils.hpp"
+#include "event/ConnectionEvent.hpp"
+#include "event/TcpStreamEvent.hpp"
 #include "http/Request.hpp"
 #include <algorithm>
 #include <arpa/inet.h>
@@ -25,6 +28,10 @@ Server::Exception::Exception(const char* msg) : ExceptionBase(msg)
 {
 }
 
+Server::Server() : is_configured_(false)
+{
+}
+
 void Server::configure(const std::vector<Config>& blocks)
 {
     sockets_.clear();
@@ -33,6 +40,7 @@ void Server::configure(const std::vector<Config>& blocks)
         throw Exception("No server configuration");
     }
 
+    std::vector<TcpStream> streams;
     for (std::vector<Config>::const_iterator it = blocks.begin(); it != blocks.end(); ++it) {
         in_addr address;
         address.s_addr = inet_addr(it->listen.address.c_str());
@@ -41,232 +49,132 @@ void Server::configure(const std::vector<Config>& blocks)
             throw Exception(msg.c_str());
         }
 
-        if (std::find(sockets_.begin(), sockets_.end(), Socket(it->listen.port, address)) ==
-            sockets_.end()) {
-
-            sockets_.push_back(Socket(it->listen.port, address));
-            Socket& socket = sockets_.back();
-            socket.init();
-            socket.bind();
-            socket.listen();
-
-            pollfd pfd = {};
-            pfd.fd = socket.fd();
-            pfd.events = POLLIN;
-            pfds_.push_back(pfd);
+        TcpStream s = TcpStream(address, it->listen.port);
+        if (std::find(streams.begin(), streams.end(), s) == streams.end()) {
+            streams.push_back(s);
         }
+    }
+
+    for (std::vector<TcpStream>::const_iterator it = streams.begin(); it != streams.end(); ++it) {
+        sockets_.add(new TcpStream(*it));
+    }
+
+    init_tcp_streams();
+    is_configured_ = true;
+}
+
+void Server::init_tcp_streams()
+{
+    for (SocketArray::iterator it = sockets_.begin(); it != sockets_.end(); ++it) {
+        TcpStream& s = static_cast<TcpStream&>(**it);
+
+        s.init();
+        s.bind();
+        s.listen();
+
+        pollfd pfd;
+        pfd.fd = s.fd();
+        pfd.events = POLLIN;
+        pfd.revents = 0;
+        pfds_.push_back(pfd);
     }
 }
 
 void Server::run()
 {
+    if (!is_configured_) {
+        throw Exception("Server is not configured");
+    }
+
     while (true) {
-        int presult = poll(pfds_.data(), pfds_.size(), POLL_TIMEOUT);
-        if (presult == -1) {
+        int n_ready = poll(pfds_.data(), pfds_.size(), POLL_TIMEOUT);
+        if (n_ready == -1) {
             exception_errno<Exception>("Error while polling sockets: ");
         }
 
-        std::vector<int> to_add;
-        std::vector<int> to_remove;
-        for (std::vector<pollfd>::const_iterator it = pfds_.begin(); it != pfds_.end(); ++it) {
-            if (it->revents & POLLIN) {
-                if (is_host(it->fd)) {
-                    timeval timeout = {};
-                    timeout.tv_sec = CONNECTION_TIMEOUT;
+        for (std::vector<pollfd>::iterator it = pfds_.begin(); it != pfds_.end(); ++it) {
+            if (n_ready == 0) {
+                break;
+            }
 
-                    clients_.push_back(Client());
-                    Client& client = clients_.back();
+            bool found = false;
 
-                    try {
-                        client.accept(it->fd, timeout);
-                    } catch (const std::exception& ex) {
-                        clients_.pop_back();
-                        std::cerr << ex.what() << std::endl;
-                        continue;
-                    }
+            SocketArray::iterator socket = sockets_.find(it->fd);
+            if (socket == sockets_.end()) {
+                // This should never happen
+                std::cerr << "Did not find socket: " << it->fd << std::endl;
+                continue;
+            }
 
-                    to_add.push_back(client.fd());
-                } else {
-                    char buf[BUFFER_SIZE];
-                    ssize_t nbytes = recv(it->fd, buf, BUFFER_SIZE, 0);
-                    if (nbytes <= 0) {
-                        if (nbytes == 0) {
-                            std::cerr << "Connection closed: socket " << it->fd << std::endl;
-                        } else {
-                            perror("recv");
-                        }
+            if (it->revents & (POLLERR | POLLHUP | POLLNVAL)) {
+                // If there was an error, add POLLIN | POLLOUT to catch it in one of the handlers
+                it->revents |= POLLIN | POLLOUT;
+            }
+            if (it->revents & (POLLIN | POLLRDHUP)) {
+                found = true;
 
-                        close(it->fd);
-                        to_remove.push_back(it->fd);
-                    }
-
-                    std::vector<Client>::iterator client_it =
-                        std::find(clients_.begin(), clients_.end(), it->fd);
-
-                    if (client_it == clients_.end()) {
-                        // Should never happen
-                        std::cerr << "Couldn't find client" << std::endl;
-                        continue;
-                    }
-
-                    client_it->append_data(buf, buf + BUFFER_SIZE);
+                switch ((*socket)->type()) {
+                    case TCP_STREAM:
+                        events_.push(new event::TcpStreamEvent(*socket));
+                        break;
+                    case CONNECTION:
+                        events_.push(new event::ConnectionEvent(*socket, true));
+                        break;
                 }
-            } else if (it->revents & POLLOUT) {
+            }
+            if (it->revents & POLLOUT) {
+                found = true;
+
+                events_.push(new event::ConnectionEvent(*socket, false));
+            }
+
+            if (found) {
+                --n_ready;
             }
         }
 
-        for (std::vector<int>::const_iterator it = to_remove.begin(); it != to_remove.end(); ++it) {
-            for (std::vector<pollfd>::iterator pit = pfds_.begin(); pit != pfds_.end(); ++pit) {
-                if (pit->fd == *it) {
-                    pfds_.erase(pit);
-                    break;
-                }
-            }
-        }
-        for (std::vector<int>::const_iterator it = to_add.begin(); it != to_add.end(); ++it) {
-            pollfd pfd = {};
-            pfd.fd = *it;
-            pfd.events = POLLIN | POLLOUT;
-            pfds_.push_back(pfd);
-        }
+        process_event_queue();
     }
 }
 
-bool Server::is_host(int fd) const
+void Server::process_event_queue()
 {
-    return std::find(sockets_.begin(), sockets_.end(), fd) != sockets_.end();
+    std::vector<int> to_add;
+    std::vector<int> to_remove;
+
+    // TODO: process events here
+
+    poll_remove_closed_connections(to_remove);
+    poll_add_new_connections(to_add);
 }
 
-// int main()
-// {
-//     SocketArray sockets;
-//     std::vector<pollfd> pfds;
+void Server::poll_add_new_connections(const std::vector<int>& fds)
+{
+    for (std::vector<int>::const_iterator it = fds.begin(); it != fds.end(); ++it) {
+        pollfd pfd = {};
+        pfd.fd = *it;
+        pfd.events = POLLIN | POLLRDHUP | POLLOUT;
+        pfd.revents = 0;
+        pfds_.push_back(pfd);
+    }
+}
 
-//     TcpStream* stream;
-//     in_addr addr;
-//     try {
-//         addr.s_addr = inet_addr("127.0.0.1");
-//         stream = new TcpStream(addr, 8000);
-//         stream->init();
-//         stream->bind();
-//         stream->listen();
-//         sockets.add(stream);
-//         addr.s_addr = inet_addr("127.0.0.1");
-//         stream = new TcpStream(addr, 9000);
-//         stream->init();
-//         stream->bind();
-//         stream->listen();
-//         sockets.add(stream);
-//         addr.s_addr = inet_addr("127.0.0.1");
-//         stream = new TcpStream(addr, 10000);
-//         stream->init();
-//         stream->bind();
-//         stream->listen();
-//         sockets.add(stream);
-//     } catch (const std::exception& ex) {
-//         std::cerr << ex.what() << std::endl;
-//         return 1;
-//     }
+void Server::poll_remove_closed_connections(const std::vector<int>& fds)
+{
+    for (std::vector<int>::const_iterator it = fds.begin(); it != fds.end(); ++it) {
+        SocketArray::iterator socket = sockets_.find(*it);
+        if (socket == sockets_.end()) {
+            std::cerr << "Can't find connection" << std::endl;
+            continue;
+        }
 
-//     for (SocketArray::iterator it = sockets.begin(); it != sockets.end(); ++it) {
-//         pollfd pfd;
-//         pfd.fd = (*it)->fd();
-//         pfd.events = POLLIN;
-//         pfd.revents = 0;
-//         pfds.push_back(pfd);
-//     }
+        sockets_.erase(socket);
 
-//     timeval timeout;
-//     timeout.tv_sec = 15000;
-//     timeout.tv_usec = 0;
-
-//     for (;;) {
-//         EventQueue events;
-
-//         int ready = poll(pfds.data(), pfds.size(), 10000);
-
-//         if (ready == -1) {
-//             perror("Poll");
-//             return 1;
-//         }
-
-//         std::vector<int> to_add;
-//         std::vector<int> to_erase;
-//         std::cout << "loop started" << std::endl;
-//         for (auto& it : pfds) {
-//             if (ready == 0) {
-//                 break;
-//             }
-
-//             bool found = false;
-
-//             if (it.revents & POLLIN) {
-//                 found = true;
-
-//                 SocketArray::iterator socket = sockets.find(it.fd);
-//                 if (socket == sockets.end()) {
-//                     std::cerr << "Did not find socket" << std::endl;
-//                     continue;
-//                 }
-
-//                 switch ((*socket)->type()) {
-//                     case TCP_STREAM: {
-//                         Connection* c = new Connection(it.fd, timeout);
-//                         // Maybe error
-//                         c->init();
-//                         sockets.add(c);
-//                         to_add.push_back(c->fd());
-//                         std::cout << "connection created" << std::endl;
-//                         break;
-//                     }
-//                     case CONNECTION: {
-//                         Connection& c = static_cast<Connection&>(**socket);
-//                         char buf[4096];
-//                         ssize_t bytes = recv(c.fd(), buf, 4096, 0);
-//                         c.append_data(buf, buf + 4096);
-//                         c.print_data();
-//                         std::cout << "data read" << std::endl;
-//                         break;
-//                     }
-//                 }
-//             } else if (it.revents & POLLOUT) {
-//                 found = true;
-
-//                 const char* msg = "HTTP/1.0 200 OK\r\n\r\n<h1>Hello World Rust is the best "
-//                                   "language ever made</h1>";
-//                 send(it.fd, msg, strlen(msg), 0);
-//                 to_erase.push_back(it.fd);
-//                 std::cout << "sent response" << std::endl;
-//             }
-
-//             if (found) {
-//                 --ready;
-//             }
-//         }
-
-//         for (std::vector<int>::const_iterator it = to_erase.begin(); it != to_erase.end(); ++it) {
-//             SocketArray::iterator socket = sockets.find(*it);
-//             if (socket == sockets.end()) {
-//                 std::cerr << "Can't find connection" << std::endl;
-//                 continue;
-//             }
-
-//             sockets.erase(socket);
-
-//             for (std::vector<pollfd>::iterator pfd = pfds.begin(); pfd != pfds.end(); ++pfd) {
-//                 if (pfd->fd == *it) {
-//                     pfds.erase(pfd);
-//                     break;
-//                 }
-//             }
-//         }
-
-//         for (std::vector<int>::const_iterator it = to_add.begin(); it != to_add.end(); ++it) {
-//             pollfd pfd = {};
-//             pfd.fd = *it;
-//             pfd.events = POLLIN | POLLOUT;
-//             pfd.revents = 0;
-//             pfds.push_back(pfd);
-//         }
-//     }
-// }
+        for (std::vector<pollfd>::iterator pfd = pfds_.begin(); pfd != pfds_.end(); ++pfd) {
+            if (pfd->fd == *it) {
+                pfds_.erase(pfd);
+                break;
+            }
+        }
+    }
+}

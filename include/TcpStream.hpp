@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/03 20:13:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/04 20:03:13 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 01:18:44 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ public:
 
 public:
     bool operator==(const TcpStream& rhs) const;
-    bool operator==(int fd) const;
+    // bool operator==(int fd) const;
 
 public:
     virtual void init();

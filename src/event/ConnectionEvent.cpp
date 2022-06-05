@@ -1,7 +1,9 @@
-#include "ConnectionEvent.hpp"
+#include "event/ConnectionEvent.hpp"
 
-ConnectionEvent::ConnectionEvent(const Connection& connection, bool read)
-    : Event(static_cast<const Socket*>(&connection), read)
+namespace event
+{
+ConnectionEvent::ConnectionEvent(const Socket* connection, bool read)
+    : Event(connection), is_read_(read)
 {
 }
 
@@ -9,3 +11,10 @@ EventType ConnectionEvent::type() const
 {
     return CONNECTION_EVENT;
 }
+
+bool ConnectionEvent::is_read() const
+{
+    return is_read_;
+}
+
+} // namespace event

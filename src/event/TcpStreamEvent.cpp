@@ -1,7 +1,8 @@
-#include "TcpStreamEvent.hpp"
+#include "event/TcpStreamEvent.hpp"
 
-TcpStreamEvent::TcpStreamEvent(const TcpStream& stream, bool read)
-    : Event(static_cast<const Socket*>(&stream), read)
+namespace event
+{
+TcpStreamEvent::TcpStreamEvent(const Socket* stream) : Event(stream)
 {
 }
 
@@ -9,3 +10,4 @@ EventType TcpStreamEvent::type() const
 {
     return TCP_STREAM_EVENT;
 }
+} // namespace event

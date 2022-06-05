@@ -22,6 +22,14 @@ void SocketArray::erase(iterator pos)
     sockets_.erase(pos);
 }
 
+void SocketArray::clear()
+{
+    for (iterator it = sockets_.begin(); it != sockets_.end(); ++it) {
+        delete *it;
+    }
+    sockets_.clear();
+}
+
 SocketArray::iterator SocketArray::begin()
 {
     return sockets_.begin();
@@ -34,7 +42,5 @@ SocketArray::iterator SocketArray::end()
 
 SocketArray::~SocketArray()
 {
-    for (iterator it = sockets_.begin(); it != sockets_.end(); ++it) {
-        delete *it;
-    }
+    clear();
 }

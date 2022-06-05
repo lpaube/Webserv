@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 16:47:12 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/04 21:07:49 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 00:57:12 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ public:
         buf_.insert(buf_.end(), first, last);
     }
     int host_fd() const;
-    void print_data();
 
 private:
     int host_fd_;
