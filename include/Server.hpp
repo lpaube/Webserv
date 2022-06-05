@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:51:00 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 02:20:30 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 06:29:31 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "ExceptionBase.hpp"
 #include "ServerParser.hpp"
 #include "SocketArray.hpp"
+#include "TcpStream.hpp"
 #include "event/EventQueue.hpp"
 #include <poll.h>
 #include <vector>
@@ -44,12 +45,11 @@ private:
     void init_tcp_streams();
     bool is_host(int fd) const;
     void process_event_queue();
-    void poll_add_new_connections(const std::vector<int>& fds);
-    void poll_remove_closed_connections(const std::vector<int>& fds);
+    void accept_connection(const TcpStream& stream);
 
 private:
     SocketArray sockets_;
     std::vector<pollfd> pfds_;
     event::EventQueue events_;
-    bool is_configured_;
+    bool configured_;
 };

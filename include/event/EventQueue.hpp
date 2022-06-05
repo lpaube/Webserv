@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 19:05:05 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 01:40:12 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 04:28:15 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,9 @@ public:
 
 public:
     reference front();
-    void pop();
+    Event* pop();
     void push(Event* event);
+    bool empty() const;
 
 private:
     std::queue<Event*> events_;

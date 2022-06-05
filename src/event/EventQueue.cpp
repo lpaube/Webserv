@@ -4,8 +4,8 @@ namespace event
 {
 EventQueue::~EventQueue()
 {
-    while (!events_.empty()) {
-        pop();
+    while (!empty()) {
+        delete pop();
     }
 }
 
@@ -14,14 +14,21 @@ EventQueue::reference EventQueue::front()
     return events_.front();
 }
 
-void EventQueue::pop()
+Event* EventQueue::pop()
 {
-    delete events_.front();
+    Event* ev = events_.front();
     events_.pop();
+    return ev;
 }
 
 void EventQueue::push(Event* event)
 {
     events_.push(event);
 }
+
+bool EventQueue::empty() const
+{
+    return events_.empty();
+}
+
 } // namespace event

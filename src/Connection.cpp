@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 18:10:03 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 03:56:31 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 06:26:45 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-Connection::Connection(int host_fd)
-    : Socket(), host_fd_(host_fd)
+Connection::Connection(const TcpStream* stream)
+    : Socket(), stream_(stream)
 {
 }
 
@@ -40,5 +40,5 @@ SocketType Connection::type() const
 
 int Connection::host_fd() const
 {
-    return host_fd_;
+    return stream_->fd();
 }
