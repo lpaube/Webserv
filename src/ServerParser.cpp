@@ -252,7 +252,13 @@ void ServerParser::parse_config_vars()
     {
       if (directives[0] == "listen")
       {
-        std::cout << "LISTEN!" << std::endl;
+        if (directives.size() != 2)
+          throw();
+        if (directives[1].find(":") == std::string::npos)
+          throw("Listen: no port number");
+        config.listen.address = directives[1].substr(0, directives[1].find(":"));
+        std::string tmp_str = directives[1].substr(directives[1].find(":") + 1);
+        //std::cout << tmp_str << std::endl;
       }
       else if (directives[0] == "server_name")
       {

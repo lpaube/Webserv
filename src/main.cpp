@@ -31,8 +31,14 @@ int main(int argc, char **argv)
 	std::string	config_file(argv[1]);
 	ConfigParser config_parser(config_file);
 
-  config_parser.serverparser[0].parse_config_vars();
-  //config_parser.serverparser[0].config.print_config();
+  try {
+    config_parser.serverparser[0].parse_config_vars();
+  }
+  catch (char const* s)
+  {
+    std::cout << s << std::endl;
+  }
+  config_parser.serverparser[0].config.print_config();
 
   
    /* int sock = socket(AF_INET, SOCK_STREAM, 0);
