@@ -36,6 +36,12 @@ body {
 	margin-bottom: 10px;
 }
 
+.user_input{
+	border-color:  #00babc;
+	border-style: solid;
+	border-width: ;
+}
+
 .signin_button{
 	background-color: #00babc;
 	color: white;
