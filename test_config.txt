@@ -13,3 +13,9 @@ server{
 	}
 	test 1234;
 }
+
+server{
+	listen 10.23.45:54;
+  server_name testing;
+  ffff;
+}

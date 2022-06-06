@@ -1,25 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Header.hpp                                         :+:      :+:    :+:   */
+/*   HeaderMap.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/31 16:38:07 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/05/31 16:54:02 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/05/31 19:50:17 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/06/01 02:29:41 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
-
-#include <string>
+#include "http/HeaderMap.hpp"
+#include "Utils.hpp"
 
 namespace http
 {
-class Header
+void HeaderMap::add(const Header& header)
 {
-    std::string name;
-    std::string value;
-};
+    headers_[header.name()] = header.value();
+}
+
+HeaderMap::const_iterator HeaderMap::get(std::string name) const
+{
+    to_lower(name);
+    return headers_.find(name);
+}
+
+HeaderMap::const_iterator HeaderMap::begin() const
+{
+    return headers_.begin();
+}
+
+HeaderMap::const_iterator HeaderMap::end() const
+{
+    return headers_.end();
+}
 
 } // namespace http

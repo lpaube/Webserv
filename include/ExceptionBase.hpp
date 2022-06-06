@@ -1,27 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Method.hpp                                         :+:      :+:    :+:   */
+/*   ExceptionBase.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/31 15:23:54 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/05/31 16:58:40 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/05/31 22:00:37 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/05/31 22:03:30 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include <string>
+#include <exception>
 
-namespace http
+class ExceptionBase : public std::exception
 {
-enum Method {
-    GET,
-    POST,
-    DELETE,
+public:
+    static const std::size_t MSG_SIZE = 512;
+
+public:
+    ExceptionBase(const char* msg);
+
+public:
+    virtual const char* what() const throw();
+
+private:
+    char msg_[MSG_SIZE];
 };
-
-const std::string& method_str(Method);
-
-} // namespace http

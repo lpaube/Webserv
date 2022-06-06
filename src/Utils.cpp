@@ -3,63 +3,52 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:40:28 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/02 13:44:41 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/02 17:21:24 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Utils.hpp"
 #include <algorithm>
 #include <ctype.h>
-#include <vector>
 #include <string>
+#include <vector>
 
-bool	vectorize_content(std::vector<std::string>& content, std::string& content_str){
-	std::string::iterator start = content_str.begin();
-	std::string::iterator end = content_str.end();
-	std::string::iterator current = start;
+bool vectorize_content(std::vector<std::string>& content, std::string& content_str)
+{
+    std::string::iterator start = content_str.begin();
+    std::string::iterator end = content_str.end();
+    std::string::iterator current = start;
 
-	while (start != end){
-		while (*start > 0 && *start < 33)
-			start++;
-		current = start;
-		if (start != end){
-			while(*current != ';'){
-				if (current == end)
-					return false;
-				current++;
-			}
-			std::string add(start, current);
-			content.push_back(trim_white_spaces(add));
-			start = current + 1;
-			}
-	}
-	return true;
+    while (start != end) {
+        while (*start > 0 && *start < 33)
+            start++;
+        current = start;
+        if (start != end) {
+            while (*current != ';') {
+                if (current == end)
+                    return false;
+                current++;
+            }
+            std::string add(start, current);
+            content.push_back(trim(add, WHITESPACE));
+            start = current + 1;
+        }
+    }
+    return true;
 }
 
-std::string	trim_white_spaces(std::string str){
-	std::string::iterator start = str.begin();
-	std::string::iterator end = str.end();
-
-	while (*start > 0 && *start < 33)
-		++start;
-	while (*end > 0 && *end < 33)
-		--end;
-	std::string ret(start, end);
-	return ret;
-}
-
-std::string trim(const std::string& str, char sep)
+std::string trim(const std::string& str, const std::string& sep)
 {
     std::string::const_iterator start = str.begin();
-    while (start != str.end() && *start == sep) {
+    while (start != str.end() && sep.find(*start) != std::string::npos) {
         ++start;
     }
 
     std::string::const_iterator end = str.end();
-    while (end != start && *(end - 1) == sep) {
+    while (end != start && sep.find(*(end - 1)) != std::string::npos) {
         --end;
     }
     return std::string(start, end);

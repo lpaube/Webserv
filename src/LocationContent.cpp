@@ -12,6 +12,7 @@
 
 #include "LocationContent.hpp"
 #include "Utils.hpp"
-LocationContent::LocationContent(){
 
+LocationContent::LocationContent()
+{
 }

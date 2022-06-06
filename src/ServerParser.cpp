@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerParser.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: laube <laube@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/01 10:47:58 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/02 13:59:01 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/06 19:48:41 by laube            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,7 @@ void	ServerParser::buildContent(){
         current++;
       }
       std::string add(start, current);
-      server_content.push_back(trim_white_spaces(add));
+      server_content.push_back(trim(add, WHITESPACE));
       start = current + 1;
     }
   }
@@ -132,56 +132,56 @@ void ServerParser::generate_fake_config()
   config.listen.address = "127.0.0.1";
   config.listen.port = 8000;
 
-  // server_name
-  config.server_name.push_back("example.com");
-  config.server_name.push_back("www.example.com");
+    // server_name
+    config.server_name.push_back("example.com");
+    config.server_name.push_back("www.example.com");
 
-  // error_page
-  Config::Error_page error_page1;
-  error_page1.code.push_back(404);
-  error_page1.code.push_back(442);
-  error_page1.uri = "/40x.html";
+    // error_page
+    Config::Error_page error_page1;
+    error_page1.code.push_back(404);
+    error_page1.code.push_back(442);
+    error_page1.uri = "/40x.html";
 
-  Config::Error_page error_page2;
-  error_page2.code.push_back(505);
-  error_page2.code.push_back(506);
-  error_page2.uri = "/50x.html";
+    Config::Error_page error_page2;
+    error_page2.code.push_back(505);
+    error_page2.code.push_back(506);
+    error_page2.uri = "/50x.html";
 
-  config.error_page.push_back(error_page1);
-  config.error_page.push_back(error_page2);
+    config.error_page.push_back(error_page1);
+    config.error_page.push_back(error_page2);
 
-  // client_max_body_size
-  config.client_max_body_size = 8000000;
+    // client_max_body_size
+    config.client_max_body_size = 8000000;
 
-  // limit_except
-  config.limit_except.push_back("GET");
-  config.limit_except.push_back("POST");
+    // limit_except
+    config.limit_except.push_back("GET");
+    config.limit_except.push_back("POST");
 
-  // return
-  config.return_redirect.code = 404;
-  config.return_redirect.url = "/error404";
+    // return
+    config.return_redirect.code = 404;
+    config.return_redirect.url = "/error404";
 
-  // root
-  config.root = "/data/w5";
+    // root
+    config.root = "/data/w5";
 
-  // autoindex
-  config.autoindex = true;
+    // autoindex
+    config.autoindex = true;
 
-  // index
-  config.index.push_back("index");
-  config.index.push_back("index.html");
+    // index
+    config.index.push_back("index");
+    config.index.push_back("index.html");
 
-  // cgi_ext
-  Config::Cgi_ext cgi_ext1;
-  cgi_ext1.extension = ".php";
-  cgi_ext1.bin_path = "/usr/bin/php";
+    // cgi_ext
+    Config::Cgi_ext cgi_ext1;
+    cgi_ext1.extension = ".php";
+    cgi_ext1.bin_path = "/usr/bin/php";
 
-  Config::Cgi_ext cgi_ext2;
-  cgi_ext2.extension = ".py";
-  cgi_ext2.bin_path = "/usr/bin/python";
+    Config::Cgi_ext cgi_ext2;
+    cgi_ext2.extension = ".py";
+    cgi_ext2.bin_path = "/usr/bin/python";
 
-  config.cgi_ext.push_back(cgi_ext1);
-  config.cgi_ext.push_back(cgi_ext2);
+    config.cgi_ext.push_back(cgi_ext1);
+    config.cgi_ext.push_back(cgi_ext2);
 }
 
 /*
@@ -253,7 +253,7 @@ void ServerParser::parse_config_vars()
       if (directives[0] == "listen")
       {
         if (directives.size() != 2)
-          throw();
+          throw("Listen: wrong arg number");
         if (directives[1].find(":") == std::string::npos)
           throw("Listen: no port number");
         config.listen.address = directives[1].substr(0, directives[1].find(":"));
@@ -304,6 +304,7 @@ const char* ServerParser::NoSepException::what() const throw(){
   return ("Error: No ';' found after value\n");
 }
 
-const char* ServerParser::SyntaxException::what() const throw(){
-  return ("Error: Syntax error in config file\n");
+const char* ServerParser::SyntaxException::what() const throw()
+{
+    return ("Error: Syntax error in config file\n");
 }
