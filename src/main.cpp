@@ -31,10 +31,8 @@ int main(int argc, char **argv)
 	std::string	config_file(argv[1]);
 	ConfigParser config_parser(config_file);
 
-  config_parser.serverparser[0].generate_fake_config();
-  Config fake_config = config_parser.serverparser[0].config;
-  fake_config.print_config();
-
+  config_parser.serverparser[0].parse_config_vars();
+  //config_parser.serverparser[0].config.print_config();
 
   
    /* int sock = socket(AF_INET, SOCK_STREAM, 0);

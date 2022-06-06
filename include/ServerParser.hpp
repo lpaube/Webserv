@@ -21,6 +21,7 @@ class Config
     struct Listen
     {
       std::string address;
+      // port is initialized to -1
       int port;
     };
 
@@ -32,6 +33,7 @@ class Config
 
     struct Return_redirect
     {
+      // code is initialized to -1
         int code;
         std::string url;
     };
@@ -46,7 +48,7 @@ class Config
     Listen                    listen;
     std::vector<std::string>  server_name;
     std::vector<Error_page>   error_page;
-    unsigned long             client_max_body_size; // Represented in bytes
+    unsigned long             client_max_body_size; // Represented in kilobytes
     std::vector<std::string>  limit_except;
     Return_redirect           return_redirect;
     std::string               root;
@@ -155,6 +157,8 @@ class ServerParser{
 		void	printContent() const;
 		void	printLocation() const;
     void  generate_fake_config();
+    void  init_config();
+    void  parse_config_vars();
 		class NoSepException : public std::exception{
 			public:
 				virtual const char* what() const throw();
