@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 19:32:06 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/05 20:55:57 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,17 +190,24 @@ void Server::accept_connection(const TcpStream& stream)
 void Server::receive_data(Connection& c)
 {
     char buf[BUFFER_SIZE];
+    ssize_t prev_read = 0;
     ssize_t total_read = 0;
     bool error = false;
 
     while (true) {
         ssize_t n = recv(c.fd(), buf, BUFFER_SIZE, 0);
 
+        // EAGAIN / EWOULDBLOCK
+        if (prev_read == BUFFER_SIZE && n < 0) {
+            break;
+        }
+
         if (n < 0) {
             error = true;
             break;
         }
 
+        prev_read = n;
         total_read += n;
         c.append_data(buf, buf + n);
 
