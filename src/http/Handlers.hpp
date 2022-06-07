@@ -6,13 +6,13 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:34:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 12:42:23 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 14:35:59 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "Connection.hpp"
+#include "socket/Connection.hpp"
 
 namespace http
 {

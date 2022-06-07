@@ -12,9 +12,9 @@
 
 #pragma once
 
-#include "socket/Buffer.hpp"
 #include "ExceptionBase.hpp"
 #include "Method.hpp"
+#include "socket/Buffer.hpp"
 #include <cstddef>
 #include <string>
 

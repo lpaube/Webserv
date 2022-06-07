@@ -6,13 +6,13 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 18:40:57 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 06:39:09 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 14:36:21 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "Socket.hpp"
+#include "socket/Socket.hpp"
 
 namespace event
 {

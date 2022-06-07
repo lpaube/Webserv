@@ -6,12 +6,11 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 12:43:10 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 14:37:29 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
-#include "Connection.hpp"
 #include "Utils.hpp"
 #include "event/ConnectionReadEvent.hpp"
 #include "event/ConnectionWriteEvent.hpp"
@@ -19,6 +18,7 @@
 #include "http/Handlers.hpp"
 #include "http/Request.hpp"
 #include "http/RequestLine.hpp"
+#include "socket/Connection.hpp"
 #include <arpa/inet.h>
 #include <cstdio>
 #include <sys/time.h>

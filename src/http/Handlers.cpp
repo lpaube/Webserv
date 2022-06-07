@@ -6,13 +6,13 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:39:04 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 12:42:28 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 14:36:09 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Handlers.hpp"
-#include "Buffer.hpp"
 #include "Utils.hpp"
+#include "socket/Buffer.hpp"
 #include <iostream>
 
 namespace http

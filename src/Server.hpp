@@ -6,18 +6,18 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:51:00 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 12:37:16 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 14:37:14 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "Connection.hpp"
 #include "ExceptionBase.hpp"
 #include "ServerParser.hpp"
-#include "SocketArray.hpp"
-#include "TcpStream.hpp"
 #include "event/EventQueue.hpp"
+#include "socket/Connection.hpp"
+#include "socket/SocketArray.hpp"
+#include "socket/TcpStream.hpp"
 #include <poll.h>
 #include <vector>
 
