@@ -6,11 +6,11 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:21:49 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/06 16:11:28 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 12:32:34 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/ConfigParser.hpp"
+#include "ConfigParser.hpp"
 #include "Server.hpp"
 #include <cstdio>
 #include <cstdlib>

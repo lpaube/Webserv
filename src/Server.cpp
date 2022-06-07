@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 02:21:08 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 12:43:10 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,11 @@
 #include "event/ConnectionReadEvent.hpp"
 #include "event/ConnectionWriteEvent.hpp"
 #include "event/TcpStreamEvent.hpp"
+#include "http/Handlers.hpp"
 #include "http/Request.hpp"
 #include "http/RequestLine.hpp"
-#include <algorithm>
 #include <arpa/inet.h>
 #include <cstdio>
-#include <sys/errno.h>
 #include <sys/time.h>
 #include <unistd.h>
 
@@ -237,13 +236,13 @@ void Server::receive_data(Connection& c)
 
     switch (c.request_state()) {
         case http::REQ_LINE:
-            parse_http_request_line(c);
+            http::parse_request_line(c);
             break;
         case http::REQ_HEADERS:
-            parse_http_headers(c);
+            http::parse_headers(c);
             break;
         case http::REQ_BODY:
-            parse_http_body(c);
+            http::parse_body(c);
             break;
         case http::REQ_DONE:
             c.set_write();
@@ -267,60 +266,4 @@ void Server::close_connection(Connection& c)
     }
 
     sockets_.erase(socket);
-}
-
-void Server::parse_http_request_line(Connection& c)
-{
-    http::RequestLine line;
-    bool error = false;
-
-    if (c.buffer().find(REQ_EOL, strlen(REQ_EOL)) == NULL) {
-        return;
-    }
-
-    try {
-        line = http::RequestLine(c.buffer());
-        c.request() = http::Request(line);
-    } catch (const std::exception& ex) {
-        error = true;
-        std::cerr << ex.what() << std::endl;
-    }
-
-    if (error) {
-        // TODO: bad request
-        return;
-    }
-
-    c.next_request_state();
-    parse_http_headers(c);
-}
-
-void Server::parse_http_headers(Connection& c)
-{
-    Buffer& buf = c.buffer();
-    const char* ptr;
-    while ((ptr = buf.find(REQ_EOL, strlen(REQ_EOL))) != NULL) {
-        if (ptr == buf.cursor()) {
-            c.next_request_state();
-            buf.advance_cursor(2);
-            break;
-        }
-
-        try {
-            http::Header header(get_next_word(buf, REQ_EOL, strlen(REQ_EOL)));
-            c.request().add_header(header);
-        } catch (const std::exception& ex) {
-            std::cout << ex.what() << std::endl;
-        }
-    }
-    buf.erase_to_cursor();
-
-    if (c.request_state() == http::REQ_BODY) {
-        parse_http_body(c);
-    }
-}
-
-void Server::parse_http_body(Connection& c)
-{
-    c.set_write();
 }
