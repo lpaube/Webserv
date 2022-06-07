@@ -1,0 +1,38 @@
+body {
+	background-color: white;
+	align-content: center;
+}
+
+.top{
+	display: flex;
+	justify-content: center;
+	color: rgb(65, 66, 78);
+	font-family: Tahoma;
+	font-size: 50px;
+}
+
+.wardrobe-img{
+	margin: auto;
+	display: block;
+	height: 500px;
+}
+
+.center{
+	margin-top:100px;
+	display: flex;
+	justify-content: center;
+}
+
+.center-button{
+	font-family: 'Tahoma';
+	background-color: rgb(142, 143, 153);
+	color:rgb(255, 255, 255);
+	font-size:35px;
+	width:300px;
+	height:45px;
+	border-radius: 15px;
+	border: none;
+	text-align: center;
+	cursor: pointer;
+	margin-right:30px;
+}
