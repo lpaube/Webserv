@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:39:04 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 14:55:45 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 17:52:15 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,7 @@ void parse_headers(sock::Connection& c)
 
 void parse_body(sock::Connection& c)
 {
+    c.request().print();
     c.set_write();
 }
 } // namespace http
