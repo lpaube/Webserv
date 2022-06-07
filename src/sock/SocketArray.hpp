@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 20:07:13 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 12:56:13 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 14:42:53 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,9 @@
 
 #include "Socket.hpp"
 #include <vector>
+
+namespace sock
+{
 
 class SocketArray
 {
@@ -34,3 +37,4 @@ public:
 private:
     std::vector<Socket*> sockets_;
 };
+} // namespace sock

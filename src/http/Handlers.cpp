@@ -6,19 +6,19 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:39:04 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 14:36:09 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 14:46:24 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Handlers.hpp"
 #include "Utils.hpp"
-#include "socket/Buffer.hpp"
+#include "sock/Buffer.hpp"
 #include <iostream>
 
 namespace http
 {
 
-void parse_request_line(Connection& c)
+void parse_request_line(sock::Connection& c)
 {
     RequestLine line;
     bool error = false;
@@ -44,7 +44,7 @@ void parse_request_line(Connection& c)
     parse_headers(c);
 }
 
-void parse_http_request_line(Connection& c)
+void parse_http_request_line(sock::Connection& c)
 {
     RequestLine line;
     bool error = false;
@@ -70,9 +70,9 @@ void parse_http_request_line(Connection& c)
     parse_headers(c);
 }
 
-void parse_headers(Connection& c)
+void parse_headers(sock::Connection& c)
 {
-    Buffer& buf = c.buffer();
+    sock::Buffer& buf = c.buffer();
     const char* ptr;
     while ((ptr = buf.find(REQ_EOL, strlen(REQ_EOL))) != NULL) {
         if (ptr == buf.cursor()) {
@@ -95,7 +95,7 @@ void parse_headers(Connection& c)
     }
 }
 
-void parse_body(Connection& c)
+void parse_body(sock::Connection& c)
 {
     c.set_write();
 }

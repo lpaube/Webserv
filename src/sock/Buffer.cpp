@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 15:06:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 12:55:34 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 14:41:45 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 #include <cstdlib>
 #include <cstring>
 
+namespace sock
+{
 Buffer::Buffer(size_t size)
     : size_(size)
 {
@@ -70,3 +72,4 @@ void Buffer::erase_to_cursor()
     const std::vector<char>::difference_type index = cursor_ - data_.data();
     data_.erase(data_.begin(), data_.begin() + index);
 }
+} // namespace sock

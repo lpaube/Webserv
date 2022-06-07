@@ -6,13 +6,13 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 18:40:57 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 14:36:21 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 14:44:44 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "socket/Socket.hpp"
+#include "sock/Socket.hpp"
 
 namespace event
 {
@@ -25,16 +25,16 @@ enum EventType {
 class Event
 {
 public:
-    Event(Socket* socket);
+    Event(sock::Socket* socket);
     virtual ~Event();
 
 public:
     virtual EventType type() const = 0;
 
 public:
-    Socket* data();
+    sock::Socket* data();
 
 protected:
-    Socket* socket_;
+    sock::Socket* socket_;
 };
 } // namespace event

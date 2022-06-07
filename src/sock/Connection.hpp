@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 16:47:12 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 12:55:51 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 14:42:09 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 #include "http/Request.hpp"
 #include <sys/socket.h>
 
+namespace sock
+{
 class Connection : public Socket
 {
 public:
@@ -48,3 +50,4 @@ private:
     http::RequestState request_state_;
     http::Request request_;
 };
+} // namespace sock

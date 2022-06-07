@@ -1,6 +1,8 @@
 #include "Socket.hpp"
 #include <unistd.h>
 
+namespace sock
+{
 Socket::Exception::Exception(const char* msg)
     : ExceptionBase(msg)
 {
@@ -45,3 +47,4 @@ void Socket::set_write()
 {
     read_ = false;
 }
+} // namespace sock

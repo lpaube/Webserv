@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 12:59:13 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 12:56:58 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 14:47:58 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 #include "ExceptionBase.hpp"
 #include "Method.hpp"
-#include "socket/Buffer.hpp"
+#include "sock/Buffer.hpp"
 #include <cstddef>
 #include <string>
 
@@ -34,7 +34,7 @@ public:
 
 public:
     RequestLine();
-    RequestLine(Buffer& request_data);
+    RequestLine(sock::Buffer& request_data);
 
 public:
     Method method() const;

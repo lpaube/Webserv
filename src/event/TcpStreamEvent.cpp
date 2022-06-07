@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/05 06:40:00 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 06:40:01 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 14:44:52 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 namespace event
 {
-TcpStreamEvent::TcpStreamEvent(Socket* stream)
+TcpStreamEvent::TcpStreamEvent(sock::Socket* stream)
     : Event(stream)
 {
 }

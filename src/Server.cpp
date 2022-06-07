@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 14:37:29 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 14:50:34 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 #include "http/Handlers.hpp"
 #include "http/Request.hpp"
 #include "http/RequestLine.hpp"
-#include "socket/Connection.hpp"
+#include "sock/Connection.hpp"
 #include <arpa/inet.h>
 #include <cstdio>
 #include <sys/time.h>
@@ -42,7 +42,7 @@ void Server::configure(const std::vector<Config>& blocks)
         throw Exception("No server configuration");
     }
 
-    std::vector<TcpStream> streams;
+    std::vector<sock::TcpStream> streams;
     for (std::vector<Config>::const_iterator it = blocks.begin(); it != blocks.end(); ++it) {
         in_addr address;
         address.s_addr = inet_addr(it->listen.address.c_str());
@@ -51,14 +51,15 @@ void Server::configure(const std::vector<Config>& blocks)
             throw Exception(msg.c_str());
         }
 
-        TcpStream s = TcpStream(address, it->listen.port);
+        sock::TcpStream s = sock::TcpStream(address, it->listen.port);
         if (std::find(streams.begin(), streams.end(), s) == streams.end()) {
             streams.push_back(s);
         }
     }
 
-    for (std::vector<TcpStream>::const_iterator it = streams.begin(); it != streams.end(); ++it) {
-        sockets_.add(new TcpStream(*it));
+    for (std::vector<sock::TcpStream>::const_iterator it = streams.begin(); it != streams.end();
+         ++it) {
+        sockets_.add(new sock::TcpStream(*it));
     }
 
     init_tcp_streams();
@@ -67,8 +68,8 @@ void Server::configure(const std::vector<Config>& blocks)
 
 void Server::init_tcp_streams()
 {
-    for (SocketArray::iterator it = sockets_.begin(); it != sockets_.end(); ++it) {
-        TcpStream& s = static_cast<TcpStream&>(**it);
+    for (sock::SocketArray::iterator it = sockets_.begin(); it != sockets_.end(); ++it) {
+        sock::TcpStream& s = static_cast<sock::TcpStream&>(**it);
 
         s.init();
         s.bind();
@@ -102,7 +103,7 @@ void Server::run()
 
             bool found = false;
 
-            SocketArray::iterator socket = sockets_.find(it->fd);
+            sock::SocketArray::iterator socket = sockets_.find(it->fd);
             if (socket == sockets_.end()) {
                 // This should never happen
                 std::cerr << "Did not find socket: " << it->fd << std::endl;
@@ -117,10 +118,10 @@ void Server::run()
                 found = true;
 
                 switch ((*socket)->type()) {
-                    case TCP_STREAM:
+                    case sock::TCP_STREAM:
                         events_.push(new event::TcpStreamEvent(*socket));
                         break;
-                    case CONNECTION:
+                    case sock::CONNECTION:
                         events_.push(new event::ConnectionReadEvent(*socket));
                         break;
                 }
@@ -146,17 +147,17 @@ void Server::process_event_queue()
 
         switch (ev->type()) {
             case event::TCP_STREAM_EVENT: {
-                const TcpStream& s = static_cast<TcpStream&>(*ev->data());
+                const sock::TcpStream& s = static_cast<sock::TcpStream&>(*ev->data());
                 accept_connection(s);
                 break;
             }
             case event::CONNECTION_READ_EVENT: {
-                Connection& c = static_cast<Connection&>(*ev->data());
+                sock::Connection& c = static_cast<sock::Connection&>(*ev->data());
                 receive_data(c);
                 break;
             }
             case event::CONNECTION_WRITE_EVENT: {
-                Connection& c = static_cast<Connection&>(*ev->data());
+                sock::Connection& c = static_cast<sock::Connection&>(*ev->data());
                 const char* msg = "HTTP/1.0 200 OK\r\n\r\n<h1>Hello World Rust is the best "
                                   "language ever made</h1>\r\n";
                 send(c.fd(), msg, strlen(msg), 0);
@@ -169,13 +170,13 @@ void Server::process_event_queue()
     }
 }
 
-void Server::accept_connection(const TcpStream& stream)
+void Server::accept_connection(const sock::TcpStream& stream)
 {
-    Connection* c = new Connection(&stream, MAX_REQUEST_SIZE);
+    sock::Connection* c = new sock::Connection(&stream, MAX_REQUEST_SIZE);
 
     try {
         c->init();
-        sockets_.add(static_cast<Socket*>(c));
+        sockets_.add(static_cast<sock::Socket*>(c));
 
         pollfd pfd;
         pfd.fd = c->fd();
@@ -188,7 +189,7 @@ void Server::accept_connection(const TcpStream& stream)
     }
 }
 
-void Server::receive_data(Connection& c)
+void Server::receive_data(sock::Connection& c)
 {
     char buf[BUFFER_SIZE];
     ssize_t prev_read = 0;
@@ -250,9 +251,9 @@ void Server::receive_data(Connection& c)
     }
 }
 
-void Server::close_connection(Connection& c)
+void Server::close_connection(sock::Connection& c)
 {
-    SocketArray::iterator socket = sockets_.find(c.fd());
+    sock::SocketArray::iterator socket = sockets_.find(c.fd());
     if (socket == sockets_.end()) {
         std::cerr << "Can't find connection" << std::endl;
         return;

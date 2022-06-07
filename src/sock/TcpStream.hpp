@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/03 20:13:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 12:56:23 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 14:43:12 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 #include <netinet/in.h>
 #include <vector>
 
+namespace sock
+{
 class TcpStream : public Socket
 {
 public:
@@ -48,3 +50,4 @@ private:
     in_addr addr_;
     uint16_t port_;
 };
+} // namespace sock

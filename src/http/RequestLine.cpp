@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 13:06:08 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/06 20:42:10 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 14:48:07 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ RequestLine::RequestLine()
 {
 }
 
-RequestLine::RequestLine(Buffer& request_data)
+RequestLine::RequestLine(sock::Buffer& request_data)
 {
     std::string first_line = get_next_word(request_data, REQ_EOL, 2);
     std::string word = get_next_word(first_line, " ");

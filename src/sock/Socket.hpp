@@ -6,13 +6,16 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 18:14:57 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 12:56:03 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 14:42:32 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #include "ExceptionBase.hpp"
+
+namespace sock
+{
 
 enum SocketType {
     TCP_STREAM,
@@ -50,3 +53,4 @@ protected:
     bool is_init_;
     bool read_;
 };
+} // namespace sock

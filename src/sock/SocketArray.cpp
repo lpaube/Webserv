@@ -1,6 +1,9 @@
 #include "SocketArray.hpp"
 #include <algorithm>
 
+namespace sock
+{
+
 void SocketArray::add(Socket* socket)
 {
     sockets_.push_back(socket);
@@ -44,3 +47,4 @@ SocketArray::~SocketArray()
 {
     clear();
 }
+} // namespace sock

@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 15:02:37 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 12:55:41 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 14:41:24 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 #include <cstddef>
 #include <vector>
 
+namespace sock
+{
 class Buffer
 {
 public:
@@ -46,3 +48,5 @@ private:
     std::vector<char> data_;
     const char* cursor_;
 };
+
+} // namespace sock

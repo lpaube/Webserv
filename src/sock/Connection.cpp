@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 18:10:03 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 12:57:12 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 14:41:58 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+namespace sock
+{
 Connection::Connection(const TcpStream* stream, size_t buffer_size)
     : Socket(),
       stream_(stream),
@@ -77,3 +79,4 @@ http::Request& Connection::request()
 {
     return request_;
 }
+} // namespace sock
