@@ -6,13 +6,13 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 12:59:13 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/06 20:39:47 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 12:56:58 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "Buffer.hpp"
+#include "socket/Buffer.hpp"
 #include "ExceptionBase.hpp"
 #include "Method.hpp"
 #include <cstddef>
