@@ -191,7 +191,7 @@ void ServerParser::generate_fake_config()
 void ServerParser::init_config()
 {
   config.listen.port = -1;
-  config.server_name.push_back("");
+  //config.server_name.push_back("");
   config.client_max_body_size = 1000;
   config.return_redirect.code = -1;
   config.root = "html";
@@ -248,7 +248,7 @@ void ServerParser::parse_config_vars()
     directives.push_back(tmp_str);
 
 
-    if (directives.size() > 0)
+    if (directives.size() > 1)
     {
       if (directives[0] == "listen")
       {
@@ -258,19 +258,30 @@ void ServerParser::parse_config_vars()
           throw("Listen: no port number");
         config.listen.address = directives[1].substr(0, directives[1].find(":"));
         std::string tmp_str = directives[1].substr(directives[1].find(":") + 1);
-        //std::cout << tmp_str << std::endl;
+        config.listen.port = std::stoi(tmp_str);
       }
       else if (directives[0] == "server_name")
       {
-        std::cout << "There is a server_name" << std::endl;
+        for (std::vector<std::string>::size_type i = 1; i < directives.size(); ++i)
+        {
+          config.server_name.push_back(directives[i]);
+        }
       }
       else if (directives[0] == "error_page")
       {
-        std::cout << "There is a error_page" << std::endl;
+        Config::Error_page tmp_page;
+
+        std::vector<std::string>::size_type i = 1;
+        for (; i < directives.size() - 1; ++i)
+        {
+          tmp_page.code.push_back(std::stoi(directives[i]));
+        }
+        tmp_page.uri = directives[i];
+        config.error_page.push_back(tmp_page);
       }
       else if (directives[0] == "client_max_body_size")
       {
-        std::cout << "There is a client_max_body_size" << std::endl;
+
       }
       else if (directives[0] == "limit_except")
       {
@@ -297,6 +308,8 @@ void ServerParser::parse_config_vars()
         std::cout << "cgi_ext" << std::endl;
       }
     }
+    else
+      throw("Not enough arguments provided");
   }
 }
 
