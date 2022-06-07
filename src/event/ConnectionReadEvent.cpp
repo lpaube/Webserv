@@ -14,7 +14,8 @@
 
 namespace event
 {
-ConnectionReadEvent::ConnectionReadEvent(Socket* connection) : Event(connection)
+ConnectionReadEvent::ConnectionReadEvent(Socket* connection)
+    : Event(connection)
 {
 }
 

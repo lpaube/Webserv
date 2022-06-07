@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:21:49 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 07:34:18 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/06 16:11:28 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,17 +28,6 @@
 
 #include "http/Request.hpp"
 
-std::string first_line(std::string& str)
-{
-    std::string::size_type pos = str.find("\r\n");
-    if (pos == std::string::npos) {
-        return "";
-    }
-    std::string line = str.substr(0, pos + 2);
-    str.erase(0, pos + 2);
-    return line;
-}
-
 int main(int argc, char** argv)
 {
     if (argc != 2) {
@@ -55,6 +44,7 @@ int main(int argc, char** argv)
     Server server;
     std::vector<Config> configs;
     configs.push_back(fake_config);
+
     try {
         server.configure(configs);
         server.run();

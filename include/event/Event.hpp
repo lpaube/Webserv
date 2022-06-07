@@ -16,8 +16,7 @@
 
 namespace event
 {
-enum EventType
-{
+enum EventType {
     TCP_STREAM_EVENT,
     CONNECTION_READ_EVENT,
     CONNECTION_WRITE_EVENT

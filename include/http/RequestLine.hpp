@@ -6,12 +6,13 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 12:59:13 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/03 22:16:34 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/06 15:09:48 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include "Buffer.hpp"
 #include "ExceptionBase.hpp"
 #include "Method.hpp"
 #include <cstddef>
@@ -32,7 +33,7 @@ public:
 
 public:
     RequestLine();
-    RequestLine(std::string request_str);
+    RequestLine(Buffer& request_data);
 
 public:
     Method method() const;

@@ -16,8 +16,7 @@
 
 namespace http
 {
-enum Method
-{
+enum Method {
     BAD_METHOD,
     GET,
     POST,

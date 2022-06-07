@@ -14,7 +14,8 @@
 
 namespace event
 {
-ConnectionWriteEvent::ConnectionWriteEvent(Socket* connection) : Event(connection)
+ConnectionWriteEvent::ConnectionWriteEvent(Socket* connection)
+    : Event(connection)
 {
 }
 

@@ -16,11 +16,15 @@
 #include <iostream>
 #include <unistd.h>
 
-TcpStream::Exception::Exception(const char* msg) : ExceptionBase(msg)
+TcpStream::Exception::Exception(const char* msg)
+    : ExceptionBase(msg)
 {
 }
 
-TcpStream::TcpStream(in_addr address, uint16_t port) : Socket(), addr_(address), port_(port)
+TcpStream::TcpStream(in_addr address, uint16_t port)
+    : Socket(),
+      addr_(address),
+      port_(port)
 {
 }
 

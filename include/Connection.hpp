@@ -6,21 +6,22 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 16:47:12 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 08:13:10 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/06 19:02:38 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include "Buffer.hpp"
 #include "Socket.hpp"
 #include "TcpStream.hpp"
+#include "http/Request.hpp"
 #include <sys/socket.h>
-#include <vector>
 
 class Connection : public Socket
 {
 public:
-    Connection(const TcpStream* stream);
+    Connection(const TcpStream* stream, size_t buffer_size);
 
 public:
     virtual void init();
@@ -30,14 +31,20 @@ public:
     template <typename DataIter>
     void append_data(DataIter first, DataIter last)
     {
-        buf_.insert(buf_.end(), first, last);
+        buf_.append(first, last);
     }
+
     int host_fd() const;
-    void print();
+    http::RequestState request_state() const;
+    void set_request_state(http::RequestState state);
+    Buffer& buffer();
+    http::Request& request();
 
 private:
     const TcpStream* stream_;
     sockaddr addr_;
     socklen_t addrlen_;
-    std::vector<char> buf_;
+    Buffer buf_;
+    http::RequestState request_state_;
+    http::Request request_;
 };

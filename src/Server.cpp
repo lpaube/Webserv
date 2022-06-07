@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 20:55:57 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/06 20:00:50 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include "event/ConnectionWriteEvent.hpp"
 #include "event/TcpStreamEvent.hpp"
 #include "http/Request.hpp"
+#include "http/RequestLine.hpp"
 #include <algorithm>
 #include <arpa/inet.h>
 #include <cstdio>
@@ -24,11 +25,13 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-Server::Exception::Exception(const char* msg) : ExceptionBase(msg)
+Server::Exception::Exception(const char* msg)
+    : ExceptionBase(msg)
 {
 }
 
-Server::Server() : configured_(false)
+Server::Server()
+    : configured_(false)
 {
 }
 
@@ -111,7 +114,7 @@ void Server::run()
                 // If there was an error, add POLLIN | POLLOUT to catch it in one of the handlers
                 it->revents |= POLLIN | POLLOUT;
             }
-            if ((it->revents & (POLLIN | POLLRDHUP)) && (*socket)->read()) {
+            if ((it->revents & POLLIN) && (*socket)->read()) {
                 found = true;
 
                 switch ((*socket)->type()) {
@@ -155,7 +158,6 @@ void Server::process_event_queue()
             }
             case event::CONNECTION_WRITE_EVENT: {
                 Connection& c = static_cast<Connection&>(*ev->data());
-                c.print();
                 const char* msg = "HTTP/1.0 200 OK\r\n\r\n<h1>Hello World Rust is the best "
                                   "language ever made</h1>\r\n";
                 send(c.fd(), msg, strlen(msg), 0);
@@ -170,7 +172,7 @@ void Server::process_event_queue()
 
 void Server::accept_connection(const TcpStream& stream)
 {
-    Connection* c = new Connection(&stream);
+    Connection* c = new Connection(&stream, MAX_REQUEST_SIZE);
 
     try {
         c->init();
@@ -178,7 +180,7 @@ void Server::accept_connection(const TcpStream& stream)
 
         pollfd pfd;
         pfd.fd = c->fd();
-        pfd.events = POLLIN | POLLRDHUP | POLLOUT;
+        pfd.events = POLLIN | POLLOUT;
         pfd.revents = 0;
         pfds_.push_back(pfd);
     } catch (const std::exception& ex) {
@@ -212,7 +214,6 @@ void Server::receive_data(Connection& c)
         c.append_data(buf, buf + n);
 
         if ((size_t)n < BUFFER_SIZE || total_read > MAX_REQUEST_SIZE) {
-            c.set_write();
             break;
         }
     }
@@ -233,6 +234,21 @@ void Server::receive_data(Connection& c)
         close_connection(c);
         return;
     }
+
+    switch (c.request_state()) {
+        case http::REQ_LINE:
+            parse_http_request_line(c);
+            break;
+        case http::REQ_HEADERS:
+            parse_http_headers(c);
+            break;
+        case http::REQ_BODY:
+            parse_http_body(c);
+            break;
+        case http::REQ_DONE:
+            c.set_write();
+            break;
+    }
 }
 
 void Server::close_connection(Connection& c)
@@ -251,4 +267,58 @@ void Server::close_connection(Connection& c)
     }
 
     sockets_.erase(socket);
+}
+
+void Server::parse_http_request_line(Connection& c)
+{
+    http::RequestLine line;
+    bool error = false;
+    try {
+        line = http::RequestLine(c.buffer());
+        c.request() = http::Request(line);
+    } catch (const std::exception& ex) {
+        error = true;
+        std::cerr << ex.what() << std::endl;
+    }
+
+    if (error) {
+        // TODO: bad request
+        return;
+    }
+
+    c.set_request_state(http::REQ_HEADERS);
+    parse_http_headers(c);
+}
+
+void Server::parse_http_headers(Connection& c)
+{
+    const char* sep = "\r\n";
+    const size_t sep_size = 2;
+
+    Buffer& buf = c.buffer();
+    const char* ptr;
+    while ((ptr = buf.find(sep, sep_size)) != NULL) {
+        if (ptr == buf.cursor()) {
+            c.set_request_state(http::REQ_BODY);
+            buf.advance_cursor(2);
+            break;
+        }
+
+        try {
+            http::Header header(get_next_word(buf, sep, sep_size));
+            c.request().add_header(header);
+        } catch (const std::exception& ex) {
+            std::cout << ex.what() << std::endl;
+        }
+    }
+    buf.erase_to_cursor();
+
+    if (c.request_state() == http::REQ_BODY) {
+        parse_http_body(c);
+    }
+}
+
+void Server::parse_http_body(Connection& c)
+{
+    c.set_write();
 }

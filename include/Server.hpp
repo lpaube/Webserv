@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:51:00 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 06:51:40 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/06 20:00:02 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,9 @@ private:
     void accept_connection(const TcpStream& stream);
     void receive_data(Connection& connection);
     void close_connection(Connection& c);
+    void parse_http_request_line(Connection& c);
+    void parse_http_headers(Connection& c);
+    void parse_http_body(Connection& c);
 
 private:
     SocketArray sockets_;

@@ -16,7 +16,8 @@
 namespace http
 {
 
-Header::Exception::Exception(const char* msg) : ExceptionBase(msg)
+Header::Exception::Exception(const char* msg)
+    : ExceptionBase(msg)
 {
 }
 
@@ -32,7 +33,9 @@ Header::Header(const std::string& str)
     value_ = trim(str.substr(pos + 1), " ");
 }
 
-Header::Header(const std::string& n, const std::string& v) : name_(n), value_(v)
+Header::Header(const std::string& n, const std::string& v)
+    : name_(n),
+      value_(v)
 {
 }
 

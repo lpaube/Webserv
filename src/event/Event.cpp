@@ -14,7 +14,8 @@
 
 namespace event
 {
-Event::Event(Socket* socket) : socket_(socket)
+Event::Event(Socket* socket)
+    : socket_(socket)
 {
 }
 

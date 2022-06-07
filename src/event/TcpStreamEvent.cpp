@@ -14,7 +14,8 @@
 
 namespace event
 {
-TcpStreamEvent::TcpStreamEvent(Socket* stream) : Event(stream)
+TcpStreamEvent::TcpStreamEvent(Socket* stream)
+    : Event(stream)
 {
 }
 

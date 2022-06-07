@@ -14,8 +14,7 @@
 
 #include "ExceptionBase.hpp"
 
-enum SocketType
-{
+enum SocketType {
     TCP_STREAM,
     CONNECTION
 };

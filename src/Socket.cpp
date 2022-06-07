@@ -1,11 +1,14 @@
 #include "Socket.hpp"
 #include <unistd.h>
 
-Socket::Exception::Exception(const char* msg) : ExceptionBase(msg)
+Socket::Exception::Exception(const char* msg)
+    : ExceptionBase(msg)
 {
 }
 
-Socket::Socket() : is_init_(false), read_(true)
+Socket::Socket()
+    : is_init_(false),
+      read_(true)
 {
 }
 
