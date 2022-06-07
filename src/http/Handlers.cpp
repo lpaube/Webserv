@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:39:04 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 14:46:24 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 14:55:45 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ void parse_headers(sock::Connection& c)
     while ((ptr = buf.find(REQ_EOL, strlen(REQ_EOL))) != NULL) {
         if (ptr == buf.cursor()) {
             c.next_request_state();
-            buf.advance_cursor(2);
+            buf.advance_cursor(strlen(REQ_EOL));
             break;
         }
 
