@@ -6,27 +6,12 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:21:49 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 12:32:34 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 15:44:19 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ConfigParser.hpp"
 #include "Server.hpp"
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <exception>
-#include <fcntl.h>
-#include <iostream>
-#include <netinet/in.h>
-#include <string>
-#include <strings.h>
-#include <sys/errno.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <unistd.h>
-
-#include "http/Request.hpp"
 
 int main(int argc, char** argv)
 {
