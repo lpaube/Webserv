@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/06 20:40:20 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 02:21:08 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -291,7 +291,7 @@ void Server::parse_http_request_line(Connection& c)
         return;
     }
 
-    c.set_request_state(http::REQ_HEADERS);
+    c.next_request_state();
     parse_http_headers(c);
 }
 
@@ -301,7 +301,7 @@ void Server::parse_http_headers(Connection& c)
     const char* ptr;
     while ((ptr = buf.find(REQ_EOL, strlen(REQ_EOL))) != NULL) {
         if (ptr == buf.cursor()) {
-            c.set_request_state(http::REQ_BODY);
+            c.next_request_state();
             buf.advance_cursor(2);
             break;
         }

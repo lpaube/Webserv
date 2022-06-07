@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 18:10:03 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/06 19:03:31 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 02:20:50 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,21 @@ http::RequestState Connection::request_state() const
     return request_state_;
 }
 
-void Connection::set_request_state(http::RequestState state)
+void Connection::next_request_state()
 {
-    request_state_ = state;
+    switch (request_state_) {
+        case http::REQ_LINE:
+            request_state_ = http::REQ_HEADERS;
+            break;
+        case http::REQ_HEADERS:
+            request_state_ = http::REQ_BODY;
+            break;
+        case http::REQ_BODY:
+            request_state_ = http::REQ_DONE;
+            break;
+        default:
+            break;
+    }
 }
 
 Buffer& Connection::buffer()

@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 16:47:12 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/06 19:02:38 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 02:20:46 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ public:
 
     int host_fd() const;
     http::RequestState request_state() const;
-    void set_request_state(http::RequestState state);
+    void next_request_state();
     Buffer& buffer();
     http::Request& request();
 
