@@ -6,15 +6,15 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 12:59:13 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 14:47:58 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 18:24:51 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include "Buffer.hpp"
 #include "ExceptionBase.hpp"
 #include "Method.hpp"
-#include "sock/Buffer.hpp"
 #include <cstddef>
 #include <string>
 
@@ -34,7 +34,7 @@ public:
 
 public:
     RequestLine();
-    RequestLine(sock::Buffer& request_data);
+    RequestLine(Buffer& request_data);
 
 public:
     Method method() const;

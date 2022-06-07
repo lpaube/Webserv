@@ -6,14 +6,17 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:39:04 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 17:52:15 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 19:07:10 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Handlers.hpp"
+#include "Buffer.hpp"
 #include "Utils.hpp"
-#include "sock/Buffer.hpp"
 #include <iostream>
+
+#include <fcntl.h>
+#include <unistd.h>
 
 namespace http
 {
@@ -72,7 +75,7 @@ void parse_http_request_line(sock::Connection& c)
 
 void parse_headers(sock::Connection& c)
 {
-    sock::Buffer& buf = c.buffer();
+    Buffer& buf = c.buffer();
     const char* ptr;
     while ((ptr = buf.find(REQ_EOL, strlen(REQ_EOL))) != NULL) {
         if (ptr == buf.cursor()) {
@@ -97,7 +100,27 @@ void parse_headers(sock::Connection& c)
 
 void parse_body(sock::Connection& c)
 {
-    c.request().print();
-    c.set_write();
+    http::Request& req = c.request();
+    Buffer& buf = c.buffer();
+
+    req.print();
+
+    if (req.content_length() != 0) {
+        size_t bytes = req.content_length() > buf.size() ? buf.size() : req.content_length();
+
+        const char* start = buf.cursor();
+        const char* end = start + bytes;
+        req.body().append(start, end);
+        req.read_body_bytes(bytes);
+        buf.advance_cursor(bytes);
+        buf.erase_to_cursor();
+
+        if (req.content_length() == 0) {
+            int file = open("./logtime42", O_CREAT | O_WRONLY);
+            write(file, req.body().data(), req.body().size());
+            c.next_request_state();
+            c.set_write();
+        }
+    }
 }
 } // namespace http

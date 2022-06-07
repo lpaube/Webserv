@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 15:02:37 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 14:41:24 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 19:11:02 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,19 @@
 #include <cstddef>
 #include <vector>
 
-namespace sock
-{
 class Buffer
 {
 public:
     Buffer(size_t size);
+
+    Buffer& operator=(const Buffer& other)
+    {
+        std::vector<char>::difference_type index = other.cursor() - other.data();
+        capacity_ = other.capacity_;
+        data_ = other.data_;
+        cursor_ = data_.data() + index;
+        return *this;
+    }
 
 public:
     template <typename Iter>
@@ -42,11 +49,10 @@ public:
     const char* cursor() const;
     void advance_cursor(size_t count);
     void erase_to_cursor();
+    void clear();
 
 private:
-    const size_t size_;
+    size_t capacity_;
     std::vector<char> data_;
     const char* cursor_;
 };
-
-} // namespace sock

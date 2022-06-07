@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:19:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/06 20:39:41 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 18:55:09 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,9 @@ enum RequestState {
 class Request
 {
 public:
+    static const ssize_t MAX_REQ_BODY_SIZE = 1024 * 200;
+
+public:
     class Exception : public ExceptionBase
     {
     public:
@@ -41,8 +44,10 @@ public:
 
 public:
     void add_header(const Header& header);
-    ssize_t content_length() const;
-    void set_body(const std::string& body);
+    size_t content_length() const;
+    bool is_chunked() const;
+    void read_body_bytes(size_t count);
+    Buffer& body();
     void print() const;
 
 private:
@@ -53,8 +58,8 @@ private:
 private:
     RequestLine request_line_;
     HeaderMap headers_;
-    std::string body_;
-    ssize_t content_length_;
+    Buffer body_;
+    size_t content_length_;
     bool is_chunked_;
 };
 

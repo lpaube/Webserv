@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 14:50:34 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 18:32:32 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,7 +172,7 @@ void Server::process_event_queue()
 
 void Server::accept_connection(const sock::TcpStream& stream)
 {
-    sock::Connection* c = new sock::Connection(&stream, MAX_REQUEST_SIZE);
+    sock::Connection* c = new sock::Connection(&stream, MAX_REQ_SIZE);
 
     try {
         c->init();
@@ -213,7 +213,7 @@ void Server::receive_data(sock::Connection& c)
         total_read += n;
         c.append_data(buf, buf + n);
 
-        if ((size_t)n < BUFFER_SIZE || total_read > MAX_REQUEST_SIZE) {
+        if ((size_t)n < BUFFER_SIZE || total_read > MAX_REQ_SIZE) {
             break;
         }
     }
@@ -230,7 +230,7 @@ void Server::receive_data(sock::Connection& c)
     }
 
     // Request too big
-    if (total_read > MAX_REQUEST_SIZE) {
+    if (total_read > MAX_REQ_SIZE) {
         close_connection(c);
         return;
     }

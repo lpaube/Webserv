@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:40:28 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 14:50:48 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 18:32:43 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ std::string trim(const std::string& str, const std::string& sep)
     return std::string(start, end);
 }
 
-std::string get_next_word(sock::Buffer& buf, const char* sep, size_t sep_size)
+std::string get_next_word(Buffer& buf, const char* sep, size_t sep_size)
 {
     const char* ptr = buf.find(sep, sep_size);
     if (ptr == NULL) {

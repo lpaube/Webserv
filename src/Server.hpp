@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:51:00 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 14:48:30 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 18:52:47 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ class Server
 public:
     static const int POLL_TIMEOUT = 5000;
     static const int CONNECTION_TIMEOUT = 20;
-    static const size_t BUFFER_SIZE = 1024 * 10;
-    static const ssize_t MAX_REQUEST_SIZE = 1024 * 200;
+    static const size_t BUFFER_SIZE = 1024 * 32;
+    static const ssize_t MAX_REQ_SIZE = 1024 * 200000;
 
 public:
     class Exception : public ExceptionBase

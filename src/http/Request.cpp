@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:09 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/06 19:05:31 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 18:55:39 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,15 @@ Request::Exception::Exception(const char* msg)
 }
 
 Request::Request()
-    : content_length_(0),
+    : body_(MAX_REQ_BODY_SIZE),
+      content_length_(0),
       is_chunked_(false)
 {
 }
 
 Request::Request(const RequestLine& request_line)
     : request_line_(request_line),
+      body_(MAX_REQ_BODY_SIZE),
       content_length_(0),
       is_chunked_(false)
 {
@@ -43,14 +45,25 @@ void Request::add_header(const Header& header)
     parse_header(header);
 }
 
-ssize_t Request::content_length() const
+size_t Request::content_length() const
 {
     return content_length_;
 }
 
-void Request::set_body(const std::string& body)
+bool Request::is_chunked() const
 {
-    body_ = body;
+    return is_chunked_;
+}
+
+void Request::read_body_bytes(size_t count)
+{
+    size_t n = count > content_length_ ? content_length_ : count;
+    content_length_ -= n;
+}
+
+Buffer& Request::body()
+{
+    return body_;
 }
 
 void Request::print() const
@@ -63,7 +76,6 @@ void Request::print() const
     for (HeaderMap::const_iterator it = headers_.begin(); it != headers_.end(); ++it) {
         std::cout << '\t' << it->first << ": " << it->second << '\n';
     }
-    std::cout << "Body: " << body_ << std::endl;
 }
 
 void Request::parse_header(const Header& header)
@@ -77,7 +89,7 @@ void Request::parse_header(const Header& header)
 
 void Request::parse_content_length(const std::string& value)
 {
-    ssize_t size = 0;
+    size_t size = 0;
     std::istringstream ss(value);
     ss >> size;
 

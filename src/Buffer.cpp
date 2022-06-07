@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 15:06:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 17:51:26 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 19:11:41 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,10 @@
 #include <cstdlib>
 #include <cstring>
 
-namespace sock
-{
 Buffer::Buffer(size_t size)
-    : size_(size)
+    : capacity_(size)
 {
-    data_.reserve(size_);
+    data_.reserve(capacity_);
     cursor_ = data_.data();
 }
 
@@ -49,7 +47,7 @@ size_t Buffer::size() const
 
 size_t Buffer::capacity() const
 {
-    return size_;
+    return capacity_;
 }
 
 size_t Buffer::space_left() const
@@ -73,4 +71,9 @@ void Buffer::erase_to_cursor()
     data_.erase(data_.begin(), data_.begin() + index);
     cursor_ = data_.data();
 }
-} // namespace sock
+
+void Buffer::clear()
+{
+    data_.clear();
+    cursor_ = data_.data();
+}
