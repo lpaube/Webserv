@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/06 20:00:50 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/06 20:40:20 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -273,6 +273,11 @@ void Server::parse_http_request_line(Connection& c)
 {
     http::RequestLine line;
     bool error = false;
+
+    if (c.buffer().find(REQ_EOL, strlen(REQ_EOL)) == NULL) {
+        return;
+    }
+
     try {
         line = http::RequestLine(c.buffer());
         c.request() = http::Request(line);
@@ -292,12 +297,9 @@ void Server::parse_http_request_line(Connection& c)
 
 void Server::parse_http_headers(Connection& c)
 {
-    const char* sep = "\r\n";
-    const size_t sep_size = 2;
-
     Buffer& buf = c.buffer();
     const char* ptr;
-    while ((ptr = buf.find(sep, sep_size)) != NULL) {
+    while ((ptr = buf.find(REQ_EOL, strlen(REQ_EOL))) != NULL) {
         if (ptr == buf.cursor()) {
             c.set_request_state(http::REQ_BODY);
             buf.advance_cursor(2);
@@ -305,7 +307,7 @@ void Server::parse_http_headers(Connection& c)
         }
 
         try {
-            http::Header header(get_next_word(buf, sep, sep_size));
+            http::Header header(get_next_word(buf, REQ_EOL, strlen(REQ_EOL)));
             c.request().add_header(header);
         } catch (const std::exception& ex) {
             std::cout << ex.what() << std::endl;

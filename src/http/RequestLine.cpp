@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 13:06:08 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/06 19:34:12 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/06 20:42:10 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,8 @@ RequestLine::RequestLine()
 
 RequestLine::RequestLine(Buffer& request_data)
 {
-    std::string word = get_next_word(request_data, " ", 1);
+    std::string first_line = get_next_word(request_data, REQ_EOL, 2);
+    std::string word = get_next_word(first_line, " ");
 
     method_ = method_from_str(word);
     if (method_ == BAD_METHOD) {
@@ -36,15 +37,15 @@ RequestLine::RequestLine(Buffer& request_data)
         throw Exception(msg.c_str());
     }
 
-    word = get_next_word(request_data, "?", 1);
+    word = get_next_word(first_line, "?");
     if (!word.empty()) {
         path_ = word;
-        query_str_ = get_next_word(request_data, " ", 1);
+        query_str_ = get_next_word(first_line, " ");
     } else {
-        path_ = get_next_word(request_data, " ", 1);
+        path_ = get_next_word(first_line, " ");
     }
 
-    http_version_ = get_next_word(request_data, "\r\n", 2);
+    http_version_ = first_line;
     if (http_version_.empty()) {
         throw Exception("Bad request");
     }

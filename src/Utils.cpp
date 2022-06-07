@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:40:28 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/06 19:36:17 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/06 20:33:25 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,17 @@ std::string get_next_word(Buffer& buf, const char* sep, size_t sep_size)
     }
     std::string word(buf.cursor(), ptr);
     buf.advance_cursor((size_t)(ptr - buf.cursor()) + sep_size);
+    return word;
+}
+
+std::string get_next_word(std::string& str, const std::string& sep)
+{
+    std::string::size_type pos = str.find(sep);
+    if (pos == std::string::npos) {
+        return "";
+    }
+    std::string word = str.substr(0, pos);
+    str.erase(0, pos + sep.length());
     return word;
 }
 

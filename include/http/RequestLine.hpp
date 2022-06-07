@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 12:59:13 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/06 15:09:48 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/06 20:39:47 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <string>
 
 #define SUPPORTED_HTTP_VERSION "HTTP/1.1"
+#define REQ_EOL "\r\n"
 
 namespace http
 {
