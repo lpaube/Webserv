@@ -1,0 +1,70 @@
+
+body {
+	background-color: white;
+	align-content: center;
+}
+
+
+.top{
+	display: flex;
+	justify-content: center;
+	color: rgb(49, 38, 76);
+	font-family: 'Helvetica';
+	font-size: 40px;
+}
+
+.wardrobe-img{
+	margin: auto;
+	display: block;
+	height: 500px;
+}
+
+
+.center{
+	margin-top:10px;
+	display: flex;
+	justify-content: center;
+}
+
+.bot{
+	margin-top:50px;
+	display: flex;
+	justify-content: center;
+}
+
+
+.upload-field{
+	margin-top: 10px;
+	margin-left: 45px;
+	color:rgb(39, 39, 39);
+}
+.send-btn{
+	margin-top: 10px;
+	background-color: white;
+	border: none;
+}
+
+.send-btn:hover{
+	cursor: pointer;
+}
+
+.upload-img{
+	width: 100px;
+	height: auto;
+}
+
+.upload-img:hover{
+}
+
+.upload-img:active{
+	width: 103px;
+}
+
+.up-text{
+
+}
+
+.upload-txt{
+	font-size: 17px;
+	color:rgb(121, 37, 199);
+}

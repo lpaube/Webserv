@@ -6,9 +6,9 @@ body {
 .top{
 	display: flex;
 	justify-content: center;
-	color: rgb(65, 66, 78);
-	font-family: Tahoma;
-	font-size: 50px;
+	color: rgb(49, 38, 76);
+	font-family: 'Helvetica';
+	font-size: 40px;
 }
 
 .wardrobe-img{
@@ -17,22 +17,51 @@ body {
 	height: 500px;
 }
 
+
 .center{
-	margin-top:100px;
+	margin-top:75px;
 	display: flex;
 	justify-content: center;
 }
 
-.center-button{
+.bot{
+	margin-top:50px;
+	display: flex;
+	justify-content: center;
+}
+
+.env-button{
 	font-family: 'Tahoma';
-	background-color: rgb(142, 143, 153);
+	background-color: rgb(204, 202, 189);
 	color:rgb(255, 255, 255);
 	font-size:35px;
-	width:300px;
-	height:45px;
-	border-radius: 15px;
+	width:275px;
+	height:50px;
+	border-radius: 5px;
+	border: none;
+	text-align: center;
+	cursor: pointer;
+}
+
+.env-button:hover{
+	transition: 0.75s;
+	background-color: rgb(188, 186, 175);
+}
+.center-button{
+	font-family: 'Tahoma';
+	background-color: rgb(66, 0, 232);
+	color:rgb(255, 255, 255);
+	font-size:35px;
+	width:275px;
+	height:50px;
+	border-radius: 5px;
 	border: none;
 	text-align: center;
 	cursor: pointer;
 	margin-right:30px;
+}
+
+.center-button:hover{
+	transition: 0.75s;
+	background-color: rgb(35, 0, 122);
 }
