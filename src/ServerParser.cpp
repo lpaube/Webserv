@@ -273,7 +273,9 @@ void ServerParser::parse_location_vars()
           std::vector<std::string>::size_type i = 1;
           for (; i < directives.size() - 1; ++i)
           {
-            tmp_page.code.push_back(std::stoi(directives[i]));
+            int x;
+            std::istringstream(directives[i]) >> x;
+            tmp_page.code.push_back(x);
           }
           tmp_page.uri = directives[i];
           new_location.error_page.push_back(tmp_page);
@@ -289,7 +291,11 @@ void ServerParser::parse_location_vars()
             if (isdigit(*it))
               tmp_str.push_back(*it);
             else if ((*it == 'm' || *it == 'M') && it + 1 == directives[1].end())
-              new_location.client_max_body_size = std::stoul(tmp_str);
+            {
+              unsigned long x;
+              std::istringstream(tmp_str) >> x;
+              new_location.client_max_body_size = x;
+            }
             else
               throw("client_max_body_size not a valid input");
           }
@@ -307,7 +313,9 @@ void ServerParser::parse_location_vars()
             new_location.return_redirect.url = directives[1];
           else if (directives.size() == 3)
           {
-            new_location.return_redirect.code = std::stoi(directives[1]);
+            int x;
+            std::istringstream(directives[1]) >> x;
+            new_location.return_redirect.code = x;
             new_location.return_redirect.url = directives[2];
           }
           else
@@ -411,7 +419,9 @@ void ServerParser::parse_server_vars()
           throw("Listen: no port number");
         config.listen.address = directives[1].substr(0, directives[1].find(":"));
         std::string tmp_str = directives[1].substr(directives[1].find(":") + 1);
-        config.listen.port = std::stoi(tmp_str);
+        int x;
+        std::istringstream(tmp_str) >> x;
+        config.listen.port = x;
       }
       else if (directives[0] == "server_name")
       {
@@ -427,7 +437,9 @@ void ServerParser::parse_server_vars()
         std::vector<std::string>::size_type i = 1;
         for (; i < directives.size() - 1; ++i)
         {
-          tmp_page.code.push_back(std::stoi(directives[i]));
+          int x;
+          std::istringstream(directives[i]) >> x;
+          tmp_page.code.push_back(x);
         }
         tmp_page.uri = directives[i];
         config.error_page.push_back(tmp_page);
@@ -443,7 +455,11 @@ void ServerParser::parse_server_vars()
           if (isdigit(*it))
             tmp_str.push_back(*it);
           else if ((*it == 'm' || *it == 'M') && it + 1 == directives[1].end())
-            config.client_max_body_size = std::stoul(tmp_str);
+          {
+            unsigned long x;
+            std::istringstream(tmp_str) >> x;
+            config.client_max_body_size = x;
+          }
           else
             throw("client_max_body_size not a valid input");
         }
@@ -458,7 +474,9 @@ void ServerParser::parse_server_vars()
           config.return_redirect.url = directives[1];
         else if (directives.size() == 3)
         {
-          config.return_redirect.code = std::stoi(directives[1]);
+          int x;
+          std::istringstream(directives[1]) >> x;
+          config.return_redirect.code = x;
           config.return_redirect.url = directives[2];
         }
         else
