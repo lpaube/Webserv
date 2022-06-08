@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:08:15 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/08 00:30:41 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/08 18:00:10 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,10 @@ std::string ConfigParser::getContent(std::fstream& file)
     std::string ret(buf);
     delete[] buf;
     return ret;
+}
+
+unsigned int ConfigParser::nbServer() const{
+	return this->nb_server;
 }
 
 ConfigParser::~ConfigParser()

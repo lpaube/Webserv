@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:08 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/08 13:34:32 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/08 18:05:25 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ Script::Script(Config& config, http::Request& request)
     (void)this->envp;
     this->cmd = new char*[3];
     http::RequestLine requestline = this->request.requestLine();
-    buildCmd(requestline.path(), config);
+    buildCmd("./" + requestline.path(), config);
 }
 
 Script::~Script()
@@ -131,7 +131,7 @@ std::string Script::get_ext(std::string& path)
 // build the cmd with the config file and the type of the script in the request.
 void Script::buildCmd(std::string path, Config& config)
 {
-
+	std::cout << "\n\n\n\nCMD PATH = " << path << "\n\n\n";
     std::size_t ext_size = config.cgi_ext.size();
     std::string path_ext = get_ext(path);
     bool found = false;
@@ -154,6 +154,7 @@ void Script::buildCmd(std::string path, Config& config)
     this->cmd[0] = strncpy(this->cmd[0], config.cgi_ext[i].bin_path.c_str(),
                            config.cgi_ext[i].bin_path.length());
     std::cout << this->cmd[0] << std::endl;
+
     this->cmd[1] = strncpy(this->cmd[1], path.c_str(), path.length());
     std::cout << this->cmd[1] << std::endl;
     this->cmd[2] = NULL;
