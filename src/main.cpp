@@ -22,7 +22,7 @@ int main(int argc, char** argv)
     }
     std::string config_file(argv[1]);
     ConfigParser config_parser(config_file);
-    // config_parser.serverparser[1].config.print_config();
+    config_parser.serverparser[0].config.print_config();
 
 
     // Server server;
