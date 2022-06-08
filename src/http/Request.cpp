@@ -63,13 +63,14 @@ void Request::print() const
     std::cout << "Body: " << body_ << std::endl;
 }
 
-
-std::string&	Request::body() {
-	return this->body_;
+std::string& Request::body()
+{
+    return this->body_;
 }
 
-RequestLine&	Request::requestLine(){
-	return this->request_line_;
+RequestLine& Request::requestLine()
+{
+    return this->request_line_;
 }
 
 void Request::parse_header(const Header& header)

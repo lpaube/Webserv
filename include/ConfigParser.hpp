@@ -19,14 +19,16 @@
 class ConfigParser
 {
 public:
-	class Exception : public ExceptionBase
-	{
-    	public:
+    class Exception : public ExceptionBase
+    {
+    public:
         Exception(const char* msg);
     };
+
 public:
     ConfigParser(std::string config_file);
     ~ConfigParser();
+
 private:
     std::string getContent(std::fstream& file);
     void createConfig();

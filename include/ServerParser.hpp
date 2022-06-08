@@ -11,24 +11,24 @@
 /* ************************************************************************** */
 
 #pragma once
-#include "LocationContent.hpp"
 #include "ExceptionBase.hpp"
+#include "LocationContent.hpp"
 #include <iostream>
 #include <string>
-#include "ExceptionBase.hpp"
 
 class Config
 {
 public:
-	class Exception : public ExceptionBase
-	{
-    	public:
+    class Exception : public ExceptionBase
+    {
+    public:
         Exception(const char* msg);
     };
+
 public:
     struct Listen {
         std::string address;
-        std::string port;//int
+        std::string port; // int
     };
 
     struct Error_page {
@@ -139,12 +139,13 @@ public:
 
 class ServerParser
 {
-	public:
-	class Exception : public ExceptionBase
-	{
-    	public:
+public:
+    class Exception : public ExceptionBase
+    {
+    public:
         Exception(const char* msg);
     };
+
 public:
     ServerParser(std::string::iterator beg, std::string::iterator end);
     ~ServerParser(){};

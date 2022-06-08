@@ -93,7 +93,7 @@ void ConfigParser::findServerStart(std::string::iterator& start)
         start++;
     }
     if (*start != '{') {
-       throw Exception("Error: Config, no opening { found after server declaration\n");
+        throw Exception("Error: Config, no opening { found after server declaration\n");
     } else
         start++;
 }

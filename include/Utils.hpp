@@ -21,4 +21,4 @@ std::string trim(const std::string& str, const std::string& sep);
 std::string get_next_word(std::string& str, const std::string& sep);
 void to_lower(std::string& str);
 bool vectorize_content(std::vector<std::string>& content, std::string& content_str);
-void	putstr_fd(std::string& msg, std::size_t fd);
+void putstr_fd(std::string& msg, std::size_t fd);

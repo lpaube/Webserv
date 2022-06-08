@@ -11,15 +11,14 @@
 /* ************************************************************************** */
 
 #include "Script.hpp"
-#include <string>
+#include "Utils.hpp"
 #include "http/RequestLine.hpp"
+#include <fcntl.h>
 #include <string.h>
+#include <string>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include "Utils.hpp"
-#include <fcntl.h>
-
 
 #define BUFFER_SIZE 50
 
@@ -28,111 +27,117 @@ Script::Exception::Exception(const char* msg)
 {
 }
 
-Script::Script(Config& config, http::Request& request) : request(request){
-	(void)this->envp;
-	this->cmd = new char *[3];
-	http::RequestLine	requestline = this->request.requestLine();
-	build_cmd(requestline.path(), config);
+Script::Script(Config& config, http::Request& request)
+    : request(request)
+{
+    (void)this->envp;
+    this->cmd = new char*[3];
+    http::RequestLine requestline = this->request.requestLine();
+    build_cmd(requestline.path(), config);
 }
 
-Script::~Script(){
-	delete[] cmd;
+Script::~Script()
+{
+    delete[] cmd;
 }
 
-std::string	Script::exec() const{
-	pid_t		id;
-	int			status;
-	int			save[2];
-	int			pipe_fd[2];
-	int			read_fd[2];
+std::string Script::exec() const
+{
+    pid_t id;
+    int status;
+    int save[2];
+    int pipe_fd[2];
+    int read_fd[2];
 
-	http::RequestLine request_line = this->request.requestLine();
-	http::Method method = request_line.method();
+    http::RequestLine request_line = this->request.requestLine();
+    http::Method method = request_line.method();
 
-	save[0] = dup(STDIN_FILENO);
-	save[1] = dup(STDOUT_FILENO);
+    save[0] = dup(STDIN_FILENO);
+    save[1] = dup(STDOUT_FILENO);
 
-	int in_file;
-	if (method == http::POST){
-		in_file = open("in_file", O_CREAT | O_APPEND);
-		putstr_fd(this->request.body(), in_file);
-		close(in_file);
-		open("in_file", O_RDONLY);
-		dup2(in_file, STDIN_FILENO);
-	}
-	int out_file = open("out_file", O_CREAT | O_APPEND);
-	dup2(out_file, STDOUT_FILENO);
-	id = fork();
-	if (id < 0)
-		throw Exception("Error fatal, fork");
-	if (id == 0){
-		execve(cmd[0], cmd, envp);
-		throw Exception("Error fatal, execve");
-	}
-	else
-		waitpid(id, &status, 0);
-	if (method == http::POST){
-		close(in_file);
-		remove("in_file");
-	}
-	close(out_file);
-	out_file = open("out_file", O_RDONLY);
-	char buf[BUFFER_SIZE];
-	std::string	script_ret;
-	int	ret = 1;
-	while (ret > 0){
-		ret = read(pipe_fd[0], buf, BUFFER_SIZE - 2);
-		buf[BUFFER_SIZE - 1] = 0;
-		script_ret.append(buf);
-	}
-	close(out_file);
-	remove("out_file");
-	return script_ret;
+    int in_file;
+    if (method == http::POST) {
+        in_file = open("in_file", O_CREAT | O_APPEND);
+        putstr_fd(this->request.body(), in_file);
+        close(in_file);
+        open("in_file", O_RDONLY);
+        dup2(in_file, STDIN_FILENO);
+    }
+    int out_file = open("out_file", O_CREAT | O_APPEND);
+    dup2(out_file, STDOUT_FILENO);
+    id = fork();
+    if (id < 0)
+        throw Exception("Error fatal, fork");
+    if (id == 0) {
+        execve(cmd[0], cmd, envp);
+        throw Exception("Error fatal, execve");
+    } else
+        waitpid(id, &status, 0);
+    if (method == http::POST) {
+        close(in_file);
+        remove("in_file");
+    }
+    close(out_file);
+    out_file = open("out_file", O_RDONLY);
+    char buf[BUFFER_SIZE];
+    std::string script_ret;
+    int ret = 1;
+    while (ret > 0) {
+        ret = read(pipe_fd[0], buf, BUFFER_SIZE - 2);
+        buf[BUFFER_SIZE - 1] = 0;
+        script_ret.append(buf);
+    }
+    close(out_file);
+    remove("out_file");
+    return script_ret;
 }
 
-std::string Script::get_ext(std::string& path){
-	unsigned long	len = path.length();
-	unsigned long	save = 0;
-	unsigned long	i = 0;
-	std::string		ext;
-	while (i < len){
-		if (path[i] == '/')
-			save = i;
-		i++;
-	}
-	while (save < len){
-		if (path[save] == '.')
-			break ;
-		else
-			save++;
-	}
-	if (save == len)
-		throw Exception("Error: No script extention found");
-	save++;
-	ext = path.substr(save);
-	return ext;
+std::string Script::get_ext(std::string& path)
+{
+    unsigned long len = path.length();
+    unsigned long save = 0;
+    unsigned long i = 0;
+    std::string ext;
+    while (i < len) {
+        if (path[i] == '/')
+            save = i;
+        i++;
+    }
+    while (save < len) {
+        if (path[save] == '.')
+            break;
+        else
+            save++;
+    }
+    if (save == len)
+        throw Exception("Error: No script extention found");
+    save++;
+    ext = path.substr(save);
+    return ext;
 }
 
-void Script::build_cmd(std::string path, Config& config){
+void Script::build_cmd(std::string path, Config& config)
+{
 
-	std::size_t ext_size = config.cgi_ext.size();
-	std::string path_ext = get_ext(path);
-	bool	found = false;
-	std::size_t i = 0;
-	while (i < ext_size){
-		if (path_ext.find(config.cgi_ext[i].extension) == true){
-			found = true;
-			break ;
-		}
-		i++;
-	}
-	std::string msg = "Error: script extension ." + path_ext;
-	if (found == false)
-		throw Exception(msg.c_str());
-	this->cmd = new char *[3];
-	this->cmd[0] = strncpy(this->cmd[0], config.cgi_ext[i].bin_path.c_str(), config.cgi_ext[i].bin_path.length());
-	std::cout << this->cmd[0] << std::endl;
-	this->cmd[1] = strncpy(this->cmd[1], path.c_str(), path.length());
-	std::cout << this->cmd[1] << std::endl;
-	this->cmd[2] = NULL;
+    std::size_t ext_size = config.cgi_ext.size();
+    std::string path_ext = get_ext(path);
+    bool found = false;
+    std::size_t i = 0;
+    while (i < ext_size) {
+        if (path_ext.find(config.cgi_ext[i].extension) == true) {
+            found = true;
+            break;
+        }
+        i++;
+    }
+    std::string msg = "Error: script extension ." + path_ext;
+    if (found == false)
+        throw Exception(msg.c_str());
+    this->cmd = new char*[3];
+    this->cmd[0] = strncpy(this->cmd[0], config.cgi_ext[i].bin_path.c_str(),
+                           config.cgi_ext[i].bin_path.length());
+    std::cout << this->cmd[0] << std::endl;
+    this->cmd[1] = strncpy(this->cmd[1], path.c_str(), path.length());
+    std::cout << this->cmd[1] << std::endl;
+    this->cmd[2] = NULL;
 }

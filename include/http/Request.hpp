@@ -17,7 +17,6 @@
 #include "RequestLine.hpp"
 #include <unistd.h>
 
-
 namespace http
 {
 class Request
@@ -33,18 +32,19 @@ public:
     Request(const RequestLine& request_line, std::string request_str);
 
 public:
-	std::string&	body();
-	RequestLine& requestLine();
+    std::string& body();
+    RequestLine& requestLine();
     ssize_t content_length() const;
     void set_body(const std::string& body);
     void print() const;
+
 private:
     void parse_header(const Header& header);
     void parse_content_length(const std::string& value);
     void parse_transfer_encoding(std::string value);
 
 private:
-	RequestLine request_line_;
+    RequestLine request_line_;
     HeaderMap headers_;
     std::string body_;
     ssize_t content_length_;

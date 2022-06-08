@@ -90,7 +90,7 @@ std::size_t ServerParser::findLocEnd(std::size_t i, std::size_t end)
             return i - 1;
         i++;
     }
-   throw Exception("Error: Syntax error in config file\n");
+    throw Exception("Error: Syntax error in config file\n");
 }
 
 void ServerParser::buildLocation()

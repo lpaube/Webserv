@@ -11,28 +11,31 @@
 /* ************************************************************************** */
 
 #pragma once
-#include "ServerParser.hpp"
-#include "http/Request.hpp"
-#include "http/Method.hpp"
 #include "ExceptionBase.hpp"
+#include "ServerParser.hpp"
+#include "http/Method.hpp"
+#include "http/Request.hpp"
 
 class Script
 {
-	public:
-	class Exception : public ExceptionBase
-	{
+public:
+    class Exception : public ExceptionBase
+    {
     public:
         Exception(const char* msg);
     };
-	public:
-		Script(Config& config,  http::Request& request);
-		~Script();
-		std::string	exec() const;
-	private:
-		char	**envp;
-		char	**cmd;
-		http::Request& request;
-	private:
-		void build_cmd(std::string path, Config& config);
-		std::string get_ext(std::string& path);
+
+public:
+    Script(Config& config, http::Request& request);
+    ~Script();
+    std::string exec() const;
+
+private:
+    char** envp;
+    char** cmd;
+    http::Request& request;
+
+private:
+    void build_cmd(std::string path, Config& config);
+    std::string get_ext(std::string& path);
 };

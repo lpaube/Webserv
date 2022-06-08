@@ -11,6 +11,9 @@
 /* ************************************************************************** */
 
 #include "../include/ConfigParser.hpp"
+#include "Script.hpp"
+#include "Utils.hpp"
+#include "http/Request.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -24,9 +27,6 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <unistd.h>
-#include "Script.hpp"
-#include "http/Request.hpp"
-#include "Utils.hpp"
 
 std::string first_line(std::string& str)
 {
@@ -141,18 +141,19 @@ int main(int argc, char** argv)
             std::cerr << ex.what() << std::endl;
         }
 
-		//SCRIPT EXEC
-		/*if (request_line.path().find("/cgi-bin/") == true)
-		{
-			Script script(fake_config, http::request);
-			std::cout << "SCRIPT RESULT" << script.exec() << std::endl;
-		}*/
-		
+        // SCRIPT EXEC
+        /*if (request_line.path().find("/cgi-bin/") == true)
+        {
+                Script script(fake_config, http::request);
+                std::cout << "SCRIPT RESULT" << script.exec() << std::endl;
+        }*/
+
         snprintf(buff, sizeof(buff),
-                 "HTTP/1.0 200 OK\r\n\r\n<h1>Hello World, Rust is NOT the best language ever made. It's over rated</h1>");
+                 "HTTP/1.0 200 OK\r\n\r\n<h1>Hello World, Rust is NOT the best language ever made. "
+                 "It's over rated</h1>");
         write(connfd, buff, std::strlen(buff));
         close(connfd);
-	}
+    }
 
     close(sock);
 }

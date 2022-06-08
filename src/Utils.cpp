@@ -14,16 +14,17 @@
 #include <algorithm>
 #include <ctype.h>
 #include <string>
-#include <vector>
 #include <unistd.h>
+#include <vector>
 
-void	putstr_fd(std::string& msg, std::size_t fd){
-	std::string::iterator it = msg.begin();
-	std::string::iterator end = msg.end();
-	while (it != end){
-		write(1, &*it, fd);
-		it++;
-	}
+void putstr_fd(std::string& msg, std::size_t fd)
+{
+    std::string::iterator it = msg.begin();
+    std::string::iterator end = msg.end();
+    while (it != end) {
+        write(1, &*it, fd);
+        it++;
+    }
 }
 
 bool vectorize_content(std::vector<std::string>& content, std::string& content_str)
