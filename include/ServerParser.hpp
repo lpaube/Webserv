@@ -26,140 +26,224 @@ class Config
     };
 
     struct Error_page {
-        std::vector<int> code;
-        std::string uri;
+      std::vector<int> code;
+      std::string uri;
     };
 
     struct Return_redirect
     {
       // code is initialized to -1
-        int code;
-        std::string url;
+      int code;
+      std::string url;
     };
 
     struct Cgi_ext {
-        std::string extension;
-        std::string bin_path;
+      std::string extension;
+      std::string bin_path;
+    };
+
+    class Location {
+      public:
+        std::string               location_match;
+        std::vector<Error_page>   error_page;
+        unsigned long             client_max_body_size; // Represented in megabytes (only takes m or M)
+        std::vector<std::string>  limit_except;
+        Return_redirect           return_redirect;
+        std::string               root;
+        bool                      autoindex;
+        std::vector<std::string>  index;
+        std::vector<Cgi_ext>      cgi_ext;
+
+        void print_location()
+        {
+          // error_page
+          std::cout << "===== error_page =====" << std::endl;
+          int i = 0;
+          for (std::vector<Error_page>::iterator it = error_page.begin(); it != error_page.end();
+              ++it, ++i) {
+            std::cout << "--- error_page: " << i << " ---" << std::endl;
+            for (std::vector<int>::iterator it_code = it->code.begin(); it_code != it->code.end();
+                ++it_code) {
+              std::cout << "code: " << *it_code << std::endl;
+            }
+            std::cout << "uri: " << it->uri << std::endl;
+          }
+          std::cout << std::endl;
+
+          // client_max_body_size
+          std::cout << "===== client_max_body_size =====" << std::endl;
+          std::cout << "max_body_size: " << client_max_body_size << std::endl;
+          std::cout << std::endl;
+
+          // return
+          std::cout << "===== return =====" << std::endl;
+          std::cout << "code: " << return_redirect.code << std::endl;
+          std::cout << "redirection url: " << return_redirect.url << std::endl;
+          std::cout << std::endl;
+
+          // root
+          std::cout << "===== root =====" << std::endl;
+          std::cout << "root: " << root << std::endl;
+          std::cout << std::endl;
+
+          // limit_except
+          std::cout << "===== limit_except =====" << std::endl;
+          for (std::vector<std::string>::iterator it = limit_except.begin();
+              it != limit_except.end();
+              ++it)
+          {
+            std::cout << "allowed method: " << *it << std::endl;
+          }
+          std::cout << std::endl;         
+
+          // autoindex
+          std::cout << "===== autoindex =====" << std::endl;
+          std::cout << "autoindex: " << autoindex << std::endl;
+          std::cout << std::endl;
+
+          // index
+          std::cout << "===== index =====" << std::endl;
+          for (std::vector<std::string>::iterator it = index.begin(); it != index.end(); ++it) {
+            std::cout << "index: " << *it << std::endl;
+          }
+          std::cout << std::endl;
+
+          // cgi_ext
+          std::cout << "===== cgi_ext =====" << std::endl;
+          i = 0;
+          for (std::vector<Cgi_ext>::iterator it = cgi_ext.begin(); it != cgi_ext.end(); ++it) {
+            std::cout << "---cgi_ext: " << i << "---" << std::endl;
+            std::cout << "extension: " << it->extension << std::endl;
+            std::cout << "binary path: " << it->bin_path << std::endl;
+          }
+          std::cout << std::endl;
+        }
     };
 
   public:
     Listen                    listen;
     std::vector<std::string>  server_name;
     std::vector<Error_page>   error_page;
-    unsigned long             client_max_body_size; // Represented in kilobytes
-    std::vector<std::string>  limit_except;
+    unsigned long             client_max_body_size; // Represented in megabytes (only takes m or M)
     Return_redirect           return_redirect;
     std::string               root;
     bool                      autoindex;
     std::vector<std::string>  index;
     std::vector<Cgi_ext>      cgi_ext;
+    std::vector<Location>     location;
 
-  public:
     void print_config()
     {
-        // listen
-        std::cout << "===== listen =====" << std::endl;
-        std::cout << "address: " << listen.address << std::endl;
-        std::cout << "port: " << listen.port << std::endl;
-        std::cout << std::endl;
+      // listen
+      std::cout << "===== listen =====" << std::endl;
+      std::cout << "address: " << listen.address << std::endl;
+      std::cout << "port: " << listen.port << std::endl;
+      std::cout << std::endl;
 
-        // server_name
-        std::cout << "===== server_name =====" << std::endl;
-        for (std::vector<std::string>::iterator it = server_name.begin(); it != server_name.end();
-             ++it) {
-            std::cout << "server name: " << *it << std::endl;
+      // server_name
+      std::cout << "===== server_name =====" << std::endl;
+      for (std::vector<std::string>::iterator it = server_name.begin(); it != server_name.end();
+          ++it) {
+        std::cout << "server name: " << *it << std::endl;
+      }
+      std::cout << std::endl;
+
+      // error_page
+      std::cout << "===== error_page =====" << std::endl;
+      int i = 0;
+      for (std::vector<Error_page>::iterator it = error_page.begin(); it != error_page.end();
+          ++it, ++i) {
+        std::cout << "--- error_page: " << i << " ---" << std::endl;
+        for (std::vector<int>::iterator it_code = it->code.begin(); it_code != it->code.end();
+            ++it_code) {
+          std::cout << "code: " << *it_code << std::endl;
         }
-        std::cout << std::endl;
+        std::cout << "uri: " << it->uri << std::endl;
+      }
+      std::cout << std::endl;
 
-        // error_page
-        std::cout << "===== error_page =====" << std::endl;
-        int i = 0;
-        for (std::vector<Error_page>::iterator it = error_page.begin(); it != error_page.end();
-             ++it, ++i) {
-            std::cout << "--- error_page: " << i << " ---" << std::endl;
-            for (std::vector<int>::iterator it_code = it->code.begin(); it_code != it->code.end();
-                 ++it_code) {
-                std::cout << "code: " << *it_code << std::endl;
-            }
-            std::cout << "uri: " << it->uri << std::endl;
-        }
-        std::cout << std::endl;
+      // client_max_body_size
+      std::cout << "===== client_max_body_size =====" << std::endl;
+      std::cout << "max_body_size: " << client_max_body_size << std::endl;
+      std::cout << std::endl;
 
-        // client_max_body_size
-        std::cout << "===== client_max_body_size =====" << std::endl;
-        std::cout << "max_body_size: " << client_max_body_size << std::endl;
-        std::cout << std::endl;
+      // return
+      std::cout << "===== return =====" << std::endl;
+      std::cout << "code: " << return_redirect.code << std::endl;
+      std::cout << "redirection url: " << return_redirect.url << std::endl;
+      std::cout << std::endl;
 
-        // limit_except
-        std::cout << "===== limit_except =====" << std::endl;
-        for (std::vector<std::string>::iterator it = limit_except.begin(); it != limit_except.end();
-             ++it) {
-            std::cout << "allowed method: " << *it << std::endl;
-        }
-        std::cout << std::endl;
+      // root
+      std::cout << "===== root =====" << std::endl;
+      std::cout << "root: " << root << std::endl;
+      std::cout << std::endl;
 
-        // return
-        std::cout << "===== return =====" << std::endl;
-        std::cout << "code: " << return_redirect.code << std::endl;
-        std::cout << "redirection url: " << return_redirect.url << std::endl;
-        std::cout << std::endl;
+      // autoindex
+      std::cout << "===== autoindex =====" << std::endl;
+      std::cout << "autoindex: " << autoindex << std::endl;
+      std::cout << std::endl;
 
-        // root
-        std::cout << "===== root =====" << std::endl;
-        std::cout << "root: " << root << std::endl;
-        std::cout << std::endl;
+      // index
+      std::cout << "===== index =====" << std::endl;
+      for (std::vector<std::string>::iterator it = index.begin(); it != index.end(); ++it) {
+        std::cout << "index: " << *it << std::endl;
+      }
+      std::cout << std::endl;
 
-        // autoindex
-        std::cout << "===== autoindex =====" << std::endl;
-        std::cout << "autoindex: " << autoindex << std::endl;
-        std::cout << std::endl;
+      // cgi_ext
+      std::cout << "===== cgi_ext =====" << std::endl;
+      i = 0;
+      for (std::vector<Cgi_ext>::iterator it = cgi_ext.begin(); it != cgi_ext.end(); ++it) {
+        std::cout << "---cgi_ext: " << i << "---" << std::endl;
+        std::cout << "extension: " << it->extension << std::endl;
+        std::cout << "binary path: " << it->bin_path << std::endl;
+      }
+      std::cout << std::endl;
 
-        // index
-        std::cout << "===== index =====" << std::endl;
-        for (std::vector<std::string>::iterator it = index.begin(); it != index.end(); ++it) {
-            std::cout << "index: " << *it << std::endl;
-        }
-        std::cout << std::endl;
-
-        // cgi_ext
-        std::cout << "===== cgi_ext =====" << std::endl;
-        i = 0;
-        for (std::vector<Cgi_ext>::iterator it = cgi_ext.begin(); it != cgi_ext.end(); ++it) {
-            std::cout << "---cgi_ext: " << i << "---" << std::endl;
-            std::cout << "extension: " << it->extension << std::endl;
-            std::cout << "binary path: " << it->bin_path << std::endl;
-        }
-        std::cout << std::endl;
+      // Location
+      int elem = 0;
+      for (std::vector<Location>::iterator loc_it = location.begin();
+          loc_it != location.end();
+          ++loc_it, ++elem)
+      {
+        std::cout << "==============================" << std::endl;
+        std::cout << "===== LOCATION " << elem << " ============" << std::endl;
+        std::cout << "==============================" << std::endl;
+        loc_it->print_location();
+      }
+      std::cout << std::endl;
     }
 };
 
 class ServerParser{
-	public:
-		ServerParser(std::string::iterator beg, std::string::iterator end);
-		~ServerParser(){};
+  public:
+    ServerParser(std::string::iterator beg, std::string::iterator end);
+    ~ServerParser(){};
 
-		void	printContent() const;
-		void	printLocation() const;
+    void	printContent() const;
+    void	printLocation() const;
     void  generate_fake_config();
-    void  init_config();
-    void  parse_config_vars();
-		class NoSepException : public std::exception{
-			public:
-				virtual const char* what() const throw();
-		};
-		class SyntaxException : public std::exception{
-			public:
-				virtual const char* what() const throw();
-		};
-	private:
-		void		buildContent();
-		void		buildLocation();
-		std::size_t	findLocStart(std::size_t i);
-		std::size_t	findLocEnd(std::size_t i, std::size_t end);
+    void  init_server_vars();
+    void  parse_server_vars();
+    void  init_location_vars(Config::Location &new_location);
+    void  parse_location_vars();
+    class NoSepException : public std::exception{
+      public:
+        virtual const char* what() const throw();
+    };
+    class SyntaxException : public std::exception{
+      public:
+        virtual const char* what() const throw();
+    };
+  private:
+    void		buildContent();
+    void		buildLocation();
+    std::size_t	findLocStart(std::size_t i);
+    std::size_t	findLocEnd(std::size_t i, std::size_t end);
 
-		std::vector<std::string> server_content;
-		std::vector<LocationContent>	location;
-		std::string	str_content;
+    std::vector<std::string> server_content;
+    std::vector<LocationContent>	location;
+    std::string	str_content;
 
   public:
     Config config;

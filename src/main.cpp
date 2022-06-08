@@ -46,6 +46,7 @@ int main(int argc, char** argv)
     }
     std::string config_file(argv[1]);
     ConfigParser config_parser(config_file);
+    /*
     try {
         config_parser.serverparser[0].parse_config_vars();
     }
@@ -53,6 +54,7 @@ int main(int argc, char** argv)
     {
         std::cout << s << std::endl;
     }
+    */
     config_parser.serverparser[0].config.print_config();
 
 
