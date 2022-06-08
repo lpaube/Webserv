@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:08 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/04 16:19:49 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/07 21:34:29 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include "Utils.hpp"
+#include <fcntl.h>
+
 
 #define BUFFER_SIZE 50
 
@@ -49,17 +51,17 @@ std::string	Script::exec() const{
 
 	save[0] = dup(STDIN_FILENO);
 	save[1] = dup(STDOUT_FILENO);
-	pipe(pipe_fd);
-	dup2(pipe_fd[1], STDOUT_FILENO);
 
+	int in_file;
 	if (method == http::POST){
-		pipe(read_fd);
-		putstr_fd(this->request.body(), static_cast<std::size_t>(read_fd[1]));
-		close(read_fd[1]);
-		dup2(read_fd[0], STDIN_FILENO);
-		putstr_fd(this->request.body(), static_cast<std::size_t>(pipe_fd[0]));
+		in_file = open("in_file", O_CREAT | O_APPEND);
+		putstr_fd(this->request.body(), in_file);
+		close(in_file);
+		open("in_file", O_RDONLY);
+		dup2(in_file, STDIN_FILENO);
 	}
-
+	int out_file = open("out_file", O_CREAT | O_APPEND);
+	dup2(out_file, STDOUT_FILENO);
 	id = fork();
 	if (id < 0)
 		throw Exception("Error fatal, fork");
@@ -69,12 +71,12 @@ std::string	Script::exec() const{
 	}
 	else
 		waitpid(id, &status, 0);
-	close (pipe_fd[1]);
 	if (method == http::POST){
-		dup2(STDIN_FILENO, save[0]);
-		close(read_fd[0]);
+		close(in_file);
+		remove("in_file");
 	}
-	dup2(STDOUT_FILENO, save[1]);
+	close(out_file);
+	out_file = open("out_file", O_RDONLY);
 	char buf[BUFFER_SIZE];
 	std::string	script_ret;
 	int	ret = 1;
@@ -83,7 +85,8 @@ std::string	Script::exec() const{
 		buf[BUFFER_SIZE - 1] = 0;
 		script_ret.append(buf);
 	}
-	close(pipe_fd[0]);
+	close(out_file);
+	remove("out_file");
 	return script_ret;
 }
 
