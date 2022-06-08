@@ -1,31 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   RequestLine.hpp                                    :+:      :+:    :+:   */
+/*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/02 12:59:13 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/03 16:42:19 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/06/04 18:14:57 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/06/07 14:42:32 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #include "ExceptionBase.hpp"
-#include "Method.hpp"
-#include <cstddef>
-#include <string>
 
-#define SUPPORTED_HTTP_VERSION "HTTP/1.1"
-
-namespace http
+namespace sock
 {
-class RequestLine
-{
-public:
-    static const std::size_t MAX_REQUEST_LINE_SIZE = 1024 * 8;
 
+enum SocketType {
+    TCP_STREAM,
+    CONNECTION
+};
+
+class Socket
+{
 public:
     class Exception : public ExceptionBase
     {
@@ -34,20 +32,25 @@ public:
     };
 
 public:
-    RequestLine();
-    RequestLine(std::string request_str);
+    Socket();
+    virtual ~Socket();
 
 public:
-    Method method() const;
-    const std::string& path() const;
-    const std::string& query() const;
-    const std::string& http_version() const;
+    virtual void init() = 0;
+    virtual SocketType type() const = 0;
 
-private:
-    Method method_;
-    std::string path_;
-    std::string query_str_;
-    std::string http_version_;
+public:
+    int fd() const;
+    bool is_init() const;
+    bool read() const;
+    void set_write();
+
+protected:
+    void check_init() const;
+
+protected:
+    int fd_;
+    bool is_init_;
+    bool read_;
 };
-
-} // namespace http
+} // namespace sock

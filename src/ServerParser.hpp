@@ -12,7 +12,9 @@
 
 #pragma once
 #include "LocationContent.hpp"
+#include "Config.hpp"
 #include <iostream>
+#include <stdint.h>
 #include <string>
 
 class ServerParser{
