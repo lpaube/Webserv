@@ -19,4 +19,7 @@ server{
 server{
 	listen 10.23.45:54;
   server_name testing;
+	location test2/super/coucou{
+    root /somepatfdsfh/fdf;
+	}
 }
