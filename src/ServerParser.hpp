@@ -29,11 +29,7 @@ public:
 public:
     struct Listen {
         std::string address;
-<<<<<<< HEAD:include/ServerParser.hpp
-        std::string port; // int
-=======
         uint16_t port;
->>>>>>> main:src/ServerParser.hpp
     };
 
     struct Error_page {

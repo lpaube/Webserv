@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:08 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/07 21:34:29 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/08 00:39:24 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <string>
+#include <stdio.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -46,8 +47,6 @@ std::string Script::exec() const
     pid_t id;
     int status;
     int save[2];
-    int pipe_fd[2];
-    int read_fd[2];
 
     http::RequestLine request_line = this->request.requestLine();
     http::Method method = request_line.method();
@@ -55,9 +54,9 @@ std::string Script::exec() const
     save[0] = dup(STDIN_FILENO);
     save[1] = dup(STDOUT_FILENO);
 
-    int in_file;
+   std::size_t in_file;
     if (method == http::POST) {
-        in_file = open("in_file", O_CREAT | O_APPEND);
+        in_file = static_cast<std::size_t>(open("in_file", O_CREAT | O_APPEND));
         putstr_fd(this->request.body(), in_file);
         close(in_file);
         open("in_file", O_RDONLY);
@@ -83,12 +82,14 @@ std::string Script::exec() const
     std::string script_ret;
     int ret = 1;
     while (ret > 0) {
-        ret = read(pipe_fd[0], buf, BUFFER_SIZE - 2);
+        ret = read(out_file, buf, BUFFER_SIZE - 2);
         buf[BUFFER_SIZE - 1] = 0;
         script_ret.append(buf);
     }
     close(out_file);
     remove("out_file");
+	dup2(STDIN_FILENO, save[0]);
+	dup2(STDOUT_FILENO, save[1]);
     return script_ret;
 }
 

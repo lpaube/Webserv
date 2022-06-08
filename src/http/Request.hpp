@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:19:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/08 00:30:33 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/08 00:33:06 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ public:
 public:
     std::string& body();
     RequestLine& requestLine();
+    void add_header(const Header& header);
     ssize_t content_length() const;
     void set_body(const std::string& body);
     void print() const;
