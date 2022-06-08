@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParser.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:08:15 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/07 12:31:57 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/08 13:50:24 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,10 @@ std::string ConfigParser::getContent(std::fstream& file)
     std::string ret(buf);
     delete[] buf;
     return ret;
+}
+
+unsigned int ConfigParser::nbServer() const{
+	return this->nb_server;
 }
 
 const char* ConfigParser::ConfigFileException::what() const throw()

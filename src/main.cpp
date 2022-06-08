@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: laube <louis-philippe.aube@hotmail.com>    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:21:49 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/08 10:52:32 by laube            ###   ########.fr       */
+/*   Updated: 2022/06/08 13:52:47 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,15 @@ int main(int argc, char** argv)
     config_parser.serverparser[0].config.print_config();
 
 
-    // Server server;
-    // std::vector<Config> configs;
-    // configs.push_back(fake_config);
-
-    // try {
-    //     server.configure(configs);
-    //     server.run();
-    // } catch (const std::exception& ex) {
-    //     std::cerr << ex.what() << std::endl;
-    // }
+     Server server;
+     std::vector<Config> configs;
+	 for (unsigned int i = 0; i < config_parser.nbServer(); i++){
+		 configs.push_back(config_parser.serverparser[i].config);
+	 }
+     try {
+         server.configure(configs);
+         server.run();
+     } catch (const std::exception& ex) {
+         std::cerr << ex.what() << std::endl;
+     }
 }

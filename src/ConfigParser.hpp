@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParser.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:07:03 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/02 17:13:40 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/08 13:51:23 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ class ConfigParser
 public:
     ConfigParser(std::string config_file);
     ~ConfigParser();
-
+	unsigned int nbServer() const;
     class ConfigFileException : public std::exception
     {
     public:
@@ -39,7 +39,6 @@ private:
     void createConfig();
     void findServerStart(std::string::iterator& start);
     std::string::iterator findServerEnd(std::string::iterator start, std::string::iterator end);
-
 private:
     bool min_server;
     std::string file_content;
