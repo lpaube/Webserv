@@ -7,10 +7,9 @@ RM			=	rm -rf
 MKDIR		=	mkdir -p
 
 SRC_DIR		=	src
-INC_DIR		=	include
 OBJ_DIR		=	obj
 DIRS		=	$(shell find $(SRC_DIR) -type d)
-INCS		=	$(shell find $(INC_DIR) -type f -name *.hpp)
+INCS		=	$(shell find $(SRC_DIR) -type f -name *.hpp)
 SRCS		=	$(shell find $(SRC_DIR) -type f -name *.cpp)
 SRCS_BASE	=	$(foreach file, $(SRCS), $(shell basename -a $(file)))
 OBJS		=	$(addprefix $(OBJ_DIR)/, $(SRCS_BASE:.cpp=.o))
@@ -24,7 +23,7 @@ release:		CXXFLAGS += -O3
 release:		fclean $(NAME)
 
 $(OBJ_DIR)/%.o:	%.cpp
-	$(CXX) $(CXXFLAGS) -I$(INC_DIR) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -I$(SRC_DIR) -c -o $@ $<
 
 $(NAME):		$(OBJ_DIR) $(OBJS)
 	$(CXX) -o $(NAME) $(OBJS)

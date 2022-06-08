@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:19:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/04 15:16:19 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/08 00:30:33 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,13 @@
 
 namespace http
 {
+enum RequestState {
+    REQ_LINE,
+    REQ_HEADERS,
+    REQ_BODY,
+    REQ_DONE
+};
+
 class Request
 {
 public:
@@ -29,7 +36,8 @@ public:
     };
 
 public:
-    Request(const RequestLine& request_line, std::string request_str);
+    Request();
+    Request(const RequestLine& request_line);
 
 public:
     std::string& body();

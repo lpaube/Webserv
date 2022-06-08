@@ -6,7 +6,11 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/01 10:47:58 by mafortin          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2022/06/03 11:39:01 by mafortin         ###   ########.fr       */
+=======
+/*   Updated: 2022/06/03 17:27:59 by mleblanc         ###   ########.fr       */
+>>>>>>> main
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,7 +147,7 @@ void ServerParser::generate_fake_config()
 {
     // listen
     config.listen.address = "127.0.0.1";
-    config.listen.port = "8000";
+    config.listen.port = 8000;
 
     // server_name
     config.server_name.push_back("example.com");

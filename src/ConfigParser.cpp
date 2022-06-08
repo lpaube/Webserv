@@ -6,11 +6,11 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:08:15 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/04 11:35:00 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/08 00:30:41 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/ConfigParser.hpp"
+#include "ConfigParser.hpp"
 #include <exception>
 #include <fstream>
 #include <iostream>

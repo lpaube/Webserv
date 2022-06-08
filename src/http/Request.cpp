@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:09 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/04 15:16:13 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/08 00:30:02 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,20 +24,23 @@ Request::Exception::Exception(const char* msg)
 {
 }
 
-Request::Request(const RequestLine& request_line, std::string request_str)
+Request::Request()
+    : content_length_(0),
+      is_chunked_(false)
+{
+}
+
+Request::Request(const RequestLine& request_line)
     : request_line_(request_line),
       content_length_(0),
       is_chunked_(false)
 {
-    std::string::size_type pos;
-    while ((pos = request_str.find("\r\n")) != std::string::npos) {
-        if (pos == 0) {
-            break;
-        }
-        Header header(get_next_word(request_str, "\r\n"));
-        headers_.add(header);
-        parse_header(header);
-    }
+}
+
+void Request::add_header(const Header& header)
+{
+    headers_.add(header);
+    parse_header(header);
 }
 
 ssize_t Request::content_length() const

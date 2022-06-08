@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 13:06:08 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/03 16:42:25 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/07 14:48:07 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,10 @@ RequestLine::RequestLine()
 {
 }
 
-RequestLine::RequestLine(std::string request_str)
+RequestLine::RequestLine(sock::Buffer& request_data)
 {
-    std::string word = get_next_word(request_str, " ");
+    std::string first_line = get_next_word(request_data, REQ_EOL, 2);
+    std::string word = get_next_word(first_line, " ");
 
     method_ = method_from_str(word);
     if (method_ == BAD_METHOD) {
@@ -36,15 +37,15 @@ RequestLine::RequestLine(std::string request_str)
         throw Exception(msg.c_str());
     }
 
-    word = get_next_word(request_str, "?");
+    word = get_next_word(first_line, "?");
     if (!word.empty()) {
         path_ = word;
-        query_str_ = get_next_word(request_str, " ");
+        query_str_ = get_next_word(first_line, " ");
     } else {
-        path_ = get_next_word(request_str, " ");
+        path_ = get_next_word(first_line, " ");
     }
 
-    http_version_ = get_next_word(request_str, "\r\n");
+    http_version_ = first_line;
     if (http_version_.empty()) {
         throw Exception("Bad request");
     }
