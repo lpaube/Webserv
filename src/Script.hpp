@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:01 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/04 16:00:34 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/08 13:33:30 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ public:
 public:
     Script(Config& config, http::Request& request);
     ~Script();
-    std::string exec() const;
+    std::string exec();
 
 private:
     char** envp;
@@ -36,6 +36,7 @@ private:
     http::Request& request;
 
 private:
-    void build_cmd(std::string path, Config& config);
+    void buildCmd(std::string path, Config& config);
     std::string get_ext(std::string& path);
+	void buildEnv(http::Method& method);
 };

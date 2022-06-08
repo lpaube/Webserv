@@ -6,13 +6,13 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:21:49 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/08 11:07:58 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/08 13:47:58 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "Config.hpp"
 #include "ConfigParser.hpp"
 #include "Server.hpp"
-#include "Config.hpp"
 
 int main(int argc, char** argv)
 {
@@ -23,7 +23,6 @@ int main(int argc, char** argv)
     std::string config_file(argv[1]);
     ConfigParser config_parser(config_file);
     config_parser.serverparser[0].config.print_config();
-
 
     // Server server;
     // std::vector<Config> configs;
