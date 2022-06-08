@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 18:32:32 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/08 19:28:23 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-Server::Exception::Exception(const char* msg)
+Server::Exception::Exception(const std::string& msg)
     : ExceptionBase(msg)
 {
 }
@@ -47,8 +47,7 @@ void Server::configure(const std::vector<Config>& blocks)
         in_addr address;
         address.s_addr = inet_addr(it->listen.address.c_str());
         if (address.s_addr == INADDR_NONE) {
-            std::string msg = "Malformed address: '" + it->listen.address + "'";
-            throw Exception(msg.c_str());
+            throw Exception("Malformed address: '" + it->listen.address + "'");
         }
 
         sock::TcpStream s = sock::TcpStream(address, it->listen.port);

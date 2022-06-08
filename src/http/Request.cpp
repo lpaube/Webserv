@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:09 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 18:55:39 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/08 19:31:29 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,14 @@
 namespace http
 {
 
-Request::Exception::Exception(const char* msg)
+Request::Exception::Exception(const std::string& msg)
     : ExceptionBase(msg)
 {
 }
 
 Request::Request()
     : body_(MAX_REQ_BODY_SIZE),
+      body_type_(B_NONE),
       content_length_(0),
       is_chunked_(false)
 {
@@ -34,6 +35,7 @@ Request::Request()
 Request::Request(const RequestLine& request_line)
     : request_line_(request_line),
       body_(MAX_REQ_BODY_SIZE),
+      body_type_(B_NONE),
       content_length_(0),
       is_chunked_(false)
 {
@@ -66,6 +68,11 @@ Buffer& Request::body()
     return body_;
 }
 
+RequestBodyType Request::body_type() const
+{
+    return body_type_;
+}
+
 void Request::print() const
 {
     std::cout << "Method: " << method_str(request_line_.method()) << '\n';
@@ -84,6 +91,8 @@ void Request::parse_header(const Header& header)
         parse_content_length(header.value());
     } else if (header.name() == TRANSFER_ENCODING_HEADER) {
         parse_transfer_encoding(header.value());
+    } else if (header.name() == CONTENT_TYPE_HEADER) {
+        parse_content_type(header.value());
     }
 }
 
@@ -94,17 +103,37 @@ void Request::parse_content_length(const std::string& value)
     ss >> size;
 
     if (ss.fail()) {
-        std::string msg = "Bad value for " CONTENT_LENGTH_HEADER ": " + value;
-        throw Exception(msg.c_str());
+        throw Exception("Bad value for " CONTENT_LENGTH_HEADER ": " + value);
     }
     content_length_ = size;
+    body_type_ = B_CONTENT_LENGTH;
 }
 
-void Request::parse_transfer_encoding(std::string value)
+void Request::parse_transfer_encoding(const std::string& value)
 {
-    to_lower(value);
-    if (value == "chunked") {
+    std::string tmp = value;
+
+    to_lower(tmp);
+    if (tmp == "chunked") {
         is_chunked_ = true;
+        body_type_ = B_CHUNKED;
+    }
+}
+
+void Request::parse_content_type(const std::string& value)
+{
+    std::string tmp = value;
+    std::string type = get_next_word(tmp, ";");
+
+    if (type == "multipart/form-data") {
+        std::string boundary = trim(tmp, " ");
+
+        if (boundary.find("boundary=") == 0) {
+            boundary_ = boundary.substr(8);
+            body_type_ = B_MULTIPART_FORMDATA;
+        } else {
+            throw Exception("Bad multiform boundary: '" + boundary + "'");
+        }
     }
 }
 

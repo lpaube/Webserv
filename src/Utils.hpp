@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:37:34 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 18:25:19 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/08 19:28:56 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,5 +30,5 @@ template <typename Exception>
 void exception_errno(std::string msg)
 {
     msg.append(strerror(errno));
-    throw Exception(msg.c_str());
+    throw Exception(msg);
 }

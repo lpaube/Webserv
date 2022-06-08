@@ -3,7 +3,7 @@
 
 namespace sock
 {
-Socket::Exception::Exception(const char* msg)
+Socket::Exception::Exception(const std::string& msg)
     : ExceptionBase(msg)
 {
 }

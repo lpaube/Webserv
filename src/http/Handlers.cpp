@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:39:04 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 19:07:10 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/08 19:29:20 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,7 @@ void parse_headers(sock::Connection& c)
         if (ptr == buf.cursor()) {
             c.next_request_state();
             buf.advance_cursor(strlen(REQ_EOL));
+            c.request().print();
             break;
         }
 
@@ -103,24 +104,31 @@ void parse_body(sock::Connection& c)
     http::Request& req = c.request();
     Buffer& buf = c.buffer();
 
-    req.print();
+    switch (req.body_type()) {
+        case http::B_CONTENT_LENGTH:
+            if (req.content_length() != 0) {
+                size_t bytes =
+                    req.content_length() > buf.size() ? buf.size() : req.content_length();
 
-    if (req.content_length() != 0) {
-        size_t bytes = req.content_length() > buf.size() ? buf.size() : req.content_length();
+                const char* start = buf.cursor();
+                const char* end = start + bytes;
+                req.body().append(start, end);
+                req.read_body_bytes(bytes);
+                buf.advance_cursor(bytes);
+                buf.erase_to_cursor();
 
-        const char* start = buf.cursor();
-        const char* end = start + bytes;
-        req.body().append(start, end);
-        req.read_body_bytes(bytes);
-        buf.advance_cursor(bytes);
-        buf.erase_to_cursor();
-
-        if (req.content_length() == 0) {
-            int file = open("./logtime42", O_CREAT | O_WRONLY);
-            write(file, req.body().data(), req.body().size());
-            c.next_request_state();
-            c.set_write();
-        }
+                if (req.content_length() == 0) {
+                    c.next_request_state();
+                    c.set_write();
+                }
+            }
+            break;
+        case http::B_CHUNKED:
+            break;
+        case http::B_MULTIPART_FORMDATA:
+            break;
+        case http::B_NONE:
+            break;
     }
 }
 } // namespace http

@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 13:06:08 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 18:32:09 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/08 19:26:46 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 namespace http
 {
-RequestLine::Exception::Exception(const char* msg)
+RequestLine::Exception::Exception(const std::string& msg)
     : ExceptionBase(msg)
 {
 }
@@ -33,8 +33,7 @@ RequestLine::RequestLine(Buffer& request_data)
 
     method_ = method_from_str(word);
     if (method_ == BAD_METHOD) {
-        std::string msg = "Bad http method: '" + word + "'";
-        throw Exception(msg.c_str());
+        throw Exception("Bad http method: '" + word + "'");
     }
 
     word = get_next_word(first_line, "?");
@@ -50,8 +49,7 @@ RequestLine::RequestLine(Buffer& request_data)
         throw Exception("Bad request");
     }
     if (http_version_ != SUPPORTED_HTTP_VERSION) {
-        std::string msg = "Unsupported http version: '" + word + "'";
-        throw Exception(msg.c_str());
+        throw Exception("Unsupported http version: '" + word + "'");
     }
 }
 

@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:51:00 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 18:52:47 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/08 19:28:05 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ public:
     class Exception : public ExceptionBase
     {
     public:
-        Exception(const char* msg);
+        Exception(const std::string& msg);
     };
 
 public:

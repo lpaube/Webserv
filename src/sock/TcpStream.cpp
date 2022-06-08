@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/03 20:22:20 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 14:43:02 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/08 19:27:22 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 
 namespace sock
 {
-TcpStream::Exception::Exception(const char* msg)
+TcpStream::Exception::Exception(const std::string& msg)
     : ExceptionBase(msg)
 {
 }

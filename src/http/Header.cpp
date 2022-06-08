@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:34:57 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/02 17:22:06 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/08 19:24:31 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 namespace http
 {
 
-Header::Exception::Exception(const char* msg)
+Header::Exception::Exception(const std::string& msg)
     : ExceptionBase(msg)
 {
 }
@@ -25,8 +25,7 @@ Header::Header(const std::string& str)
 {
     std::string::size_type pos = str.find(':');
     if (pos == std::string::npos) {
-        std::string msg = "Bad Header: '" + str + "'";
-        throw Exception(msg.c_str());
+        throw Exception("Bad Header: '" + str + "'");
     }
     name_ = str.substr(0, pos);
     to_lower(name_);
