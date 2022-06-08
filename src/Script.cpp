@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:08 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/08 02:04:46 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/08 11:09:34 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ std::string Script::exec() const
         in_file = static_cast<std::size_t>(open("in_file", O_CREAT | O_APPEND));
         putstr_fd(this->request.body(), in_file);
         close(in_file);
-       in_file = open("in_file", O_RDONLY);
+       in_file = static_cast<std::size_t>(open("in_file", O_RDONLY));
         dup2(in_file, STDIN_FILENO);
     }
     int out_file = open("out_file", O_CREAT | O_APPEND);

@@ -6,12 +6,13 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:21:49 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/08 00:29:54 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/08 11:07:58 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ConfigParser.hpp"
 #include "Server.hpp"
+#include "Config.hpp"
 
 int main(int argc, char** argv)
 {
@@ -21,19 +22,17 @@ int main(int argc, char** argv)
     }
     std::string config_file(argv[1]);
     ConfigParser config_parser(config_file);
+    // config_parser.serverparser[1].config.print_config();
 
-    config_parser.serverparser[0].generate_fake_config();
-    Config fake_config = config_parser.serverparser[0].config;
-    fake_config.print_config();
 
-    Server server;
-    std::vector<Config> configs;
-    configs.push_back(fake_config);
+    // Server server;
+    // std::vector<Config> configs;
+    // configs.push_back(fake_config);
 
-    try {
-        server.configure(configs);
-        server.run();
-    } catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
-    }
+    // try {
+    //     server.configure(configs);
+    //     server.run();
+    // } catch (const std::exception& ex) {
+    //     std::cerr << ex.what() << std::endl;
+    // }
 }

@@ -1,19 +1,25 @@
-
 server{
-	listen 10.25.143.36;
+	listen 10.25.143.36:8000;
+  server_name Cyborgab www.Cyborgab.com;
+  client_max_body_size 80m;
+  error_page    404  ./resources/error/error404.html    ;
+  error_page    504 505 ./resources/error/error50x.html;
+  autoindex on;
+  root /somepath/fdf;
 	location test/{
-		content1;
-		content2;
-		content3;
+    client_max_body_size 800m;
+    limit_except GET POST DELETE;
 	}
 	location test2/super/coucou{
-		content3;
+    root /somepatfdsfh/fdf;
 	}
-	test 1234;
+  return 345 /somereturn/url;
 }
 
 server{
 	listen 10.23.45:54;
   server_name testing;
-  ffff;
+	location test2/super/coucou{
+    root /somepatfdsfh/fdf;
+	}
 }
