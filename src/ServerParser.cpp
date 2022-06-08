@@ -6,7 +6,7 @@
 /*   By: laube <louis-philippe.aube@hotmail.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/01 10:47:58 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/08 10:43:28 by laube            ###   ########.fr       */
+/*   Updated: 2022/06/08 10:51:11 by laube            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -294,7 +294,6 @@ void ServerParser::parse_location_vars()
         }
         else if (directives[0] == "limit_except")
         {
-          std::cout << "We're in limit_except!" << std::endl;
           for (std::string::size_type j = 1; j < directives.size(); ++j)
           {
             new_location.limit_except.push_back(directives[j]);

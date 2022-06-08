@@ -6,7 +6,7 @@
 /*   By: laube <louis-philippe.aube@hotmail.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:21:49 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/08 10:49:51 by laube            ###   ########.fr       */
+/*   Updated: 2022/06/08 10:52:32 by laube            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,14 @@ int main(int argc, char** argv)
     // config_parser.serverparser[1].config.print_config();
 
 
-    Server server;
-    std::vector<Config> configs;
+    // Server server;
+    // std::vector<Config> configs;
     // configs.push_back(fake_config);
 
-    try {
-        server.configure(configs);
-        server.run();
-    } catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
-    }
+    // try {
+    //     server.configure(configs);
+    //     server.run();
+    // } catch (const std::exception& ex) {
+    //     std::cerr << ex.what() << std::endl;
+    // }
 }
