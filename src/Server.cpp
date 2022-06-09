@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 14:42:32 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 16:09:49 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -255,6 +255,9 @@ void Server::receive_data(sock::Connection& c)
             http::parse_body(c);
             break;
         case http::REQ_DONE:
+            if (c.buffer().size() != 0) {
+                // Bad request
+            }
             c.set_write();
             break;
     }

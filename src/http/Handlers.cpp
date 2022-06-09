@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:39:04 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 14:43:25 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 16:32:25 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,6 @@ void parse_headers(sock::Connection& c)
         if (ptr == buf.cursor()) {
             c.next_request_state();
             buf.advance_cursor(strlen(REQ_EOL));
-            c.request().print();
             break;
         }
 
@@ -92,18 +91,30 @@ static void content_length_body(sock::Connection& c)
                 // Bad request
             }
             c.next_request_state();
-            c.set_write();
         }
     }
 }
 
-// static void chunked_request(sock::Connection& c)
-// {
-//     http::Request& req = c.request();
-//     Buffer& buf = c.buffer();
-//     (void)req;
-//     (void)buf;
-// }
+static void chunked_request(sock::Connection& c)
+{
+    http::Request& req = c.request();
+    Buffer& buf = c.buffer();
+
+    size_t chunk_size = 0;
+    do {
+        std::string line = get_next_word(buf, REQ_EOL, strlen(REQ_EOL));
+        if (line.empty()) {
+            // error
+        }
+        // chunk_size = ;
+        c.append_data(buf.cursor(), buf.cursor() + chunk_size);
+        buf.advance_cursor(chunk_size);
+        if (buf.find(REQ_EOL, strlen(REQ_EOL)) != buf.cursor()) {
+            // error
+        }
+        buf.advance_cursor(strlen(REQ_EOL));
+    } while (chunk_size != 0);
+}
 
 void parse_body(sock::Connection& c)
 {
@@ -114,12 +125,9 @@ void parse_body(sock::Connection& c)
             content_length_body(c);
             break;
         case http::B_CHUNKED:
+            chunked_request(c);
             break;
         case http::B_NONE:
-            if (c.buffer().size() != 0) {
-                // Error missing content length
-            }
-            c.set_write();
             break;
     }
 }
