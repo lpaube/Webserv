@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 10:32:43 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 14:42:32 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,8 +157,12 @@ void Server::process_event_queue()
             }
             case event::CONNECTION_WRITE_EVENT: {
                 sock::Connection& c = static_cast<sock::Connection&>(*ev->data());
+                c.request().print();
                 const char* msg = "HTTP/1.0 200 OK\r\n\r\n<h1>Hello World Rust is the best "
                                   "language ever made</h1>\r\n";
+                c.request().body().append(0);
+                std::cout << c.request().body().data() << std::endl;
+                std::cout << "Size: " << c.request().body().size() << std::endl;
                 send(c.fd(), msg, strlen(msg), 0);
                 close_connection(c);
                 break;

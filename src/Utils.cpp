@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:40:28 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 18:32:43 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 11:15:10 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,26 @@ std::string get_next_word(std::string& str, const std::string& sep)
     std::string word = str.substr(0, pos);
     str.erase(0, pos + sep.length());
     return word;
+}
+
+std::vector<std::string> split(const std::string& str, char sep)
+{
+    std::vector<std::string> arr;
+    std::string::size_type p1 = 0;
+    std::string::size_type p2 = str.find(sep);
+
+    while (p2 != std::string::npos)
+    {
+        if (p2 - p1 != 0) {
+            arr.push_back(str.substr(p1, p2 - p1));
+        }
+        p1 = p2 + 1;
+        p2 = str.find(sep, p1);
+    }
+    if (p1 < str.length()) {
+        arr.push_back(str.substr(p1));
+    }
+    return arr;
 }
 
 void to_lower(std::string& str)

@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 15:06:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 10:30:10 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 14:40:50 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,4 +90,12 @@ void Buffer::clear()
 {
     data_.clear();
     cursor_ = data_.data();
+}
+
+void Buffer::append(char c)
+{
+    if (size() == capacity()) {
+        throw Exception("Buffer is full");
+    }
+    data_.push_back(c);
 }

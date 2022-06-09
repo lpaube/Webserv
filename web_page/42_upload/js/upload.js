@@ -2,23 +2,23 @@
 
 const sendHTTPRequest = (method, url, data) => {
 	const promise = new Promise((resolve, reject) => {
-	const xhr =  new XMLHttpRequest();
-	xhr.open(method, url);
-	xhr.responseType = "json";
-	xhr.onload = () => {
-		resolve(xhr.response);
-	};
-	xhr.send(data);
+		const xhr =  new XMLHttpRequest();
+		xhr.open(method, url);
+		xhr.responseType = "json";
+		xhr.onload = () => {
+			resolve(xhr.response);
+		};
+		xhr.send(data);
 	});
 	return promise;
 };
 
 
 const uploadFile = () => {
-	const file = document.getElementById("upload-file").files[0];
-	let req = new XMLHttpRequest();
+	let photo = document.getElementById("upload-file").files[0];
 	let formData = new FormData();
-	formData.append("file", file);
+	formData.append("photo", photo);
+	fetch('http://localhost:8000', {method: "POST", body: formData});
 };
 
 (function(){

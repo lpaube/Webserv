@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:09 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/08 19:31:29 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 14:45:13 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ Request::Request()
     : body_(MAX_REQ_BODY_SIZE),
       body_type_(B_NONE),
       content_length_(0),
+      content_type_(T_TEXT),
       is_chunked_(false)
 {
 }
@@ -37,6 +38,7 @@ Request::Request(const RequestLine& request_line)
       body_(MAX_REQ_BODY_SIZE),
       body_type_(B_NONE),
       content_length_(0),
+      content_type_(T_TEXT),
       is_chunked_(false)
 {
 }
@@ -109,12 +111,24 @@ void Request::parse_content_length(const std::string& value)
     body_type_ = B_CONTENT_LENGTH;
 }
 
+static std::string trim_spaces(const std::string& s)
+{
+    return trim(s, " ");
+}
+
 void Request::parse_transfer_encoding(const std::string& value)
 {
-    std::string tmp = value;
+    std::vector<std::string> arr = split(value, ',');
+    std::transform(arr.begin(), arr.end(), arr.begin(), &trim_spaces);
 
-    to_lower(tmp);
-    if (tmp == "chunked") {
+    std::vector<std::string>::iterator word = std::find(arr.begin(), arr.end(), "chunked");
+
+    if (word == arr.end()) {
+        return;
+    }
+
+    to_lower(*word);
+    if (*word == "chunked") {
         is_chunked_ = true;
         body_type_ = B_CHUNKED;
     }
@@ -129,8 +143,8 @@ void Request::parse_content_type(const std::string& value)
         std::string boundary = trim(tmp, " ");
 
         if (boundary.find("boundary=") == 0) {
-            boundary_ = boundary.substr(8);
-            body_type_ = B_MULTIPART_FORMDATA;
+            boundary_ = boundary.substr(strlen("boundary="));
+            content_type_ = T_MULTIPART_FORMDATA;
         } else {
             throw Exception("Bad multiform boundary: '" + boundary + "'");
         }

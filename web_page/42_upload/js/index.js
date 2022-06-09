@@ -24,7 +24,7 @@ const sendHTTPRequest = (method, url, data) => {
 	xhr.onload = () => {
 		resolve(xhr.response);
 	};
-	xhr.send(data);
+	xhr.send();
 	});
 	return promise;
 };
@@ -37,10 +37,9 @@ const getDownload = () => {
 };
 
 const getUpload = () => {
-	let data;
-	sendHTTPRequest('GET', "upload.html").then(data => {
-	console.log(data);
-});
+	sendHTTPRequest('POST', 'http://localhost:8000', "upload.html").then(data => {
+		console.log(data);
+	});
 };
 
 const	uploadFile = () => {

@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:39:04 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 10:27:03 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 14:43:25 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,21 +22,19 @@ namespace http
 void parse_request_line(sock::Connection& c)
 {
     RequestLine line;
-    bool error = false;
 
     if (c.buffer().find(REQ_EOL, strlen(REQ_EOL)) == NULL) {
-        // Request line too long
-        error = true;
+        // Bad request line
+        return;
     }
 
-    if (!error) {
-        try {
-            line = http::RequestLine(c.buffer());
-            c.request() = http::Request(line);
-        } catch (const std::exception& ex) {
-            error = true;
-            std::cerr << ex.what() << std::endl;
-        }
+    bool error = false;
+    try {
+        line = http::RequestLine(c.buffer());
+        c.request() = http::Request(line);
+    } catch (const std::exception& ex) {
+        error = true;
+        std::cerr << ex.what() << std::endl;
     }
 
     if (error) {
@@ -74,35 +72,54 @@ void parse_headers(sock::Connection& c)
     }
 }
 
-void parse_body(sock::Connection& c)
+static void content_length_body(sock::Connection& c)
 {
     http::Request& req = c.request();
     Buffer& buf = c.buffer();
 
+    if (req.content_length() != 0) {
+        size_t bytes = req.content_length() > buf.size() ? buf.size() : req.content_length();
+
+        const char* start = buf.cursor();
+        const char* end = start + bytes;
+        req.body().append(start, end);
+        req.read_body_bytes(bytes);
+        buf.advance_cursor(bytes);
+        buf.erase_to_cursor();
+
+        if (req.content_length() == 0) {
+            if (buf.size() != 0) {
+                // Bad request
+            }
+            c.next_request_state();
+            c.set_write();
+        }
+    }
+}
+
+// static void chunked_request(sock::Connection& c)
+// {
+//     http::Request& req = c.request();
+//     Buffer& buf = c.buffer();
+//     (void)req;
+//     (void)buf;
+// }
+
+void parse_body(sock::Connection& c)
+{
+    http::Request& req = c.request();
+
     switch (req.body_type()) {
         case http::B_CONTENT_LENGTH:
-            if (req.content_length() != 0) {
-                size_t bytes =
-                    req.content_length() > buf.size() ? buf.size() : req.content_length();
-
-                const char* start = buf.cursor();
-                const char* end = start + bytes;
-                req.body().append(start, end);
-                req.read_body_bytes(bytes);
-                buf.advance_cursor(bytes);
-                buf.erase_to_cursor();
-
-                if (req.content_length() == 0) {
-                    c.next_request_state();
-                    c.set_write();
-                }
-            }
+            content_length_body(c);
             break;
         case http::B_CHUNKED:
             break;
-        case http::B_MULTIPART_FORMDATA:
-            break;
         case http::B_NONE:
+            if (c.buffer().size() != 0) {
+                // Error missing content length
+            }
+            c.set_write();
             break;
     }
 }

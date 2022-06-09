@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 15:02:37 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 10:30:56 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 14:39:48 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ public:
         }
         data_.insert(data_.end(), first, last);
     }
+    void append(char c);
 
     const char* data() const;
     const char* find(const char* sep, size_t sep_size) const;

@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:19:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/08 19:23:51 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 14:44:31 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,12 @@ enum RequestState {
 enum RequestBodyType {
     B_CONTENT_LENGTH,
     B_CHUNKED,
-    B_MULTIPART_FORMDATA,
     B_NONE
+};
+
+enum RequestContentType {
+    T_TEXT,
+    T_MULTIPART_FORMDATA,
 };
 
 class Request
@@ -70,6 +74,7 @@ private:
     Buffer body_;
     RequestBodyType body_type_;
     size_t content_length_;
+    RequestContentType content_type_;
     bool is_chunked_;
     std::string boundary_;
 };
