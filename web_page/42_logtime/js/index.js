@@ -13,6 +13,7 @@ https://stackoverflow.com/questions/45697176/send-simple-http-request-with-html-
     }
 */
 
+
 var test = document.getElementById("get_time");
 test.onclick = function(){
 	const xhr = new XMLHttpRequest()
@@ -22,7 +23,8 @@ test.onclick = function(){
 		}
 	}
 	var input = document.getElementById("input");
-	xhr.open("GET", "new.html");
+	xhr.open('get', "localhost:8000", false);
 	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-    xhr.send();
+	xhr.setRequestHeader('Acess-Control-Allow-Origin', '*');
+    xhr.send(input);
  };
