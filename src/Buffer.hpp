@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 15:02:37 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 19:11:02 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 10:30:56 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,20 +15,20 @@
 #include <algorithm>
 #include <cstddef>
 #include <vector>
+#include "ExceptionBase.hpp"
 
 class Buffer
 {
 public:
-    Buffer(size_t size);
-
-    Buffer& operator=(const Buffer& other)
+    class Exception : public ExceptionBase
     {
-        std::vector<char>::difference_type index = other.cursor() - other.data();
-        capacity_ = other.capacity_;
-        data_ = other.data_;
-        cursor_ = data_.data() + index;
-        return *this;
-    }
+    public:
+        Exception(const std::string& msg);
+    };
+
+public:
+    Buffer(size_t size);
+    Buffer& operator=(const Buffer& other);
 
 public:
     template <typename Iter>
@@ -36,7 +36,7 @@ public:
     {
         size_t count = (size_t)std::distance(first, last);
         if (space_left() < count) {
-            last = first + count;
+            throw Exception("Buffer is full");
         }
         data_.insert(data_.end(), first, last);
     }

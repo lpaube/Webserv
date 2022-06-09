@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 10:09:00 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 10:32:43 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,7 +210,13 @@ void Server::receive_data(sock::Connection& c)
 
         prev_read = n;
         total_read += n;
-        c.append_data(buf, buf + n);
+        try {
+            c.append_data(buf, buf + n);
+        } catch (const std::exception& ex) {
+            error = true;
+            std::cerr << ex.what() << std::endl;
+            break;
+        }
 
         if ((size_t)n < BUFFER_SIZE || total_read > MAX_REQ_SIZE) {
             break;

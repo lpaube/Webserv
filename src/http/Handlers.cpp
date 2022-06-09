@@ -6,17 +6,15 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:39:04 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 09:50:34 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 10:27:03 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Handlers.hpp"
 #include "Buffer.hpp"
 #include "Utils.hpp"
+#include <exception>
 #include <iostream>
-
-#include <fcntl.h>
-#include <unistd.h>
 
 namespace http
 {
@@ -27,41 +25,18 @@ void parse_request_line(sock::Connection& c)
     bool error = false;
 
     if (c.buffer().find(REQ_EOL, strlen(REQ_EOL)) == NULL) {
-        return;
-    }
-
-    try {
-        line = http::RequestLine(c.buffer());
-        c.request() = http::Request(line);
-    } catch (const std::exception& ex) {
+        // Request line too long
         error = true;
-        std::cerr << ex.what() << std::endl;
     }
 
-    if (error) {
-        // TODO: bad request
-        return;
-    }
-
-    c.next_request_state();
-    parse_headers(c);
-}
-
-void parse_http_request_line(sock::Connection& c)
-{
-    RequestLine line;
-    bool error = false;
-
-    if (c.buffer().find(REQ_EOL, strlen(REQ_EOL)) == NULL) {
-        return;
-    }
-
-    try {
-        line = http::RequestLine(c.buffer());
-        c.request() = http::Request(line);
-    } catch (const std::exception& ex) {
-        error = true;
-        std::cerr << ex.what() << std::endl;
+    if (!error) {
+        try {
+            line = http::RequestLine(c.buffer());
+            c.request() = http::Request(line);
+        } catch (const std::exception& ex) {
+            error = true;
+            std::cerr << ex.what() << std::endl;
+        }
     }
 
     if (error) {

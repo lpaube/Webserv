@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 15:06:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 19:11:41 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 10:30:10 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,25 @@
 #include <cstdlib>
 #include <cstring>
 
+Buffer::Exception::Exception(const std::string& msg)
+    : ExceptionBase(msg)
+{
+}
+
 Buffer::Buffer(size_t size)
     : capacity_(size)
 {
     data_.reserve(capacity_);
     cursor_ = data_.data();
+}
+
+Buffer& Buffer::operator=(const Buffer& other)
+{
+    std::vector<char>::difference_type index = other.cursor() - other.data();
+    capacity_ = other.capacity_;
+    data_ = other.data_;
+    cursor_ = data_.data() + index;
+    return *this;
 }
 
 const char* Buffer::data() const
