@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/08 19:28:23 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 10:09:00 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "Utils.hpp"
 #include "event/ConnectionReadEvent.hpp"
 #include "event/ConnectionWriteEvent.hpp"
-#include "event/TcpStreamEvent.hpp"
+#include "event/TcpListenerEvent.hpp"
 #include "http/Handlers.hpp"
 #include "http/Request.hpp"
 #include "http/RequestLine.hpp"
@@ -42,7 +42,7 @@ void Server::configure(const std::vector<Config>& blocks)
         throw Exception("No server configuration");
     }
 
-    std::vector<sock::TcpStream> streams;
+    std::vector<sock::TcpListener> streams;
     for (std::vector<Config>::const_iterator it = blocks.begin(); it != blocks.end(); ++it) {
         in_addr address;
         address.s_addr = inet_addr(it->listen.address.c_str());
@@ -50,15 +50,15 @@ void Server::configure(const std::vector<Config>& blocks)
             throw Exception("Malformed address: '" + it->listen.address + "'");
         }
 
-        sock::TcpStream s = sock::TcpStream(address, it->listen.port);
+        sock::TcpListener s = sock::TcpListener(address, it->listen.port);
         if (std::find(streams.begin(), streams.end(), s) == streams.end()) {
             streams.push_back(s);
         }
     }
 
-    for (std::vector<sock::TcpStream>::const_iterator it = streams.begin(); it != streams.end();
+    for (std::vector<sock::TcpListener>::const_iterator it = streams.begin(); it != streams.end();
          ++it) {
-        sockets_.add(new sock::TcpStream(*it));
+        sockets_.add(new sock::TcpListener(*it));
     }
 
     init_tcp_streams();
@@ -68,7 +68,7 @@ void Server::configure(const std::vector<Config>& blocks)
 void Server::init_tcp_streams()
 {
     for (sock::SocketArray::iterator it = sockets_.begin(); it != sockets_.end(); ++it) {
-        sock::TcpStream& s = static_cast<sock::TcpStream&>(**it);
+        sock::TcpListener& s = static_cast<sock::TcpListener&>(**it);
 
         s.init();
         s.bind();
@@ -118,7 +118,7 @@ void Server::run()
 
                 switch ((*socket)->type()) {
                     case sock::TCP_STREAM:
-                        events_.push(new event::TcpStreamEvent(*socket));
+                        events_.push(new event::TcpListenerEvent(*socket));
                         break;
                     case sock::CONNECTION:
                         events_.push(new event::ConnectionReadEvent(*socket));
@@ -146,7 +146,7 @@ void Server::process_event_queue()
 
         switch (ev->type()) {
             case event::TCP_STREAM_EVENT: {
-                const sock::TcpStream& s = static_cast<sock::TcpStream&>(*ev->data());
+                const sock::TcpListener& s = static_cast<sock::TcpListener&>(*ev->data());
                 accept_connection(s);
                 break;
             }
@@ -169,7 +169,7 @@ void Server::process_event_queue()
     }
 }
 
-void Server::accept_connection(const sock::TcpStream& stream)
+void Server::accept_connection(const sock::TcpListener& stream)
 {
     sock::Connection* c = new sock::Connection(&stream, MAX_REQ_SIZE);
 

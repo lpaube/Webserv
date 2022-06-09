@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:51:00 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/08 19:28:05 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 10:09:00 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include "event/EventQueue.hpp"
 #include "sock/Connection.hpp"
 #include "sock/SocketArray.hpp"
-#include "sock/TcpStream.hpp"
+#include "sock/TcpListener.hpp"
 #include <poll.h>
 #include <vector>
 
@@ -47,7 +47,7 @@ private:
     void init_tcp_streams();
     bool is_host(int fd) const;
     void process_event_queue();
-    void accept_connection(const sock::TcpStream& stream);
+    void accept_connection(const sock::TcpListener& stream);
     void receive_data(sock::Connection& connection);
     void close_connection(sock::Connection& c);
 

@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   TcpStream.cpp                                      :+:      :+:    :+:   */
+/*   TcpListener.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "TcpStream.hpp"
+#include "TcpListener.hpp"
 #include "Utils.hpp"
 #include <fcntl.h>
 #include <iostream>
@@ -18,29 +18,29 @@
 
 namespace sock
 {
-TcpStream::Exception::Exception(const std::string& msg)
+TcpListener::Exception::Exception(const std::string& msg)
     : ExceptionBase(msg)
 {
 }
 
-TcpStream::TcpStream(in_addr address, uint16_t port)
+TcpListener::TcpListener(in_addr address, uint16_t port)
     : Socket(),
       addr_(address),
       port_(port)
 {
 }
 
-bool TcpStream::operator==(const TcpStream& rhs) const
+bool TcpListener::operator==(const TcpListener& rhs) const
 {
     return address().s_addr == rhs.address().s_addr && port() == rhs.port();
 }
 
-// bool TcpStream::operator==(int fd) const
+// bool TcpListener::operator==(int fd) const
 // {
 //     return this->fd() == fd;
 // }
 
-void TcpStream::init()
+void TcpListener::init()
 {
     if (is_init()) {
         std::cout << "Socket already initialized" << std::endl;
@@ -63,12 +63,12 @@ void TcpStream::init()
     }
 }
 
-SocketType TcpStream::type() const
+SocketType TcpListener::type() const
 {
     return TCP_STREAM;
 }
 
-void TcpStream::bind()
+void TcpListener::bind()
 {
     check_init();
 
@@ -82,7 +82,7 @@ void TcpStream::bind()
     }
 }
 
-void TcpStream::listen()
+void TcpListener::listen()
 {
     check_init();
 
@@ -91,12 +91,12 @@ void TcpStream::listen()
     }
 }
 
-uint16_t TcpStream::port() const
+uint16_t TcpListener::port() const
 {
     return port_;
 }
 
-in_addr TcpStream::address() const
+in_addr TcpListener::address() const
 {
     return addr_;
 }

@@ -24,7 +24,7 @@ Socket::~Socket()
 void Socket::check_init() const
 {
     if (!is_init()) {
-        throw Exception("Must initialize TcpStream before using it");
+        throw Exception("Must initialize TcpListener before using it");
     }
 }
 

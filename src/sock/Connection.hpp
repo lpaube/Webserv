@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 16:47:12 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 14:42:09 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 10:09:00 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 #include "Buffer.hpp"
 #include "Socket.hpp"
-#include "TcpStream.hpp"
+#include "TcpListener.hpp"
 #include "http/Request.hpp"
 #include <sys/socket.h>
 
@@ -23,7 +23,7 @@ namespace sock
 class Connection : public Socket
 {
 public:
-    Connection(const TcpStream* stream, size_t buffer_size);
+    Connection(const TcpListener* stream, size_t buffer_size);
 
 public:
     virtual void init();
@@ -43,7 +43,7 @@ public:
     http::Request& request();
 
 private:
-    const TcpStream* stream_;
+    const TcpListener* stream_;
     sockaddr addr_;
     socklen_t addrlen_;
     Buffer buf_;

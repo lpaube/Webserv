@@ -1,26 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   TcpStreamEvent.cpp                                 :+:      :+:    :+:   */
+/*   TcpListenerEvent.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/05 06:40:00 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 14:44:52 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/06/04 18:57:02 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/06/07 14:44:59 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "event/TcpStreamEvent.hpp"
+#pragma once
+
+#include "Event.hpp"
+#include "sock/Socket.hpp"
 
 namespace event
 {
-TcpStreamEvent::TcpStreamEvent(sock::Socket* stream)
-    : Event(stream)
+class TcpListenerEvent : public Event
 {
-}
+public:
+    TcpListenerEvent(sock::Socket* stream);
 
-EventType TcpStreamEvent::type() const
-{
-    return TCP_STREAM_EVENT;
-}
+public:
+    virtual EventType type() const;
+};
 } // namespace event

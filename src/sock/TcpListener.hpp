@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   TcpStream.hpp                                      :+:      :+:    :+:   */
+/*   TcpListener.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -19,7 +19,7 @@
 
 namespace sock
 {
-class TcpStream : public Socket
+class TcpListener : public Socket
 {
 public:
     class Exception : public ExceptionBase
@@ -29,10 +29,10 @@ public:
     };
 
 public:
-    TcpStream(in_addr address, uint16_t port);
+    TcpListener(in_addr address, uint16_t port);
 
 public:
-    bool operator==(const TcpStream& rhs) const;
+    bool operator==(const TcpListener& rhs) const;
     // bool operator==(int fd) const;
 
 public:

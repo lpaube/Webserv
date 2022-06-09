@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 18:10:03 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 14:41:58 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 10:09:00 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 
 namespace sock
 {
-Connection::Connection(const TcpStream* stream, size_t buffer_size)
+Connection::Connection(const TcpListener* stream, size_t buffer_size)
     : Socket(),
       stream_(stream),
       buf_(buffer_size),
