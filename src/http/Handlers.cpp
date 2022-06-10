@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:39:04 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 16:32:25 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 20:52:24 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,8 @@ static void chunked_request(sock::Connection& c)
 {
     http::Request& req = c.request();
     Buffer& buf = c.buffer();
+
+    (void)req;
 
     size_t chunk_size = 0;
     do {

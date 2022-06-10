@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:19:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 14:44:31 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 20:53:01 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ enum RequestBodyType {
 
 enum RequestContentType {
     T_TEXT,
-    T_MULTIPART_FORMDATA,
+    T_MULTIPART_FORMDATA
 };
 
 class Request

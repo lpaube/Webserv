@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 18:40:57 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 14:44:44 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 20:52:50 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 namespace event
 {
 enum EventType {
-    TCP_STREAM_EVENT,
+    TCP_LISTENER_EVENT,
     CONNECTION_READ_EVENT,
     CONNECTION_WRITE_EVENT
 };

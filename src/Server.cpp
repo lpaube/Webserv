@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 16:09:49 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 20:53:21 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,10 +96,6 @@ void Server::run()
 
         for (std::vector<pollfd>::iterator it = pfds_.begin(); it != pfds_.end() && n_ready > 0;
              ++it) {
-            if (n_ready == 0) {
-                break;
-            }
-
             bool found = false;
 
             sock::SocketArray::iterator socket = sockets_.find(it->fd);
@@ -145,7 +141,7 @@ void Server::process_event_queue()
         event::Event* ev = events_.pop();
 
         switch (ev->type()) {
-            case event::TCP_STREAM_EVENT: {
+            case event::TCP_LISTENER_EVENT: {
                 const sock::TcpListener& s = static_cast<sock::TcpListener&>(*ev->data());
                 accept_connection(s);
                 break;

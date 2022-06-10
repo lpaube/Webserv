@@ -21,6 +21,6 @@ TcpListenerEvent::TcpListenerEvent(sock::Socket* stream)
 
 EventType TcpListenerEvent::type() const
 {
-    return TCP_STREAM_EVENT;
+    return TCP_LISTENER_EVENT;
 }
 } // namespace event
