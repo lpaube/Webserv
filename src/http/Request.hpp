@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:19:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/08 00:33:06 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/10 01:07:54 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,9 @@
 #include "ExceptionBase.hpp"
 #include "HeaderMap.hpp"
 #include "RequestLine.hpp"
+#include "Config.hpp"
 #include <unistd.h>
+#include <vector>
 
 namespace http
 {
@@ -46,6 +48,7 @@ public:
     ssize_t content_length() const;
     void set_body(const std::string& body);
     void print() const;
+	std::string body() const;
 
 private:
     void parse_header(const Header& header);

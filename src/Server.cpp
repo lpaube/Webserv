@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 14:50:34 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/10 01:16:07 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include "Utils.hpp"
+#include "Script.hpp"
 #include "event/ConnectionReadEvent.hpp"
 #include "event/ConnectionWriteEvent.hpp"
 #include "event/TcpStreamEvent.hpp"
@@ -37,7 +38,7 @@ Server::Server()
 void Server::configure(const std::vector<Config>& blocks)
 {
     sockets_.clear();
-
+	this->configList_ = blocks;
     if (blocks.empty()) {
         throw Exception("No server configuration");
     }
@@ -102,7 +103,7 @@ void Server::run()
             }
 
             bool found = false;
-
+ 
             sock::SocketArray::iterator socket = sockets_.find(it->fd);
             if (socket == sockets_.end()) {
                 // This should never happen
@@ -158,8 +159,13 @@ void Server::process_event_queue()
             }
             case event::CONNECTION_WRITE_EVENT: {
                 sock::Connection& c = static_cast<sock::Connection&>(*ev->data());
-                const char* msg = "HTTP/1.0 200 OK\r\n\r\n<h1>Hello World Rust is the best "
-                                  "language ever made</h1>\r\n";
+				std::vector<Config>	ReponseConfigs = getRespConfigs(c, this->configList_);
+				if(c.request().requestLine().path().find("cgi-bin", 0) == true){
+					Script script();
+				}
+                const char* msg = "HTTP/1.0 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>Hello World Rust is the best "
+                                  "language ever made!!!!</h1>\r\n";
+								  c.request().print();
                 send(c.fd(), msg, strlen(msg), 0);
                 close_connection(c);
                 break;
@@ -249,6 +255,7 @@ void Server::receive_data(sock::Connection& c)
             c.set_write();
             break;
     }
+	
 }
 
 void Server::close_connection(sock::Connection& c)
@@ -267,4 +274,11 @@ void Server::close_connection(sock::Connection& c)
     }
 
     sockets_.erase(socket);
+}
+
+std::vector<Config>& getRespConfigs(sock::Connection c, std::vector<Config>& configList_){
+	std::vector<Config> ResponseConfigs;
+	for(int i = 0; i < configList_.size(); i++){
+		if (c.configList_[i].listen.adress
+	}
 }

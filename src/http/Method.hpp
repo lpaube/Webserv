@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Method.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 15:23:54 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/05/31 22:18:59 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 19:00:10 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@ enum Method {
     BAD_METHOD,
     GET,
     POST,
-    DELETE
+    DELETE,
+	OPTIONS
 };
 
 const char* method_str(Method method);

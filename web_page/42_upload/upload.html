@@ -1,31 +1,47 @@
 
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=devide-width, initial-scale=1.0">
 		<title>Le Garde-Robe</title>
 		<script src="js/upload.js" async></script>
 		<link rel="stylesheet" href="css/upload.css">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet"> 
 	</head>
 	<body>
-		<div class="top">
-			<p id="top_content">
-				Le Garde-Robe De Webserv
+		<div class="wrapper">
+			<header>File Uploader •<span class="title"> 42  Webserv</span> </header>
+			<form action ="#">
+				<input type="file" class="file-input" hidden>
+				<img class="upload_cloud" src="assets/icons8-download-100.png">
+				<p>Browse File to Upload</p>
+			</form>
+			<section class="progress-area">
+			</section>
+			<section class="uploaded-area">
+				<li class="row">
+					<div class="content">
+						<img class="file" src="assets/icons8-file-64.png">
+						<div class="content">
+							<div class="details">
+								<span class="name">Check Uploaded Files</span>
+								<span class="size"></span>
+							</div>
+					</div>
+				</li>
+			</section>
+		</div>
+		<div class="bot">
+			<p>
+				Front-End : Marc-Andre Fortin
 			</p>
-		</div>
-		<img src="assets/wardrobe.jpeg" alt="GardeRobe" class="wardrobe-img">
-		<div class="content">
-		<div class="center">
-			<input type="file" class="upload-field" id="upload-file">
-		</div>
-		<div class ="bot">
-			<button class="send-btn" id="send-btn">
-				<img src="assets/upload_cld.png" class="upload-img" onchange="testFunct(this)"\>
-				<p class="upload-txt">
-					Upload
-				</p>
-			</button>
-			</div>
+			<p>
+				Server back-end : Michael Leblanc, Louis Philippe Aube, Marc-Andre Fortin
+			</p>
 		</div>
 	</body>
 </html>

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:51:00 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 14:48:30 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/10 01:14:24 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 #include "ExceptionBase.hpp"
 #include "ServerParser.hpp"
+#include "Config.hpp"
 #include "event/EventQueue.hpp"
 #include "sock/Connection.hpp"
 #include "sock/SocketArray.hpp"
@@ -55,5 +56,8 @@ private:
     sock::SocketArray sockets_;
     std::vector<pollfd> pfds_;
     event::EventQueue events_;
+	std::vector<Config> configList_;
     bool configured_;
 };
+
+std::vector<Config>& getRespConfigs(sock::Connection c, std::vector<Config>& configList_);

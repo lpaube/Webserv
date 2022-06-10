@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:09 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/08 00:32:57 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/10 00:59:21 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ Request::Request()
     : content_length_(0),
       is_chunked_(false)
 {
+	(void)this->configs;
 }
 
 Request::Request(const RequestLine& request_line)
@@ -66,7 +67,7 @@ void Request::print() const
     std::cout << "Body: " << body_ << std::endl;
 }
 
-std::string& Request::body()
+std::string Request::body() const
 {
     return this->body_;
 }
