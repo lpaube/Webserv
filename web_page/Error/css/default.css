@@ -1,0 +1,37 @@
+*{
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Montserrat', sans-serif;
+}
+
+body{
+	display: flex;
+	vertical-align: center;
+	justify-content: center;
+	flex-direction: column;
+	min-height: 100vh;
+	background: rgb(255, 192, 181);
+}
+
+.error{
+	padding-left: 10px;
+	font-size: 100px;
+}
+
+span{
+	transition: 1.5s;
+}
+
+span:hover{
+	font-size: 120px;
+	transition: 1.5s;
+}
+
+.msg{
+	font-size: 15px;
+	margin-top: 10px;
+	padding-left: 20px;
+	color:rgb(85, 84, 84);
+	
+}
