@@ -14,17 +14,18 @@ https://stackoverflow.com/questions/45697176/send-simple-http-request-with-html-
 */
 
 
-var test = document.getElementById("get_time");
-test.onclick = function(){
-	const xhr = new XMLHttpRequest()
-	xhr.onreadystatechange = function () {
-		if (xhr.readyState === 4) {
-			alert("NO CONNECTION FOUND");
-		}
+(function(){
+const userinput = document.querySelector(".user_input").value;
+console.log(userinput);
+var get_time = document.getElementById("get_time");
+get_time.onclick = () =>{
+		console.log("HERE");
+		fetch("http://127.0.0.1:8000/cgi-bin/get_time.py?user=" + userinput, {
+			method: "GET"
+		}).then((result) => {
+			return result.text();
+		}).then((content) => {
+			alert(content);
+		});
 	}
-	var input = document.getElementById("input");
-	xhr.open('get', "localhost:8000", false);
-	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-	xhr.setRequestHeader('Acess-Control-Allow-Origin', '*');
-    xhr.send(input);
- };
+})();

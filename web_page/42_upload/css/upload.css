@@ -1,70 +1,166 @@
 
-body {
-	background-color: white;
-	align-content: center;
+*{
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Montserrat', sans-serif;
 }
 
+body{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 100vh;
+	background: rgb(163, 125, 250);
+	flex-direction: column;
+}
 
-.top{
+.wrapper{
+	font-size: 17px;
+	background-color:rgb(255, 248, 238);
+	width: 450px;
+	padding: 45px;
+	border-radius: 10px;
+}
+
+.wrapper header{
+	color:rgb(129, 93, 212);
+	font-style: bold;
+	font-size: 26px;
+	margin-left: 7px;
+}
+
+.title{
+	color: black;
+	font-family: "Futura";
+}
+
+.wrapper form{
+	border: 2px dashed rgb(163, 125, 250);
+	height: 168px;
 	display: flex;
 	justify-content: center;
-	color: rgb(49, 38, 76);
-	font-family: 'Helvetica';
-	font-size: 40px;
-}
-
-.wardrobe-img{
-	margin: auto;
-	display: block;
-	height: 500px;
-}
-
-
-.center{
-	margin-top:10px;
-	display: flex;
-	justify-content: center;
-}
-
-.bot{
-	margin-top:50px;
-	display: flex;
-	justify-content: center;
-}
-
-
-.upload-field{
-	margin-top: 10px;
-	margin-left: 45px;
-	color:rgb(39, 39, 39);
-}
-.send-btn{
-	margin-top: 10px;
-	background-color: white;
-	border: none;
-}
-
-.send-btn:hover{
+	align-items: center;
+	flex-direction: column;
+	border-radius: 10px;
 	cursor: pointer;
 }
 
-.upload-img{
-	width: 100px;
-	height: auto;
+form :where(i, p){
+	color: rgb(48, 36, 59);
 }
 
-.upload-img:hover{
+form i{
+	color: rgb(163, 125, 250);
 }
 
-.upload-img:active{
-	width: 103px;
-}
-
-.up-text{
+form p{
+	font-size: 20px;
+	margin-top: 15px;
 
 }
 
-.upload-txt{
-	font-size: 17px;
-	color:rgb(121, 37, 199);
+section .row{
+	margin-top: 10px;
+	background:rgb(219, 204, 255);
+	margin-bottom: 10px;
+	list-style: none;
+	padding: 20px 25px;
+	border-radius: 5px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+}
+
+
+section .details span{
+	font-size: 13px;
+}
+
+section .progress-area .row .content{
+	width: 100%;
+	margin-left: 15px;
+
+}
+
+.progress-area .details{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+
+.percent{
+	margin-left: 50px;
+}
+
+.uploaded-area .row .content{
+	display: flex;
+	align-items: center;
+}
+
+.uploaded-area .row:hover{
+	background-color: rgb(255, 248, 238);
+	transition: 1.5s;
+	color: rgb(163, 126, 247);
+}
+
+.uploaded-area:hover{
+	cursor: pointer;
+	border-color: black;
+	border-style: dashed;
+	border: 2px;
+}
+
+.uploaded-area .row .details{
+	display: flex;
+	flex-direction: column;
+}
+
+.progress-area .progress-bar{
+	height: 6px;
+	width: 100%;
+	background-color: rgb(255, 255, 255);
+	border-radius: 30px;
+}
+
+.progress-bar .progress{
+	height: 100%;
+	width: 0%;
+	background-color: rgb(163, 125, 250);
+	border-radius: inherit;
+}
+
+.uploaded-area .details .size{
+	font-size: 11px;
+	color: rgb(106, 105, 105);
+}
+
+.upload_cloud{
+	width: 60px;
+	transition: 1s;
+}
+
+.upload_cloud:hover{
+	width: 75px;
+	transition: 1s;
+}
+
+.file{
+	width: 60px;
+}
+
+.checkbox{
+	margin-left: 50px;
+	width: 20px;
+	height: 20px;
+}
+
+.bot{
+	margin-top: 75px;
+	color:rgb(255, 255, 255);
+	font-size: 10px;
+	justify-content: center;
+	align-items: center;
 }

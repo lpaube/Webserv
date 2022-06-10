@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 14:50:34 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/09 22:49:24 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ void Server::run()
             }
 
             bool found = false;
-
+ 
             sock::SocketArray::iterator socket = sockets_.find(it->fd);
             if (socket == sockets_.end()) {
                 // This should never happen
@@ -158,8 +158,11 @@ void Server::process_event_queue()
             }
             case event::CONNECTION_WRITE_EVENT: {
                 sock::Connection& c = static_cast<sock::Connection&>(*ev->data());
-                const char* msg = "HTTP/1.0 200 OK\r\n\r\n<h1>Hello World Rust is the best "
-                                  "language ever made</h1>\r\n";
+              
+              
+                const char* msg = "HTTP/1.0 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>Hello World Rust is the best "
+                                  "language ever made!!!!</h1>\r\n";
+								  c.request().print();
                 send(c.fd(), msg, strlen(msg), 0);
                 close_connection(c);
                 break;
