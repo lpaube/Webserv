@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:19:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 20:53:01 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/10 16:58:36 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,11 @@ enum RequestContentType {
     T_MULTIPART_FORMDATA
 };
 
+enum ChunkedRequestState {
+    C_CHUNK_SIZE,
+    C_CHUNK
+};
+
 class Request
 {
 public:
@@ -60,6 +65,10 @@ public:
     void read_body_bytes(size_t count);
     Buffer& body();
     RequestBodyType body_type() const;
+    size_t chunk_size() const;
+    void set_chunk_size(size_t size);
+    ChunkedRequestState chunk_state() const;
+    void set_chunk_state(ChunkedRequestState state);
     void print() const;
 
 private:
@@ -76,6 +85,8 @@ private:
     size_t content_length_;
     RequestContentType content_type_;
     bool is_chunked_;
+    size_t chunk_size_;
+    ChunkedRequestState chunk_state_;
     std::string boundary_;
 };
 

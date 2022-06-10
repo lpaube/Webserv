@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 15:06:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 14:40:50 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/10 15:17:21 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,4 +98,9 @@ void Buffer::append(char c)
         throw Exception("Buffer is full");
     }
     data_.push_back(c);
+}
+
+size_t Buffer::cursor_size() const
+{
+    return (size_t)((data() + size()) - cursor_);
 }

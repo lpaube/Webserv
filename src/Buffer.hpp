@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/06 15:02:37 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 14:39:48 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/10 15:16:28 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ public:
     size_t size() const;
     size_t capacity() const;
     size_t space_left() const;
+    size_t cursor_size() const;
     const char* cursor() const;
     void advance_cursor(size_t count);
     void erase_to_cursor();

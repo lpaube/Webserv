@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:09 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 14:45:13 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/10 16:59:19 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,9 @@ Request::Request()
       body_type_(B_NONE),
       content_length_(0),
       content_type_(T_TEXT),
-      is_chunked_(false)
+      is_chunked_(false),
+      chunk_size_(0),
+      chunk_state_(C_CHUNK_SIZE)
 {
 }
 
@@ -39,7 +41,9 @@ Request::Request(const RequestLine& request_line)
       body_type_(B_NONE),
       content_length_(0),
       content_type_(T_TEXT),
-      is_chunked_(false)
+      is_chunked_(false),
+      chunk_size_(0),
+      chunk_state_(C_CHUNK_SIZE)
 {
 }
 
@@ -73,6 +77,26 @@ Buffer& Request::body()
 RequestBodyType Request::body_type() const
 {
     return body_type_;
+}
+
+size_t Request::chunk_size() const
+{
+    return chunk_size_;
+}
+
+void Request::set_chunk_size(size_t size)
+{
+    chunk_size_ = size;
+}
+
+ChunkedRequestState Request::chunk_state() const
+{
+    return chunk_state_;
+}
+
+void Request::set_chunk_state(ChunkedRequestState state)
+{
+    chunk_state_ = state;
 }
 
 void Request::print() const

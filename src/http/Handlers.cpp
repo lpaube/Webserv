@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 12:39:04 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 20:52:24 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/10 17:38:54 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "Utils.hpp"
 #include <exception>
 #include <iostream>
+#include <sstream>
 
 namespace http
 {
@@ -77,7 +78,8 @@ static void content_length_body(sock::Connection& c)
     Buffer& buf = c.buffer();
 
     if (req.content_length() != 0) {
-        size_t bytes = req.content_length() > buf.size() ? buf.size() : req.content_length();
+        size_t bytes =
+            req.content_length() > buf.cursor_size() ? buf.cursor_size() : req.content_length();
 
         const char* start = buf.cursor();
         const char* end = start + bytes;
@@ -87,10 +89,11 @@ static void content_length_body(sock::Connection& c)
         buf.erase_to_cursor();
 
         if (req.content_length() == 0) {
-            if (buf.size() != 0) {
+            if (buf.cursor_size() != 0) {
                 // Bad request
             }
             c.next_request_state();
+            c.set_write();
         }
     }
 }
@@ -100,22 +103,55 @@ static void chunked_request(sock::Connection& c)
     http::Request& req = c.request();
     Buffer& buf = c.buffer();
 
-    (void)req;
+    while (true) {
+        if (req.chunk_state() == http::C_CHUNK_SIZE) {
+            size_t chunk_size = 0;
+            // Read chunk size
+            std::string line = get_next_word(buf, REQ_EOL, strlen(REQ_EOL));
+            if (line.empty()) {
+                break;
+            }
 
-    size_t chunk_size = 0;
-    do {
-        std::string line = get_next_word(buf, REQ_EOL, strlen(REQ_EOL));
-        if (line.empty()) {
-            // error
+            std::stringstream ss;
+            ss << std::hex << line;
+            ss >> chunk_size;
+            if (ss.fail()) {
+                // error
+            }
+
+            req.set_chunk_size(chunk_size);
+            req.set_chunk_state(http::C_CHUNK);
         }
-        // chunk_size = ;
-        c.append_data(buf.cursor(), buf.cursor() + chunk_size);
-        buf.advance_cursor(chunk_size);
-        if (buf.find(REQ_EOL, strlen(REQ_EOL)) != buf.cursor()) {
-            // error
+
+        // Done
+        if (req.chunk_size() == 0) {
+            if (buf.cursor_size() != 0) {
+                // bad request
+            }
+            c.next_request_state();
+            c.set_write();
+            break;
         }
-        buf.advance_cursor(strlen(REQ_EOL));
-    } while (chunk_size != 0);
+
+        if (req.chunk_state() == http::C_CHUNK) {
+            // Can read the hole chunk
+            if (req.chunk_size() + strlen(REQ_EOL) <= buf.cursor_size()) {
+                req.body().append(buf.cursor(), buf.cursor() + req.chunk_size());
+                buf.advance_cursor(req.chunk_size());
+            } else {
+                break;
+            }
+
+            if (buf.find(REQ_EOL, strlen(REQ_EOL)) != buf.cursor()) {
+                // error
+            }
+
+            buf.advance_cursor(strlen(REQ_EOL));
+            req.set_chunk_state(http::C_CHUNK_SIZE);
+        }
+    }
+
+    buf.erase_to_cursor();
 }
 
 void parse_body(sock::Connection& c)
@@ -127,9 +163,12 @@ void parse_body(sock::Connection& c)
             content_length_body(c);
             break;
         case http::B_CHUNKED:
-            chunked_request(c);
+            req.body().append(c.buffer().cursor(), c.buffer().cursor() + c.buffer().cursor_size());
+            c.set_write();
             break;
         case http::B_NONE:
+            chunked_request(c);
+            c.next_request_state();
             break;
     }
 }
