@@ -7,6 +7,7 @@ class Config
 {
 public:
     struct Listen {
+        std::string combined;
         std::string address;
         // port is initialized to -1
         int port;

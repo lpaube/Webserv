@@ -376,6 +376,7 @@ void ServerParser::parse_server_vars()
                     throw("Listen: wrong arg number");
                 if (directives[1].find(":") == std::string::npos)
                     throw("Listen: no port number");
+                config.listen.combined = directives[1];
                 config.listen.address = directives[1].substr(0, directives[1].find(":"));
                 std::string tmp_str = directives[1].substr(directives[1].find(":") + 1);
                 int x;

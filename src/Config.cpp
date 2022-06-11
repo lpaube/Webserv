@@ -67,6 +67,7 @@ void Config::print_config()
 {
     // listen
     std::cout << "===== listen =====" << std::endl;
+    std::cout << "combined: " << listen.combined << std::endl;
     std::cout << "address: " << listen.address << std::endl;
     std::cout << "port: " << listen.port << std::endl;
     std::cout << std::endl;
