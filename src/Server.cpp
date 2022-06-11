@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: laube <laube@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/11 17:33:04 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/11 19:31:50 by laube            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,8 +164,13 @@ void Server::process_event_queue()
 
         //What do we pass to the following constructor?
         //Response response();
+				for(unsigned int i = 0; i < resp_configs.size(); i++){
+					std::cout << "CONFIG #" << i << "\n";
+					resp_configs[i].print_config();
+				}
+				//CGI SCRIPT RESPONSE
 				if(c.request().requestLine().path().find("cgi-bin", 0) == true){
-				//	Script script();
+					//	Script script();
 					std::cout << "IN SCRIPT\n\n\n\n\n";
 				}
 
@@ -173,36 +178,38 @@ void Server::process_event_queue()
 				//ICI MIK
 		//	}
 
-        else
-        {
-          /* Getting the content from an html file:
-           * Function getHtml(); should be in Server.hpp.
-           * Does Server contain a variable Response?
-           */
-          std::string line;
-          std::string path_prefix = ".";
-          std::string full_path = path_prefix + c.request().requestLine().path();
-          std::ifstream html_file(full_path);
-          std::cout << "THIS IS THE PATH: " << std::endl;
-          std::cout << full_path << std::endl;
-          if (html_file.is_open())
-          {
-            std::cerr << "There was an error when trying to open the html file." << std::endl;
-          }
-          else
-          {
-            std::cout << "=========SHOWING HTML==============" << std::endl;
-            while (getline(html_file, line))
-            {
-              //response.body << line << std::endl;
-            }
-            html_file.close();
-            std::cout << "=========ENDING HTML==============" << std::endl;
-          }
-        }
 
 
 				
+				//DIR RESPONSE
+				//FILE RESPONSE
+                else
+                {
+                /* Getting the content from an html file:
+                * Function getHtml(); should be in Server.hpp.
+                * Does Server contain a variable Response?
+                */
+                std::string line;
+                std::string path_prefix = ".";
+                std::string full_path = path_prefix + c.request().requestLine().path();
+                std::ifstream html_file(full_path);
+                std::cout << "THIS IS THE PATH: " << std::endl;
+                std::cout << full_path << std::endl;
+                if (html_file.is_open())
+                {
+                    std::cerr << "There was an error when trying to open the html file." << std::endl;
+                }
+                else
+                {
+                    std::cout << "=========SHOWING HTML==============" << std::endl;
+                    while (getline(html_file, line))
+                    {
+                    //response.body << line << std::endl;
+                    }
+                    html_file.close();
+                    std::cout << "=========ENDING HTML==============" << std::endl;
+                }
+                }
                 const char* msg = "HTTP/1.0 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>Hello World Rust is the best "
                                   "language ever made!!!!</h1>\r\n";
 								  c.request().print();
@@ -317,11 +324,14 @@ void Server::close_connection(sock::Connection& c)
 }
 
 std::vector<Config> getRespConfigs(sock::Connection c, std::vector<Config>& configList_){
-	std::vector<Config> ResponseConfigs;
+	std::vector<Config> responseConfigs;
 	http::HeaderMap headers = c.request().headers();
 	http::HeaderMap::const_iterator it = headers.get("host");
 	std::string host = it->second;
 	for(unsigned long i = 0; i < configList_.size(); i++){
+		if (host == configList_[i].listen.combined){
+		responseConfigs.push_back(configList_[i]);
+		}
 	}
-	return ResponseConfigs;
+	return responseConfigs;
 }
