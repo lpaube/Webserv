@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/11 17:33:04 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/11 17:42:24 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,21 +161,13 @@ void Server::process_event_queue()
                 sock::Connection& c = static_cast<sock::Connection&>(*ev->data());
 				std::vector<Config> resp_configs = getRespConfigs(c, configList_);
 
+				//CGI SCRIPT RESPONSE
 				if(c.request().requestLine().path().find("cgi-bin", 0) == true){
-				//	Script script();
+					//	Script script();
 					std::cout << "IN SCRIPT\n\n\n\n\n";
 				}
-
-			//if(request = directory){
-				//ICI MIK
-		//	}
-
-			//if(request = file){
-				//ICI LP
-			//}
-
-
-				
+				//DIR RESPONSE
+				//FILE RESPONSE
                 const char* msg = "HTTP/1.0 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>Hello World Rust is the best "
                                   "language ever made!!!!</h1>\r\n";
 								  c.request().print();
@@ -290,11 +282,14 @@ void Server::close_connection(sock::Connection& c)
 }
 
 std::vector<Config> getRespConfigs(sock::Connection c, std::vector<Config>& configList_){
-	std::vector<Config> ResponseConfigs;
+	std::vector<Config> responseConfigs;
 	http::HeaderMap headers = c.request().headers();
 	http::HeaderMap::const_iterator it = headers.get("host");
 	std::string host = it->second;
 	for(unsigned long i = 0; i < configList_.size(); i++){
+		if (host == configList[i].listen.str){//attendre que lp ait add la var
+		responseConfigs.push_back(configList[i]);
+		}
 	}
-	return ResponseConfigs;
+	return responseConfigs;
 }

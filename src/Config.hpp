@@ -10,6 +10,7 @@ public:
         std::string address;
         // port is initialized to -1
         int port;
+		std::string str;
     };
 
     struct Error_page {
