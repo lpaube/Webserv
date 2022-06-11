@@ -10,6 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <iostream>
+#include <string>
+#include <map>
 
 #pragma once
 

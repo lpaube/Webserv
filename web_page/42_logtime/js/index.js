@@ -20,7 +20,9 @@ console.log(userinput);
 var get_time = document.getElementById("get_time");
 get_time.onclick = () =>{
 		console.log("HERE");
-		fetch("http://127.0.0.1:8000/cgi-bin/get_time.py?user=" + userinput, {
+		//fetch("http://127.0.0.1:8000/cgi-bin/get_time.py?user=" + userinput, {
+		fetch("http://127.0.0.1:8000/web_page/42_logtime/test.html", {
+		//fetch("../test.html", {
 			method: "GET"
 		}).then((result) => {
 			return result.text();
