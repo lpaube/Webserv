@@ -1,56 +1,31 @@
 
-//EXEMPLE DE POST
-	/*let data;
-	sendHTTPRequest("POST", "https://reqres.in/api/register", {
-		email: 'test@test.com',
-		passord: 'testpwd'
-	}).then(data => {
-	console.log(data);*/
 
-//EXEMPLE DE FILE UPLOAD
-/*let photo = document.getElementById("image-file").files[0];  // file from input
-let req = new XMLHttpRequest();
-let formData = new FormData();
+var ADD = "http://localhost:8000";
 
-formData.append("photo", photo);                                
-req.open("POST", '/upload/image');
-req.send(formData);*/
+const getUp = () => {
+var url = new URL(ADD + "/upload.html");
+//var params = [['lat', '35.696233'], ['long', '139.570431']];
+var params = [];
+url.search = new URLSearchParams(params).toString();
 
-const sendHTTPRequest = (method, url, data) => {
-	const promise = new Promise((resolve, reject) => {
-	const xhr =  new XMLHttpRequest();
-	xhr.open(method, url);
-	xhr.responseType = "json";
-	xhr.onload = () => {
-		resolve(xhr.response);
-	};
-	xhr.send(data);
-	});
-	return promise;
+fetch(url)
+
 };
 
-const getDownload = () => {
-	let data;
-	sendHTTPRequest('GET', "download.html").then(data => {
-	console.log(data);
-});
+const getShow = () => {
+	var url = new URL(ADD + "/download.html");
+	//var params = [['lat', '35.696233'], ['long', '139.570431']];
+	var params = [];
+	url.search = new URLSearchParams(params).toString();
+
+fetch(url)
 };
 
-const getUpload = () => {
-	let data;
-	sendHTTPRequest('GET', "upload.html").then(data => {
-	console.log(data);
-});
-};
 
-const	uploadFile = () => {
-	const file = document.getElementById("upload-field").files[0];
-	console.log(file);
-}
 
 (function(){
 	let downBtn = document.getElementById("download-button");
 	let upBtn = document.getElementById("upload-button");
-	downBtn.addEventListener("click", getDownload);
-	upBtn.addEventListener("click", getUpload);
+	downBtn.addEventListener("click", getShow);
+	upBtn.addEventListener("click", getUp);
 })();
