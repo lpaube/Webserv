@@ -15,8 +15,21 @@
 
 class Response
 {
-public:
-	Response(/* args */) {}
-	~Response() {}
-private:
+  public:
+    Response(/* args */) {}
+    ~Response() {}
+    std::string getHeader() const;
+    void	setContentLength(std::size_t length);
+
+  private:
+    void  createCodeMsg();
+    void  buildHeaderString();
+
+  private:
+    std::map<int, std::string> codeList;
+    std::string contentLength;
+    std::string location;
+    std::string headerString;
+    std::size_t	code;
+    std::string codeMsg;
 };

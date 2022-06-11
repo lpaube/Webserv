@@ -170,6 +170,24 @@ void Server::process_event_queue()
 				//ICI MIK
 		//	}
 
+        else
+        {
+          /* Function getHtml(); should be in Server.hpp.
+           * Does Server contain a variable Response?
+           */
+          std::string line;
+          std::ifstream html_file(c.request().requestLine().path());
+          if (!html_file.is_open())
+          {
+            std::cerr << "There was an error when trying to open the html file." << std::endl;
+            return ;
+          }
+          while (getline(html_file, line))
+          {
+            std::cout << line << std::endl;
+          }
+          html_file.close();
+        }
 			//if(request = file){
 				//ICI LP
 			//}
