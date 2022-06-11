@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/11 17:42:24 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/11 17:46:11 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,10 @@ void Server::process_event_queue()
             case event::CONNECTION_WRITE_EVENT: {
                 sock::Connection& c = static_cast<sock::Connection&>(*ev->data());
 				std::vector<Config> resp_configs = getRespConfigs(c, configList_);
-
+				for(unsigned int i = 0; i < resp_configs.size(); i++){
+					std::cout << "CONFIG #" << i << "\n";
+					resp_configs[i].print_config();
+				}
 				//CGI SCRIPT RESPONSE
 				if(c.request().requestLine().path().find("cgi-bin", 0) == true){
 					//	Script script();
@@ -287,8 +290,8 @@ std::vector<Config> getRespConfigs(sock::Connection c, std::vector<Config>& conf
 	http::HeaderMap::const_iterator it = headers.get("host");
 	std::string host = it->second;
 	for(unsigned long i = 0; i < configList_.size(); i++){
-		if (host == configList[i].listen.str){//attendre que lp ait add la var
-		responseConfigs.push_back(configList[i]);
+		if (host == configList_[i].listen.combined){
+		responseConfigs.push_back(configList_[i]);
 		}
 	}
 	return responseConfigs;
