@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:19:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 21:57:58 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/11 16:16:30 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,9 @@
 #include "ExceptionBase.hpp"
 #include "HeaderMap.hpp"
 #include "RequestLine.hpp"
+#include "Config.hpp"
 #include <unistd.h>
+#include <vector>
 
 namespace http
 {
@@ -40,11 +42,13 @@ public:
     Request(const RequestLine& request_line);
 
 public:
+    RequestLine& requestLine();
     void add_header(const Header& header);
     ssize_t content_length() const;
     void set_body(const std::string& body);
     void print() const;
-	std::string body_;
+	std::string body() const;
+	HeaderMap headers() const;
 
 private:
     void parse_header(const Header& header);
@@ -54,7 +58,7 @@ private:
 private:
     RequestLine request_line_;
     HeaderMap headers_;
-   // std::string body_;
+    std::string body_;
     ssize_t content_length_;
     bool is_chunked_;
 };

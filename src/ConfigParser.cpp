@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:08:15 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/08 13:50:24 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/08 18:00:10 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,11 @@
 #include <string.h>
 #include <string>
 
+ConfigParser::Exception::Exception(const char* msg)
+    : ExceptionBase(msg)
+{
+}
+
 ConfigParser::ConfigParser(std::string config_file)
 {
     std::fstream file;
@@ -24,7 +29,7 @@ ConfigParser::ConfigParser(std::string config_file)
     nb_server = 0;
     file.open(config_file.c_str(), std::fstream::in);
     if (file.is_open() == false)
-        throw ConfigFileException();
+        throw Exception("Error: Config file\n");
     this->file_content = getContent(file);
     file.close();
     createConfig();
@@ -40,7 +45,7 @@ void ConfigParser::createConfig()
         start = this->file_content.begin();
         findServerStart(start);
         if (min_server == false) {
-            throw ConfigSyntaxException();
+            throw Exception("Error: Config, no server found\n");
         }
         if (start == this->file_content.end())
             break;
@@ -61,7 +66,7 @@ std::string::iterator ConfigParser::findServerEnd(std::string::iterator start,
     bool open = false;
     while (start != end) {
         if (*start == '{' && open == true)
-            throw ConfigSyntaxException();
+            throw Exception("Error: Config, {{}} scopeception\n");
         if (*start == '{')
             open = true;
         else if (*start == '}' && open == true)
@@ -70,7 +75,7 @@ std::string::iterator ConfigParser::findServerEnd(std::string::iterator start,
             return start - 1;
         start++;
     }
-    throw ConfigSyntaxException();
+    throw Exception("Error: Config, {} scope no closed\n");
     return end;
 }
 
@@ -88,7 +93,7 @@ void ConfigParser::findServerStart(std::string::iterator& start)
         start++;
     }
     if (*start != '{') {
-        throw ConfigSyntaxException();
+        throw Exception("Error: Config, no opening { found after server declaration\n");
     } else
         start++;
 }
@@ -109,16 +114,6 @@ std::string ConfigParser::getContent(std::fstream& file)
 
 unsigned int ConfigParser::nbServer() const{
 	return this->nb_server;
-}
-
-const char* ConfigParser::ConfigFileException::what() const throw()
-{
-    return ("Error: Config file\n");
-}
-
-const char* ConfigParser::ConfigSyntaxException::what() const throw()
-{
-    return ("Error: Syntax error in config file\n");
 }
 
 ConfigParser::~ConfigParser()

@@ -6,13 +6,13 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:21:49 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/08 13:52:47 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/08 18:01:24 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "Config.hpp"
 #include "ConfigParser.hpp"
 #include "Server.hpp"
-#include "Config.hpp"
 
 int main(int argc, char** argv)
 {

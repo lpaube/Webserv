@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:07:03 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/08 13:51:23 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/08 17:59:35 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,16 +22,11 @@ public:
     ConfigParser(std::string config_file);
     ~ConfigParser();
 	unsigned int nbServer() const;
-    class ConfigFileException : public std::exception
+	public:
+    class Exception : public ExceptionBase
     {
     public:
-        virtual const char* what() const throw();
-    };
-
-    class ConfigSyntaxException : public std::exception
-    {
-    public:
-        virtual const char* what() const throw();
+        Exception(const char* msg);
     };
 
 private:

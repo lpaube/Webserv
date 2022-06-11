@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:40:28 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 14:50:48 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/11 15:36:53 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,18 @@
 #include <algorithm>
 #include <ctype.h>
 #include <string>
+#include <unistd.h>
 #include <vector>
+
+void putstr_fd(std::string msg, std::size_t fd)
+{
+    std::string::iterator it = msg.begin();
+    std::string::iterator end = msg.end();
+    while (it != end) {
+        write(1, &*it, fd);
+        it++;
+    }
+}
 
 bool vectorize_content(std::vector<std::string>& content, std::string& content_str)
 {

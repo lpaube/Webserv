@@ -6,12 +6,13 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/11 14:24:55 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/11 17:33:04 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include "Utils.hpp"
+#include "Script.hpp"
 #include "event/ConnectionReadEvent.hpp"
 #include "event/ConnectionWriteEvent.hpp"
 #include "event/TcpStreamEvent.hpp"
@@ -37,7 +38,7 @@ Server::Server()
 void Server::configure(const std::vector<Config>& blocks)
 {
     sockets_.clear();
-
+	this->configList_ = blocks;
     if (blocks.empty()) {
         throw Exception("No server configuration");
     }
@@ -158,8 +159,23 @@ void Server::process_event_queue()
             }
             case event::CONNECTION_WRITE_EVENT: {
                 sock::Connection& c = static_cast<sock::Connection&>(*ev->data());
-              
-              
+				std::vector<Config> resp_configs = getRespConfigs(c, configList_);
+
+				if(c.request().requestLine().path().find("cgi-bin", 0) == true){
+				//	Script script();
+					std::cout << "IN SCRIPT\n\n\n\n\n";
+				}
+
+			//if(request = directory){
+				//ICI MIK
+		//	}
+
+			//if(request = file){
+				//ICI LP
+			//}
+
+
+				
                 const char* msg = "HTTP/1.0 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>Hello World Rust is the best "
                                   "language ever made!!!!</h1>\r\n";
 								  c.request().print();
@@ -252,6 +268,7 @@ void Server::receive_data(sock::Connection& c)
             c.set_write();
             break;
     }
+	
 }
 
 void Server::close_connection(sock::Connection& c)
@@ -270,4 +287,14 @@ void Server::close_connection(sock::Connection& c)
     }
 
     sockets_.erase(socket);
+}
+
+std::vector<Config> getRespConfigs(sock::Connection c, std::vector<Config>& configList_){
+	std::vector<Config> ResponseConfigs;
+	http::HeaderMap headers = c.request().headers();
+	http::HeaderMap::const_iterator it = headers.get("host");
+	std::string host = it->second;
+	for(unsigned long i = 0; i < configList_.size(); i++){
+	}
+	return ResponseConfigs;
 }
