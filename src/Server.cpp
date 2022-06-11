@@ -162,6 +162,8 @@ void Server::process_event_queue()
                 sock::Connection& c = static_cast<sock::Connection&>(*ev->data());
 				std::vector<Config> resp_configs = getRespConfigs(c, configList_);
 
+        //What do we pass to the following constructor?
+        //Response response();
 				if(c.request().requestLine().path().find("cgi-bin", 0) == true){
 				//	Script script();
 					std::cout << "IN SCRIPT\n\n\n\n\n";
@@ -173,7 +175,8 @@ void Server::process_event_queue()
 
         else
         {
-          /* Function getHtml(); should be in Server.hpp.
+          /* Getting the content from an html file:
+           * Function getHtml(); should be in Server.hpp.
            * Does Server contain a variable Response?
            */
           std::string line;
@@ -182,21 +185,21 @@ void Server::process_event_queue()
           std::ifstream html_file(full_path);
           std::cout << "THIS IS THE PATH: " << std::endl;
           std::cout << full_path << std::endl;
-          if (!html_file.is_open())
+          if (html_file.is_open())
           {
             std::cerr << "There was an error when trying to open the html file." << std::endl;
           }
-          std::cout << "=========SHOWING HTML==============" << std::endl;
-          while (getline(html_file, line))
+          else
           {
-            std::cout << line << std::endl;
+            std::cout << "=========SHOWING HTML==============" << std::endl;
+            while (getline(html_file, line))
+            {
+              //response.body << line << std::endl;
+            }
+            html_file.close();
+            std::cout << "=========ENDING HTML==============" << std::endl;
           }
-          html_file.close();
-          std::cout << "=========ENDING HTML==============" << std::endl;
         }
-			//if(request = file){
-				//ICI LP
-			//}
 
 
 				
