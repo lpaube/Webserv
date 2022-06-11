@@ -6,13 +6,14 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:08 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/08 18:05:25 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/11 15:35:04 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Script.hpp"
 #include "Utils.hpp"
 #include "http/RequestLine.hpp"
+#include "http/Request.hpp"
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>

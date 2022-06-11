@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 16:47:12 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/10 01:16:26 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/11 16:01:45 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ public:
     void next_request_state();
     Buffer& buffer();
     http::Request& request();
+	sockaddr& addr();
 
 
 private:

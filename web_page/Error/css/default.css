@@ -1,0 +1,45 @@
+*{
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Montserrat', sans-serif;
+}
+
+body{
+	display: flex;
+	justify-content: center;
+
+	flex-direction: column;
+	min-height: 100vh;
+	background: rgb(255, 192, 181);
+}
+
+.error{
+	display: inline-block;
+	padding-left: 10px;
+	font-size: 140px;
+}
+
+.error_msg{
+	display: inline-block;
+}
+
+span.letter{
+	transition: all 1s ease-in-out;
+	cursor: default;
+}
+
+.msg{
+	font-size: 20px;
+	margin-top: 10px;
+	padding-left: 10px;
+	color:rgb(85, 84, 84);
+	
+}
+
+.letter:hover{
+	font-size: 160px;
+}
+
+.server_name{
+}
