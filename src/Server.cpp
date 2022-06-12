@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/11 14:24:55 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/11 22:02:38 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,7 +162,7 @@ void Server::process_event_queue()
               
                 const char* msg = "HTTP/1.0 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>Hello World Rust is the best "
                                   "language ever made!!!!</h1>\r\n";
-								  c.request().print();
+				std::cout << "SENDING RESPONSE TO CLIENT" << std::endl;
                 send(c.fd(), msg, strlen(msg), 0);
                 close_connection(c);
                 break;
