@@ -2,13 +2,15 @@ server{
 	listen 127.0.0.1:8000;
   server_name Cyborgab www.Cyborgab.com;
   client_max_body_size 80m;
-  error_page    404  ./resources/error/error404.html    ;
+  error_page    404  ./resources/error/error404.html;
   error_page    504 505 ./resources/error/error50x.html;
   autoindex on;
+  cgi_ext		.py /usr/bin/python;
   root /somepath/fdf;
 	location test/{
     client_max_body_size 800m;
     limit_except GET POST DELETE;
+	cgi_ext		.py /usr/bin/python;
 	}
 	location test2/super/coucou{
     root /somepatfdsfh/fdf;

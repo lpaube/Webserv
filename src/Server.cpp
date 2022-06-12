@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/11 17:46:11 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/11 21:14:09 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,17 +166,22 @@ void Server::process_event_queue()
 				}
 				//CGI SCRIPT RESPONSE
 				if(c.request().requestLine().path().find("cgi-bin", 0) == true){
-					//	Script script();
-					std::cout << "IN SCRIPT\n\n\n\n\n";
+					Script script(resp_configs[0], c.request());
+					std::string ret =  script.exec();
+					const char *msg = ret.c_str();
+					send(c.fd(), msg, strlen(msg), 0);
+					close_connection(c);
+                	break;
 				}
-				//DIR RESPONSE
-				//FILE RESPONSE
+				else{
+				
                 const char* msg = "HTTP/1.0 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>Hello World Rust is the best "
                                   "language ever made!!!!</h1>\r\n";
-								  c.request().print();
+				c.request().print();
                 send(c.fd(), msg, strlen(msg), 0);
                 close_connection(c);
                 break;
+				}
             }
         }
 

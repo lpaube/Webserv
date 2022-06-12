@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/09 17:17:01 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/11 15:12:08 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/11 18:27:44 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ const uploadFile = () => {
 			method: "POST",
 			body: data
 		}).then(response => {
-			console.log(response)
+			console.log(response);
 			showFile(file);
 		}).catch(e => alert(e.message));
 	}

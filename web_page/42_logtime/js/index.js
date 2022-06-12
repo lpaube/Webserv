@@ -18,14 +18,11 @@ https://stackoverflow.com/questions/45697176/send-simple-http-request-with-html-
 const userinput = document.querySelector(".user_input").value;
 console.log(userinput);
 var get_time = document.getElementById("get_time");
-get_time.onclick = () =>{
-		console.log("HERE");
-		fetch("http://127.0.0.1:8000/cgi-bin/get_time.py?user=" + userinput, {
-			method: "GET"
-		}).then((result) => {
-			return result.text();
-		}).then((content) => {
-			alert(content);
-		});
-	}
+get_time.onclick = () =>	{
+	fetch("http://127.0.0.1:8000/cgi-bin/get_time.py", {
+		method: "GET"
+	}).then(response => {
+		alert(response);
+	}).catch(e => alert(e.message));
+}
 })();
