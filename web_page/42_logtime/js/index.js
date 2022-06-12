@@ -21,8 +21,9 @@ var get_time = document.getElementById("get_time");
 get_time.onclick = () =>	{
 	fetch("http://127.0.0.1:8000/cgi-bin/get_time.py", {
 		method: "GET"
-	}).then(response => {
-		alert(response);
-	}).catch(e => alert(e.message));
+	}).then(response => response.text())
+	.then((content) => {
+		document.write(content);
+	});
 }
 })();

@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/11 21:14:09 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/11 22:30:40 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,7 +143,7 @@ void Server::run()
 
 void Server::process_event_queue()
 {
-    while (!events_.empty()) {
+	  while (!events_.empty()) {
         event::Event* ev = events_.pop();
 
         switch (ev->type()) {
@@ -159,12 +159,12 @@ void Server::process_event_queue()
             }
             case event::CONNECTION_WRITE_EVENT: {
                 sock::Connection& c = static_cast<sock::Connection&>(*ev->data());
-				std::vector<Config> resp_configs = getRespConfigs(c, configList_);
+                std::vector<Config> resp_configs = getRespConfigs(c.request().headers(), configList_);
 				for(unsigned int i = 0; i < resp_configs.size(); i++){
 					std::cout << "CONFIG #" << i << "\n";
 					resp_configs[i].print_config();
 				}
-				//CGI SCRIPT RESPONSE
+		
 				if(c.request().requestLine().path().find("cgi-bin", 0) == true){
 					Script script(resp_configs[0], c.request());
 					std::string ret =  script.exec();
@@ -173,15 +173,12 @@ void Server::process_event_queue()
 					close_connection(c);
                 	break;
 				}
-				else{
-				
                 const char* msg = "HTTP/1.0 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>Hello World Rust is the best "
                                   "language ever made!!!!</h1>\r\n";
-				c.request().print();
+				std::cout << "SENDING RESPONSE TO CLIENT" << std::endl;
                 send(c.fd(), msg, strlen(msg), 0);
                 close_connection(c);
                 break;
-				}
             }
         }
 
@@ -289,11 +286,11 @@ void Server::close_connection(sock::Connection& c)
     sockets_.erase(socket);
 }
 
-std::vector<Config> getRespConfigs(sock::Connection c, std::vector<Config>& configList_){
+std::vector<Config> getRespConfigs(http::HeaderMap header, std::vector<Config>& configList_){
 	std::vector<Config> responseConfigs;
-	http::HeaderMap headers = c.request().headers();
-	http::HeaderMap::const_iterator it = headers.get("host");
+	http::HeaderMap::const_iterator it = header.get("host");
 	std::string host = it->second;
+	(void)configList_;
 	for(unsigned long i = 0; i < configList_.size(); i++){
 		if (host == configList_[i].listen.combined){
 		responseConfigs.push_back(configList_[i]);
@@ -301,3 +298,23 @@ std::vector<Config> getRespConfigs(sock::Connection c, std::vector<Config>& conf
 	}
 	return responseConfigs;
 }
+
+
+	/*std::vector<Config> resp_configs = getRespConfigs(c, configList_);
+				for(unsigned int i = 0; i < resp_configs.size(); i++){
+					std::cout << "CONFIG #" << i << "\n";
+					resp_configs[i].print_config();
+				}
+				//CGI SCRIPT RESPONSE
+				if(c.request().requestLine().path().find("cgi-bin", 0) == true){
+					Script script(resp_configs[0], c.request());
+					std::string ret =  script.exec();
+					const char *msg = ret.c_str();
+					send(c.fd(), msg, strlen(msg), 0);
+					close_connection(c);
+                	break;
+				}*/
+
+
+
+
