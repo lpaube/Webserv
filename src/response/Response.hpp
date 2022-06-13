@@ -27,6 +27,7 @@ class Response
     ~Response() {}
     std::string getHeader() const;
     Config getConfig() const {return config;}
+    size_t getBodySize() const ;
     void	setContentLength(std::size_t length);
 
   private:
@@ -40,7 +41,7 @@ class Response
   private:
     //std::map<int, std::string> codeList;
     Config      config;
-    size_t body_size;
+    //size_t body_size;
     size_t header_size;
     std::size_t	code;
     //std::string location;

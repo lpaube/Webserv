@@ -27,3 +27,7 @@ Response::Response(sock::Connection c, std::vector<Config>& configs)
     throw "No config matches the request";
   this->config = responseConfigs[0];
 }
+
+size_t Response::getBodySize() const {
+  return body.str().size();
+}

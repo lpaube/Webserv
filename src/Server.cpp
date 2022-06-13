@@ -180,10 +180,7 @@ void Server::process_event_queue()
 			//if(request = directory){
 				//ICI MIK
 		//	}
-
-
-
-				
+    
 				//DIR RESPONSE
 				//FILE RESPONSE
         else
@@ -193,24 +190,25 @@ void Server::process_event_queue()
             std::string line;
             std::string path_prefix = ".";
             std::string full_path = path_prefix + c.request().requestLine().path();
-            std::ifstream html_file(full_path);
+            std::ifstream requested_file(full_path);
             std::cout << full_path << std::endl;
-            if (!html_file.is_open())
+            if (!requested_file.is_open())
             {
               std::cerr << "There was an error when trying to open the html file." << std::endl;
             }
             else
             {
               std::cout << "=========SHOWING HTML==============" << std::endl;
-              while (getline(html_file, line))
+              while (getline(requested_file, line))
               {
                 response.body.clear();
                 response.body << line << std::endl;
               }
 
               std::cout << response.body.str() << std::endl;
-              html_file.close();
+              requested_file.close();
               std::cout << "=========ENDING HTML==============" << std::endl;
+              std::cout << "===Body size: " << response.getBodySize() << "====" << std::endl;
             }
           }
           catch (const char* s) {
@@ -331,7 +329,6 @@ void Server::close_connection(sock::Connection& c)
 
 std::vector<Config> getRespConfigs(http::HeaderMap header, std::vector<Config>& configList_){
   std::vector<Config> responseConfigs;
-  // http::HeaderMap headers = c.request().headers();
   http::HeaderMap::const_iterator it = header.get("host");
   std::string host = it->second;
   std::cout << "============This is host: " << host << "=============" << std::endl;
