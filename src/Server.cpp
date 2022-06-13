@@ -6,7 +6,7 @@
 /*   By: laube <laube@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/11 19:31:50 by laube            ###   ########.fr       */
+/*   Updated: 2022/06/13 16:03:46 by laube            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,7 +145,7 @@ void Server::run()
 
 void Server::process_event_queue()
 {
-    while (!events_.empty()) {
+	  while (!events_.empty()) {
         event::Event* ev = events_.pop();
 
         switch (ev->type()) {
@@ -168,11 +168,14 @@ void Server::process_event_queue()
 					std::cout << "CONFIG #" << i << "\n";
 					resp_configs[i].print_config();
 				}
-        */
-				//CGI SCRIPT RESPONSE
+		
 				if(c.request().requestLine().path().find("cgi-bin", 0) == true){
-					//	Script script();
-					std::cout << "IN SCRIPT\n\n\n\n\n";
+					Script script(resp_configs[0], c.request());
+					std::string ret =  script.exec();
+					const char *msg = ret.c_str();
+					send(c.fd(), msg, strlen(msg), 0);
+					close_connection(c);
+                	break;
 				}
 
 			//if(request = directory){

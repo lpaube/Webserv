@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:40:28 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/11 15:36:53 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/11 19:17:14 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void putstr_fd(std::string msg, std::size_t fd)
     std::string::iterator it = msg.begin();
     std::string::iterator end = msg.end();
     while (it != end) {
-        write(1, &*it, fd);
+        write(fd, &*it, 1);
         it++;
     }
 }
