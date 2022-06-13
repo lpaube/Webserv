@@ -6,7 +6,7 @@
 /*   By: laube <laube@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/13 16:03:46 by laube            ###   ########.fr       */
+/*   Updated: 2022/06/13 16:31:50 by laube            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,9 +161,8 @@ void Server::process_event_queue()
             }
             case event::CONNECTION_WRITE_EVENT: {
                 sock::Connection& c = static_cast<sock::Connection&>(*ev->data());
-				//std::vector<Config> resp_configs = getRespConfigs(c, configList_);
+				std::vector<Config> resp_configs = getRespConfigs(c.request().headers(), configList_);
 
-                /*
 				for(unsigned int i = 0; i < resp_configs.size(); i++){
 					std::cout << "CONFIG #" << i << "\n";
 					resp_configs[i].print_config();
@@ -189,10 +188,6 @@ void Server::process_event_queue()
 				//FILE RESPONSE
         else
         {
-          /* Getting the content from an html file:
-           * Function getHtml(); should be in Server.hpp.
-           * Does Server contain a variable Response?
-           */
           try {
             Response response(c, configList_);
             std::string line;
@@ -334,11 +329,10 @@ void Server::close_connection(sock::Connection& c)
   sockets_.erase(socket);
 }
 
-/*
-std::vector<Config> getRespConfigs(sock::Connection c, std::vector<Config>& configList_){
+std::vector<Config> getRespConfigs(http::HeaderMap header, std::vector<Config>& configList_){
   std::vector<Config> responseConfigs;
-  http::HeaderMap headers = c.request().headers();
-  http::HeaderMap::const_iterator it = headers.get("host");
+  // http::HeaderMap headers = c.request().headers();
+  http::HeaderMap::const_iterator it = header.get("host");
   std::string host = it->second;
   std::cout << "============This is host: " << host << "=============" << std::endl;
   for(unsigned long i = 0; i < configList_.size(); i++){
@@ -348,4 +342,3 @@ std::vector<Config> getRespConfigs(sock::Connection c, std::vector<Config>& conf
   }
   return responseConfigs;
 }
-*/
