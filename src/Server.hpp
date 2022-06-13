@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:51:00 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/11 17:17:39 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/11 22:29:55 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,4 +60,4 @@ private:
     bool configured_;
 };
 
-std::vector<Config> getRespConfigs(sock::Connection c, std::vector<Config>& configList_);
+std::vector<Config> getRespConfigs(http::HeaderMap header, std::vector<Config>& configList_);
