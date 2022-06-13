@@ -20,6 +20,7 @@
 #include "http/Request.hpp"
 #include "http/RequestLine.hpp"
 #include "sock/Connection.hpp"
+#include "response/Response.hpp"
 #include <arpa/inet.h>
 #include <cstdio>
 #include <sys/time.h>
@@ -160,14 +161,14 @@ void Server::process_event_queue()
             }
             case event::CONNECTION_WRITE_EVENT: {
                 sock::Connection& c = static_cast<sock::Connection&>(*ev->data());
-				std::vector<Config> resp_configs = getRespConfigs(c, configList_);
+				//std::vector<Config> resp_configs = getRespConfigs(c, configList_);
 
-        //What do we pass to the following constructor?
-        //Response response();
+                /*
 				for(unsigned int i = 0; i < resp_configs.size(); i++){
 					std::cout << "CONFIG #" << i << "\n";
 					resp_configs[i].print_config();
 				}
+        */
 				//CGI SCRIPT RESPONSE
 				if(c.request().requestLine().path().find("cgi-bin", 0) == true){
 					//	Script script();
@@ -183,155 +184,165 @@ void Server::process_event_queue()
 				
 				//DIR RESPONSE
 				//FILE RESPONSE
-                else
-                {
-                /* Getting the content from an html file:
-                * Function getHtml(); should be in Server.hpp.
-                * Does Server contain a variable Response?
-                */
-                std::string line;
-                std::string path_prefix = ".";
-                std::string full_path = path_prefix + c.request().requestLine().path();
-                std::ifstream html_file(full_path);
-                std::cout << "THIS IS THE PATH: " << std::endl;
-                std::cout << full_path << std::endl;
-                if (html_file.is_open())
-                {
-                    std::cerr << "There was an error when trying to open the html file." << std::endl;
-                }
-                else
-                {
-                    std::cout << "=========SHOWING HTML==============" << std::endl;
-                    while (getline(html_file, line))
-                    {
-                    //response.body << line << std::endl;
-                    }
-                    html_file.close();
-                    std::cout << "=========ENDING HTML==============" << std::endl;
-                }
-                }
-                const char* msg = "HTTP/1.0 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>Hello World Rust is the best "
-                                  "language ever made!!!!</h1>\r\n";
-								  c.request().print();
-                send(c.fd(), msg, strlen(msg), 0);
-                close_connection(c);
-                break;
+        else
+        {
+          /* Getting the content from an html file:
+           * Function getHtml(); should be in Server.hpp.
+           * Does Server contain a variable Response?
+           */
+          try {
+            Response response(c, configList_);
+            std::string line;
+            std::string path_prefix = ".";
+            std::string full_path = path_prefix + c.request().requestLine().path();
+            std::ifstream html_file(full_path);
+            std::cout << full_path << std::endl;
+            if (!html_file.is_open())
+            {
+              std::cerr << "There was an error when trying to open the html file." << std::endl;
             }
-        }
+            else
+            {
+              std::cout << "=========SHOWING HTML==============" << std::endl;
+              while (getline(html_file, line))
+              {
+                response.body.clear();
+                response.body << line << std::endl;
+              }
 
+              std::cout << response.body.str() << std::endl;
+              html_file.close();
+              std::cout << "=========ENDING HTML==============" << std::endl;
+            }
+          }
+          catch (const char* s) {
+            std::cerr << s << std::endl;
+            return;
+          }
+        }
+        const char* msg = "HTTP/1.0 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>Hello World Rust is the best "
+          "language ever made!!!!</h1>\r\n";
+        c.request().print();
+        send(c.fd(), msg, strlen(msg), 0);
+        close_connection(c);
+        break;
+           }
+        }
         delete ev;
     }
 }
 
 void Server::accept_connection(const sock::TcpStream& stream)
 {
-    sock::Connection* c = new sock::Connection(&stream, MAX_REQUEST_SIZE);
+  sock::Connection* c = new sock::Connection(&stream, MAX_REQUEST_SIZE);
 
-    try {
-        c->init();
-        sockets_.add(static_cast<sock::Socket*>(c));
+  try {
+    c->init();
+    sockets_.add(static_cast<sock::Socket*>(c));
 
-        pollfd pfd;
-        pfd.fd = c->fd();
-        pfd.events = POLLIN | POLLOUT;
-        pfd.revents = 0;
-        pfds_.push_back(pfd);
-    } catch (const std::exception& ex) {
-        delete c;
-        std::cerr << ex.what() << std::endl;
-    }
+    pollfd pfd;
+    pfd.fd = c->fd();
+    pfd.events = POLLIN | POLLOUT;
+    pfd.revents = 0;
+    pfds_.push_back(pfd);
+  } catch (const std::exception& ex) {
+    delete c;
+    std::cerr << ex.what() << std::endl;
+  }
 }
 
 void Server::receive_data(sock::Connection& c)
 {
-    char buf[BUFFER_SIZE];
-    ssize_t prev_read = 0;
-    ssize_t total_read = 0;
-    bool error = false;
+  char buf[BUFFER_SIZE];
+  ssize_t prev_read = 0;
+  ssize_t total_read = 0;
+  bool error = false;
 
-    while (true) {
-        ssize_t n = recv(c.fd(), buf, BUFFER_SIZE, 0);
+  while (true) {
+    ssize_t n = recv(c.fd(), buf, BUFFER_SIZE, 0);
 
-        // EAGAIN / EWOULDBLOCK
-        if (prev_read == BUFFER_SIZE && n < 0) {
-            break;
-        }
-
-        if (n < 0) {
-            error = true;
-            break;
-        }
-
-        prev_read = n;
-        total_read += n;
-        c.append_data(buf, buf + n);
-
-        if ((size_t)n < BUFFER_SIZE || total_read > MAX_REQUEST_SIZE) {
-            break;
-        }
+    // EAGAIN / EWOULDBLOCK
+    if (prev_read == BUFFER_SIZE && n < 0) {
+      break;
     }
 
-    if (error) {
-        close_connection(c);
-        return;
+    if (n < 0) {
+      error = true;
+      break;
     }
 
-    // Client closed connection
-    if (total_read == 0) {
-        close_connection(c);
-        return;
-    }
+    prev_read = n;
+    total_read += n;
+    c.append_data(buf, buf + n);
 
-    // Request too big
-    if (total_read > MAX_REQUEST_SIZE) {
-        close_connection(c);
-        return;
+    if ((size_t)n < BUFFER_SIZE || total_read > MAX_REQUEST_SIZE) {
+      break;
     }
+  }
 
-    switch (c.request_state()) {
-        case http::REQ_LINE:
-            http::parse_request_line(c);
-            break;
-        case http::REQ_HEADERS:
-            http::parse_headers(c);
-            break;
-        case http::REQ_BODY:
-            http::parse_body(c);
-            break;
-        case http::REQ_DONE:
-            c.set_write();
-            break;
-    }
-	
+  if (error) {
+    close_connection(c);
+    return;
+  }
+
+  // Client closed connection
+  if (total_read == 0) {
+    close_connection(c);
+    return;
+  }
+
+  // Request too big
+  if (total_read > MAX_REQUEST_SIZE) {
+    close_connection(c);
+    return;
+  }
+
+  switch (c.request_state()) {
+    case http::REQ_LINE:
+      http::parse_request_line(c);
+      break;
+    case http::REQ_HEADERS:
+      http::parse_headers(c);
+      break;
+    case http::REQ_BODY:
+      http::parse_body(c);
+      break;
+    case http::REQ_DONE:
+      c.set_write();
+      break;
+  }
 }
 
 void Server::close_connection(sock::Connection& c)
 {
-    sock::SocketArray::iterator socket = sockets_.find(c.fd());
-    if (socket == sockets_.end()) {
-        std::cerr << "Can't find connection" << std::endl;
-        return;
-    }
+  sock::SocketArray::iterator socket = sockets_.find(c.fd());
+  if (socket == sockets_.end()) {
+    std::cerr << "Can't find connection" << std::endl;
+    return;
+  }
 
-    for (std::vector<pollfd>::iterator pfd = pfds_.begin(); pfd != pfds_.end(); ++pfd) {
-        if (pfd->fd == c.fd()) {
-            pfds_.erase(pfd);
-            break;
-        }
+  for (std::vector<pollfd>::iterator pfd = pfds_.begin(); pfd != pfds_.end(); ++pfd) {
+    if (pfd->fd == c.fd()) {
+      pfds_.erase(pfd);
+      break;
     }
+  }
 
-    sockets_.erase(socket);
+  sockets_.erase(socket);
 }
 
+/*
 std::vector<Config> getRespConfigs(sock::Connection c, std::vector<Config>& configList_){
-	std::vector<Config> responseConfigs;
-	http::HeaderMap headers = c.request().headers();
-	http::HeaderMap::const_iterator it = headers.get("host");
-	std::string host = it->second;
-	for(unsigned long i = 0; i < configList_.size(); i++){
-		if (host == configList_[i].listen.combined){
-		responseConfigs.push_back(configList_[i]);
-		}
-	}
-	return responseConfigs;
+  std::vector<Config> responseConfigs;
+  http::HeaderMap headers = c.request().headers();
+  http::HeaderMap::const_iterator it = headers.get("host");
+  std::string host = it->second;
+  std::cout << "============This is host: " << host << "=============" << std::endl;
+  for(unsigned long i = 0; i < configList_.size(); i++){
+    if (host == configList_[i].listen.combined){
+      responseConfigs.push_back(configList_[i]);
+    }
+  }
+  return responseConfigs;
 }
+*/
