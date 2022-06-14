@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:08 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/13 20:21:01 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/13 22:11:42 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ Script::Script(Config& config, http::Request& request)
 
     buildCmd(requestline.path(), config);
 	buildEnv(method, config);
-	printEnv();
+	//printEnv();
 }
 
 Script::~Script()
@@ -94,6 +94,7 @@ std::string Script::exec()
         throw Exception("Error fatal, execve\n\n");
     } else
         waitpid(id, &status, 0);
+	//free(envp);
 	dup2(save[1], 1);
 	dup2(save[0], 0);//return stdout to original
 	close(out_file);
@@ -104,6 +105,10 @@ std::string Script::exec()
 	std::ifstream input_file("out_file.tmp");
 	std::string script_output((std::istreambuf_iterator<char>(input_file)), std::istreambuf_iterator<char>());
 	remove("out_file.tmp");
+	for (std::size_t i = 0; i < envp_size; i++){
+		delete[] envp[i];
+	}
+	delete[] envp;
     return script_output;
 }
 
@@ -167,7 +172,8 @@ void	Script::buildEnv(http::Method& method, Config& config){
 	http::HeaderMap::const_iterator it;
 	std::stringstream ss;
 	std::string add;
-
+	(void)config;
+	
 	if (method == http::POST){
 		//The MIME type of the body of the request, or null if the type is not known
 		it = header.get("Content-Type");
@@ -177,8 +183,7 @@ void	Script::buildEnv(http::Method& method, Config& config){
 	
 	//The length of the request body in bytes made available by the input stream or -1 if the length is not known.
 	ss << this->request.content_length();
-	std::cout << "TESTING HERE :" << this->request.content_length() << std::endl;
-	v_env.push_back("|CONTENT_LENGTH=" + ss.str() + "");
+	v_env.push_back("CONTENT_LENGTH=" + ss.str() + "");
 
 	//The revision of the CGI specification being used by the server to communicate with the script. It is "CGI/1.1"
 	v_env.push_back("GATEWAY_INTERFACE=CGI/1.1");
@@ -232,6 +237,7 @@ void	Script::buildEnv(http::Method& method, Config& config){
 	if (it != header.end())
 		v_env.push_back("REMOTE_HOST=" + it->second);
 	//Returns the name of the HTTP method with which this request was made. For example, GET, POST, or PUT.
+	std::cout << "REQUEST LINE : " << request.requestLine().path();
 	const char *method_name = method_str(request.requestLine().method());
 	std::string method_join("REQUEST_METHOD=");
 	method_join += method_name;
@@ -249,22 +255,24 @@ void	Script::buildEnv(http::Method& method, Config& config){
 	v_env.push_back("SERVER_PORT=" + ss.str() + "");
 	
 	//Returns the name and version of the protocol the request uses in the following form: protocol/majorVersion.minorVersion. For example, HTTP/1.1
-	v_env.push_back("SERVER_PROTOCOL=HTTP/1.1");
+	//v_env.push_back("SERVER_PROTOCOL=HTTP/1.1");
 
-	std::size_t size_y = v_env.size();
-	envp = (char**)malloc(sizeof(char) * size_y + 1);
-	for (std::size_t i = 0; i < size_y; i++){
-		envp[i] = strdup(v_env[i].c_str());
+	envp_size = v_env.size();
+	envp = new char *[envp_size];
+	for (std::size_t i = 0; i < envp_size; i++){
+		envp[i] = new char[v_env[i].size()];
+		strcpy(envp[i], v_env[i].c_str());
 	}
-	envp[size_y] = NULL;
+	envp[envp_size] = NULL;
+	printEnv();
 }
 
 void	Script::printEnv() const{
 	std::size_t i = 0;
+	std::cout << "|!|PRINTING CGI ENV|!|\n";
 	while (envp[i]){
 		std::cout << envp[i] << "\n";
 		i++;
 	}
-	std::cout << "END!!!\n\n";
 	std::cout << std::flush;
 }

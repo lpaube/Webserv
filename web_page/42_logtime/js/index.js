@@ -15,11 +15,12 @@ https://stackoverflow.com/questions/45697176/send-simple-http-request-with-html-
 
 
 (function(){
-const userinput = document.querySelector(".user_input").value;
-console.log(userinput);
+const userinput = document.getElementById("input");
 var get_time = document.getElementById("get_time");
 get_time.onclick = () =>	{
-	fetch("http://127.0.0.1:8000/cgi-bin/get_time.py", {
+	fetch("http://127.0.0.1:8000/cgi-bin/get_time.py?" + new URLSearchParams(
+		{ user: userinput.value, test: "test"}
+	), {
 		method: "GET"
 	}).then(response => response.text())
 	.then((content) => {

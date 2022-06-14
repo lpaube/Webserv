@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/13 20:24:14 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/13 21:45:10 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,13 +139,11 @@ void Server::run()
         }
 
         process_event_queue();
-		std::cout << "|!|OUT_EVENT_QUEUE|!|" << std::endl;
     }
 }
 
 void Server::process_event_queue()
 {
-	std::cout << "|!|IN_EVENT_QUEUE|!|" << std::endl;
 	  while (!events_.empty()) {
         event::Event* ev = events_.pop();
 
@@ -172,17 +170,14 @@ void Server::process_event_queue()
 				}
 		
 				if(c.request().requestLine().path().find("cgi-bin", 0) == true){
-					std::cout << "IN SCRIPT" << std::endl;
+					std::cout << "|!|IN SCRIPT|!|" << std::endl;
 					Script script(resp_configs[0], c.request());
 					std::string ret =  script.exec();
-					const char *msg = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>Hello World Rust is the best "
-                    	              "language ever made!!!!</h1>\r\n";
-					send(c.fd(), msg, strlen(msg), 0);
+					send(c.fd(), ret.c_str(), ret.size(), 0);
 					std::cout << "|!|OUT OF SCRIPT|!|" << std::endl;
 				}
 				else{
-                	const char* msg = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>Hello World Rust is the best "
-                    	              "language ever made!!!!</h1>\r\n";
+                	const char* msg = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>DEFAULT SERVER MESSAGE </h1>\r\n";
 					std::cout << "|!|SENDING RESPONSE TO CLIENT|!|" << std::endl;
                 	send(c.fd(), msg, strlen(msg), 0);
 					std::cout << "|!|RESPONSE SENT|!|" << std::endl;
@@ -196,7 +191,6 @@ void Server::process_event_queue()
 		std::cout << "|!|DELETING EVENT|!|" << std::endl;
         delete ev;
     }
-	std::cout << "|!|OUT_OF_QUEUE|!|" << std::endl;
 }
 
 void Server::accept_connection(const sock::TcpStream& stream)

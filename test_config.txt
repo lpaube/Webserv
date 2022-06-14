@@ -6,6 +6,7 @@ server{
   error_page    504 505 ./resources/error/error50x.html;
   autoindex on;
   cgi_ext		.py /usr/bin/python;
+  cgi_ext		.sh /bin/bash;
   root /somepath/fdf;
 	location test/{
     client_max_body_size 800m;

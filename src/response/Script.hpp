@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:01 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/13 19:21:54 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/13 20:36:12 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ private:
 	std::vector<std::string> v_env;
     char** envp;
     char** cmd;
+	std::size_t envp_size;
     http::Request& request;
 
 private:
