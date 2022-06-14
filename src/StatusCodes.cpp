@@ -1,12 +1,17 @@
 #include "StatusCodes.hpp"
 #include <map>
 
-#define INSERT_STATUS_CODE status_codes::status_code_map.insert(std::pair<int, std::string>
+/*
+ * We can access the status code messages through a static method
+ * like so: StatusCodes::getCodeMsg(code)
+ */
 
-bool status_codes::initialized = false;
-std::map<int, std::string> status_codes::status_code_map;
+#define INSERT_STATUS_CODE StatusCodes::status_code_map.insert(std::pair<int, std::string>
 
-void status_codes::initialize_status_codes()
+bool StatusCodes::initialized = false;
+std::map<int, std::string> StatusCodes::status_code_map;
+
+void StatusCodes::initialize_status_codes()
 {
     INSERT_STATUS_CODE(100, "Continue"));
     INSERT_STATUS_CODE(101, "Switching Protocols"));
@@ -78,7 +83,7 @@ void status_codes::initialize_status_codes()
     initialized = true;
 }
 
-std::string status_codes::getCodeMsg(int code)
+std::string StatusCodes::getCodeMsg(int code)
 {
     if (!initialized)
       initialize_status_codes();

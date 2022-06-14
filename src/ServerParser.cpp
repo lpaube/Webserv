@@ -19,6 +19,8 @@
 #include <sstream>
 #include <string>
 
+#define BYTES_IN_MB 1000000
+
 ServerParser::ServerParser(std::string::iterator beg, std::string::iterator end)
     : str_content(beg, end)
 {
@@ -280,7 +282,7 @@ void ServerParser::parse_location_vars()
                         else if ((*it == 'm' || *it == 'M') && it + 1 == directives[1].end()) {
                             unsigned long x;
                             std::istringstream(tmp_str) >> x;
-                            new_location.client_max_body_size = x;
+                            new_location.client_max_body_size = x * BYTES_IN_MB;
                         } else
                             throw("client_max_body_size not a valid input");
                     }
@@ -409,7 +411,7 @@ void ServerParser::parse_server_vars()
                     else if ((*it == 'm' || *it == 'M') && it + 1 == directives[1].end()) {
                         unsigned long x;
                         std::istringstream(tmp_str) >> x;
-                        config.client_max_body_size = x;
+                        config.client_max_body_size = x * BYTES_IN_MB;
                     } else
                         throw("client_max_body_size not a valid input");
                 }

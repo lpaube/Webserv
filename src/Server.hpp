@@ -56,7 +56,7 @@ private:
     sock::SocketArray sockets_;
     std::vector<pollfd> pfds_;
     event::EventQueue events_;
-	std::vector<Config> configList_;
+    std::vector<Config> configList_;
     bool configured_;
 };
 

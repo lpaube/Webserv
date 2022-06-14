@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "Response.hpp"
+#include "StatusCodes.hpp"
 
 Response::Response(sock::Connection c, std::vector<Config>& configs)
 {
@@ -36,6 +37,7 @@ size_t Response::getBodySize() const {
 void Response::setStatusCode(size_t code)
 {
   this->status_code = code;
+  this->status_code_msg = StatusCodes::getCodeMsg(code);
 }
 
 void Response::setHtmlBody()

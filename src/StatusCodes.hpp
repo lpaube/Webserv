@@ -4,7 +4,13 @@
 #include <iostream>
 #include <string>
 
-struct status_codes {
+/*
+ * We can access the status code messages through a static method
+ * like so: StatusCodes::getCodeMsg(code)
+ * See StatusCodes.cpp for all the status codes
+ */
+
+struct StatusCodes {
   static std::map<int, std::string> status_code_map;
   static bool initialized;
 

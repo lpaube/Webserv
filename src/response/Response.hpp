@@ -30,6 +30,7 @@ class Response
     size_t getBodySize() const ;
     void  setStatusCode(size_t code);
     size_t getStatusCode() const {return status_code;}
+    std::string getStatusCodeMsg() const {return status_code_msg;}
     void setHtmlBody();
     void setHtmlHeader();
     
