@@ -6,7 +6,7 @@
 /*   By: laube <laube@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/13 16:31:50 by laube            ###   ########.fr       */
+/*   Updated: 2022/06/13 20:48:25 by laube            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,6 +196,7 @@ void Server::process_event_queue()
         close_connection(c);
         break;
            }
+
         }
         delete ev;
     }
