@@ -189,19 +189,11 @@ void Server::process_event_queue()
           Response response(c, resp_configs);
           response.setHtmlBody();
           response.setHtmlHeader();
-          /*
           const char* msg = response.full_content.c_str();
           std::cout << "@@@@@@@ THIS IS MESSAGE: " << msg << std::endl;
 					send(c.fd(), msg, strlen(msg), 0);
           close_connection(c);
           break;
-          */
-        const char* msg = "HTTP/1.0 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>Hello World Rust is the okayest "
-          "language ever made!!!!</h1>\r\n";
-        c.request().print();
-        send(c.fd(), msg, strlen(msg), 0);
-        close_connection(c);
-        break;
         }
         const char* msg = "HTTP/1.0 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>Hello World Rust is the okayest "
           "language ever made!!!!</h1>\r\n";
