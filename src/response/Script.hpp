@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:01 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/11 16:00:46 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/13 19:21:54 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ public:
     std::string exec();
 
 private:
+	std::vector<std::string> v_env;
     char** envp;
     char** cmd;
     http::Request& request;
@@ -38,5 +39,6 @@ private:
 private:
     void buildCmd(std::string path, Config& config);
     std::string get_ext(std::string& path);
-	void buildEnv(http::Method& method);
-};
+	void buildEnv(http::Method& method, Config& config);
+	void	printEnv() const;
+	};
