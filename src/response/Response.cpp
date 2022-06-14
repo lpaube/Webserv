@@ -30,10 +30,6 @@ Response::Response(sock::Connection c, std::vector<Config>& configs)
   this->config = responseConfigs[0];
 }
 
-size_t Response::getBodySize() const {
-  return body.str().size();
-}
-
 void Response::setStatusCode(size_t code)
 {
   this->status_code = code;
@@ -43,6 +39,7 @@ void Response::setStatusCode(size_t code)
 void Response::setHtmlBody()
 {
   std::string line;
+  std::stringstream body_stream;
   std::ifstream requested_file(full_path.c_str());
 
   if (!requested_file.is_open())
@@ -56,15 +53,25 @@ void Response::setHtmlBody()
     //body.clear();
     while (getline(requested_file, line))
     {
-      body << line << std::endl;
+      body_stream << line << "\r\n";
     }
     requested_file.close();
-    if (getBodySize() > getConfig().client_max_body_size)
+    body_stream << "\r\n";
+    body = body_stream.str();
+    body_size = body.size();
+    if (body_size > getConfig().client_max_body_size)
       setStatusCode(413);
   }
 }
 
 void Response::setHtmlHeader()
 {
-  
+  std::stringstream header_stream;
+
+  header_stream << "HTTP/1.1 " << status_code << " " << StatusCodes::getCodeMsg(status_code)
+    << "\r\n";
+  header_size = header_stream.str().size();
+  header_stream << "Content Length: " << header_size + body_size << "\r\n\r\n";
+  header = header_stream.str();
+  full_content = header + body;
 }
