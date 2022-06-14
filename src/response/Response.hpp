@@ -30,7 +30,9 @@ class Response
     size_t getBodySize() const ;
     void  setStatusCode(size_t code);
     size_t getStatusCode() const {return status_code;}
-    Response& getHtml();
+    void setHtmlBody();
+    void setHtmlHeader();
+    
 
   private:
     void  createCodeMsg();
@@ -46,6 +48,7 @@ class Response
     //size_t body_size;
     size_t header_size;
     size_t	status_code;
+    std::string status_code_msg;
     std::string full_path;
     //std::string location;
     //std::string headerString;

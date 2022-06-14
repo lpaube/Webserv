@@ -6,7 +6,7 @@
 /*   By: laube <laube@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/13 20:48:25 by laube            ###   ########.fr       */
+/*   Updated: 2022/06/13 16:31:50 by laube            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include "http/RequestLine.hpp"
 #include "sock/Connection.hpp"
 #include "response/Response.hpp"
+#include "StatusCodes.hpp"
 #include <arpa/inet.h>
 #include <cstdio>
 #include <sys/time.h>
@@ -186,7 +187,9 @@ void Server::process_event_queue()
         else
         {
           Response response(c, resp_configs);
-          response.getHtml();
+          response.setHtmlBody();
+          //response.setHtmlHeader();
+          std::cout << "!!!!!!This is code msg: " << status_codes::getCodeMsg(404) << "!!!!!!!" << std::endl;
           std::cout << "======This is the whole HTML: " << response.body.str() << "==========" << std::endl;
         }
         const char* msg = "HTTP/1.0 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>Hello World Rust is the best "
@@ -196,7 +199,6 @@ void Server::process_event_queue()
         close_connection(c);
         break;
            }
-
         }
         delete ev;
     }

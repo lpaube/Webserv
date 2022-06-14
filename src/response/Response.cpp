@@ -38,7 +38,7 @@ void Response::setStatusCode(size_t code)
   this->status_code = code;
 }
 
-Response& Response::getHtml()
+void Response::setHtmlBody()
 {
   std::string line;
   std::ifstream requested_file(full_path.c_str());
@@ -60,5 +60,9 @@ Response& Response::getHtml()
     if (getBodySize() > getConfig().client_max_body_size)
       setStatusCode(413);
   }
-  return *this;
+}
+
+void Response::setHtmlHeader()
+{
+  
 }
