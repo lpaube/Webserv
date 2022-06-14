@@ -185,36 +185,9 @@ void Server::process_event_queue()
 				//FILE RESPONSE
         else
         {
-          try {
-            Response response(c, configList_);
-            std::string line;
-            std::string path_prefix = ".";
-            std::string full_path = path_prefix + c.request().requestLine().path();
-            std::ifstream requested_file(full_path);
-            std::cout << full_path << std::endl;
-            if (!requested_file.is_open())
-            {
-              std::cerr << "There was an error when trying to open the html file." << std::endl;
-            }
-            else
-            {
-              std::cout << "=========SHOWING HTML==============" << std::endl;
-              while (getline(requested_file, line))
-              {
-                response.body.clear();
-                response.body << line << std::endl;
-              }
-
-              std::cout << response.body.str() << std::endl;
-              requested_file.close();
-              std::cout << "=========ENDING HTML==============" << std::endl;
-              std::cout << "===Body size: " << response.getBodySize() << "====" << std::endl;
-            }
-          }
-          catch (const char* s) {
-            std::cerr << s << std::endl;
-            return;
-          }
+          Response response(c, resp_configs);
+          response.getHtml();
+          std::cout << "======This is the whole HTML: " << response.body.str() << "==========" << std::endl;
         }
         const char* msg = "HTTP/1.0 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>Hello World Rust is the best "
           "language ever made!!!!</h1>\r\n";

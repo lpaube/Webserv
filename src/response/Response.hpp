@@ -16,6 +16,7 @@
 #include "Config.hpp"
 #include "sock/Connection.hpp"
 #include <sstream>
+#include <fstream>
 
 #pragma once
 
@@ -25,10 +26,11 @@ class Response
     Response(/* args */) {}
     Response(sock::Connection c, std::vector<Config>& configs);
     ~Response() {}
-    std::string getHeader() const;
     Config getConfig() const {return config;}
     size_t getBodySize() const ;
-    void	setContentLength(std::size_t length);
+    void  setStatusCode(size_t code);
+    size_t getStatusCode() const {return status_code;}
+    Response& getHtml();
 
   private:
     void  createCodeMsg();
@@ -43,7 +45,8 @@ class Response
     Config      config;
     //size_t body_size;
     size_t header_size;
-    std::size_t	code;
+    size_t	status_code;
+    std::string full_path;
     //std::string location;
     //std::string headerString;
     //std::string codeMsg;

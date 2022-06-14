@@ -25,9 +25,40 @@ Response::Response(sock::Connection c, std::vector<Config>& configs)
 	}
   if (responseConfigs.size() == 0)
     throw "No config matches the request";
+  full_path = "." + c.request().requestLine().path();
   this->config = responseConfigs[0];
 }
 
 size_t Response::getBodySize() const {
   return body.str().size();
+}
+
+void Response::setStatusCode(size_t code)
+{
+  this->status_code = code;
+}
+
+Response& Response::getHtml()
+{
+  std::string line;
+  std::ifstream requested_file(full_path.c_str());
+
+  if (!requested_file.is_open())
+  {
+    setStatusCode(400);
+    std::cerr << "There was an error when trying to open the html file." << std::endl;
+  }
+  else
+  {
+    setStatusCode(200);
+    //body.clear();
+    while (getline(requested_file, line))
+    {
+      body << line << std::endl;
+    }
+    requested_file.close();
+    if (getBodySize() > getConfig().client_max_body_size)
+      setStatusCode(413);
+  }
+  return *this;
 }
