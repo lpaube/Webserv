@@ -25,7 +25,10 @@ Response::Response(http::Request& request, std::vector<Config>& configs)
 		}
 	}
   if (responseConfigs.size() == 0)
+  {
+    std::cerr << "NO CONFIG MATCH" << std::endl;
     throw "No config matches the request";
+  }
   full_path = "." + request.requestLine().path();
   this->config = responseConfigs[0];
 }
