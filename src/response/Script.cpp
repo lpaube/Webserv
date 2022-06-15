@@ -93,7 +93,9 @@ std::string Script::exec()
         execve(cmd[0], cmd, envp);
         throw Exception("Error fatal, execve\n\n");
     } else
+    {
         waitpid(id, &status, 0);
+    }
 	//free(envp);
 	dup2(save[1], 1);
 	dup2(save[0], 0);//return stdout to original
