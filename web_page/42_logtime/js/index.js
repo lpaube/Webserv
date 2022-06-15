@@ -1,30 +1,41 @@
 /*
-https://stackoverflow.com/questions/45697176/send-simple-http-request-with-html-submit-button
-    function submit() {
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4) {
-                alert(xhr.response);
-            }
-        }
-        xhr.open('get', 'https://google.com', true);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-        xhr.send();
+  https://stackoverflow.com/questions/45697176/send-simple-http-request-with-html-submit-button
+function submit() {
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      alert(xhr.response);
     }
-*/
+  }
+  xhr.open('get', 'https://google.com', true);
+  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+  xhr.send();
+}
+  */
 
 
-var test = document.getElementById("get_time");
-test.onclick = function(){
-	const xhr = new XMLHttpRequest()
-	xhr.onreadystatechange = function () {
-		if (xhr.readyState === 4) {
-			alert("NO CONNECTION FOUND");
-		}
+  (function(){
+	const userinput = document.getElementById("input");
+	var get_time = document.getElementById("get_time");
+	get_time.onclick = () =>	{
+		fetch("http://127.0.0.1:8000/cgi-bin/get_time.py?" + new URLSearchParams(
+			{ user: userinput.value, test: "test"}
+		), {
+			method: "GET"
+		}).then(response => response.text())
+		.then((content) => {
+			document.write(content);
+		});
 	}
-	var input = document.getElementById("input");
-	xhr.open('get', "localhost:8000", false);
-	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-	xhr.setRequestHeader('Acess-Control-Allow-Origin', '*');
-    xhr.send(input);
- };
+
+    var get_time = document.getElementById("test_html");
+    get_time.onclick = () =>	{
+      fetch("http://127.0.0.1:8000/web_page/42_logtime/test.html", {
+        method: "GET"
+      }).then(response => response.text())
+        .then((content) => {
+          document.write(content);
+        });
+    }
+  })();
+  

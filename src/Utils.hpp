@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:37:34 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 11:02:25 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/15 15:00:16 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ std::string get_next_word(std::string& str, const std::string& sep);
 std::vector<std::string> split(const std::string& str, char sep);
 void to_lower(std::string& str);
 bool vectorize_content(std::vector<std::string>& content, std::string& content_str);
+void putstr_fd(std::vector<char> msg, std::size_t fd);
 
 template <typename Exception>
 void exception_errno(std::string msg)

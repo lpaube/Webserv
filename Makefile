@@ -1,7 +1,7 @@
 NAME		=	webserv
 
 CXX			=	clang++
-CXXFLAGS	=	-Wall -Wextra -Werror -Wpedantic -Wsign-conversion -std=c++98
+CXXFLAGS	=	-Wall -Wextra -Werror -Wpedantic -Wsign-conversion  -std=c++98
 
 RM			=	rm -rf
 MKDIR		=	mkdir -p

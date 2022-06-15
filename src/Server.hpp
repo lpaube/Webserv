@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:51:00 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 10:10:45 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/15 14:52:25 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 #include "ExceptionBase.hpp"
 #include "ServerParser.hpp"
+#include "Config.hpp"
 #include "event/EventQueue.hpp"
 #include "sock/Connection.hpp"
 #include "sock/SocketArray.hpp"
@@ -55,5 +56,8 @@ private:
     sock::SocketArray sockets_;
     std::vector<pollfd> pfds_;
     event::EventQueue events_;
+    std::vector<Config> configList_;
     bool configured_;
 };
+
+std::vector<Config> getRespConfigs(http::HeaderMap header, std::vector<Config>& configList_);

@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 18:10:03 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 10:09:00 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/15 14:51:22 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,4 +79,9 @@ http::Request& Connection::request()
 {
     return request_;
 }
+
+sockaddr& Connection::addr(){
+	return addr_;
+}
+
 } // namespace sock

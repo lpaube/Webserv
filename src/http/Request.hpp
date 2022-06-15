@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:19:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/10 16:58:36 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/15 14:59:36 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,9 @@
 #include "ExceptionBase.hpp"
 #include "HeaderMap.hpp"
 #include "RequestLine.hpp"
+#include "Config.hpp"
 #include <unistd.h>
+#include <vector>
 
 namespace http
 {
@@ -59,6 +61,7 @@ public:
     Request(const RequestLine& request_line);
 
 public:
+    RequestLine& requestLine();
     void add_header(const Header& header);
     size_t content_length() const;
     bool is_chunked() const;
@@ -70,6 +73,8 @@ public:
     ChunkedRequestState chunk_state() const;
     void set_chunk_state(ChunkedRequestState state);
     void print() const;
+    const std::vector<char>& body() const;
+	HeaderMap headers() const;
 
 private:
     void parse_header(const Header& header);

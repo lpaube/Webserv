@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:09 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/10 16:59:19 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/15 14:59:04 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,20 @@ void Request::print() const
     for (HeaderMap::const_iterator it = headers_.begin(); it != headers_.end(); ++it) {
         std::cout << '\t' << it->first << ": " << it->second << '\n';
     }
+}
+
+const std::vector<char>& Request::body() const
+{
+    return this->body_.internal();
+}
+
+HeaderMap Request::headers() const{
+	return headers_;
+}
+
+RequestLine& Request::requestLine()
+{
+    return this->request_line_;
 }
 
 void Request::parse_header(const Header& header)

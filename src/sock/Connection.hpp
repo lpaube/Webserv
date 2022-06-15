@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 16:47:12 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 10:09:00 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/15 14:51:26 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@ public:
     void next_request_state();
     Buffer& buffer();
     http::Request& request();
+	sockaddr& addr();
+
 
 private:
     const TcpListener* stream_;

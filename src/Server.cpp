@@ -6,12 +6,13 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 20:53:21 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/15 15:02:52 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include "Utils.hpp"
+#include "response/Script.hpp"
 #include "event/ConnectionReadEvent.hpp"
 #include "event/ConnectionWriteEvent.hpp"
 #include "event/TcpListenerEvent.hpp"
@@ -19,10 +20,30 @@
 #include "http/Request.hpp"
 #include "http/RequestLine.hpp"
 #include "sock/Connection.hpp"
+#include "response/Response.hpp"
+#include "StatusCodes.hpp"
 #include <arpa/inet.h>
 #include <cstdio>
 #include <sys/time.h>
 #include <unistd.h>
+#include <fstream>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+ # include <sys/errno.h>
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <sys/wait.h>
+# include <stdio.h>
+# include <unistd.h>
+# include <signal.h>
+# include <stdlib.h>
+# include <limits.h>
+# include <dirent.h>
+# include <stdbool.h>
 
 Server::Exception::Exception(const std::string& msg)
     : ExceptionBase(msg)
@@ -37,7 +58,7 @@ Server::Server()
 void Server::configure(const std::vector<Config>& blocks)
 {
     sockets_.clear();
-
+	this->configList_ = blocks;
     if (blocks.empty()) {
         throw Exception("No server configuration");
     }
@@ -97,7 +118,7 @@ void Server::run()
         for (std::vector<pollfd>::iterator it = pfds_.begin(); it != pfds_.end() && n_ready > 0;
              ++it) {
             bool found = false;
-
+ 
             sock::SocketArray::iterator socket = sockets_.find(it->fd);
             if (socket == sockets_.end()) {
                 // This should never happen
@@ -137,142 +158,172 @@ void Server::run()
 
 void Server::process_event_queue()
 {
-    while (!events_.empty()) {
+	const char* msg;
+	  while (!events_.empty()) {
         event::Event* ev = events_.pop();
 
         switch (ev->type()) {
             case event::TCP_LISTENER_EVENT: {
+				std::cout <<	"|!|IN_CONNECTION_STREAM_EVENT|!|" << std::endl;
                 const sock::TcpListener& s = static_cast<sock::TcpListener&>(*ev->data());
                 accept_connection(s);
                 break;
             }
             case event::CONNECTION_READ_EVENT: {
+				std::cout << "|!|IN_CONNECTION_READ_EVENT|!|" << std::endl;
                 sock::Connection& c = static_cast<sock::Connection&>(*ev->data());
                 receive_data(c);
                 break;
             }
             case event::CONNECTION_WRITE_EVENT: {
+				std::cout << "|!|IN_CONNECTION_WRITE_EVENT|!|" << std::endl;
                 sock::Connection& c = static_cast<sock::Connection&>(*ev->data());
-                c.request().print();
-                const char* msg = "HTTP/1.0 200 OK\r\n\r\n<h1>Hello World Rust is the best "
-                                  "language ever made</h1>\r\n";
-                c.request().body().append(0);
-                std::cout << c.request().body().data() << std::endl;
-                std::cout << "Size: " << c.request().body().size() << std::endl;
-                send(c.fd(), msg, strlen(msg), 0);
-                close_connection(c);
-                break;
-            }
+				std::vector<Config> resp_configs = getRespConfigs(c.request().headers(), configList_);
+		
+				if(c.request().requestLine().path().find("cgi-bin", 0) == true){
+					std::cout << "|!|IN SCRIPT|!|" << std::endl;
+					Script script(resp_configs[0], c.request());
+					std::string ret =  script.exec();
+					msg = ret.c_str();
+					std::cout << "|!|OUT OF SCRIPT|!|" << std::endl;
+				}
+				else{
+					struct stat info;
+					stat(c.request().requestLine().path().c_str(), &info);
+					//if (S_ISREG(info.st_mode) == true){
+					std::cout << "|!|IN FILE RESPONSE|!|" << std::endl;
+					Response response(c.request(), resp_configs);
+          			response.setHtmlBody();
+          			response.setHtmlHeader();
+					msg = response.full_content.c_str();
+					std::cout << "|!|FILE RESPONSE BUILT|!|" << std::endl;
+					}
+					//else{
+					//msg = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>DEFAULT SERVER MESSAGE </h1>\r\n";
+					//}
+			std::cout << "|!|SENDING RESPONSE TO CLIENT|!|" << std::endl;
+			send(c.fd(), msg, strlen(msg), 0);
+			std::cout << "|!|RESPONSE SENT|!|" << std::endl;
+			std::cout << "|!|CLOSING_CONNECTION|!|" << std::endl;
+			close_connection(c);
+			std::cout << "|!|CONNECTION_CLOSED|!|" << std::endl;
+			break;
+			}
         }
-
+		std::cout << "|!|DELETING EVENT|!|" << std::endl;
         delete ev;
     }
 }
 
+
 void Server::accept_connection(const sock::TcpListener& stream)
 {
-    sock::Connection* c = new sock::Connection(&stream, MAX_REQ_SIZE);
+  sock::Connection* c = new sock::Connection(&stream, MAX_REQ_SIZE);
 
-    try {
-        c->init();
-        sockets_.add(static_cast<sock::Socket*>(c));
+  try {
+    c->init();
+    sockets_.add(static_cast<sock::Socket*>(c));
 
-        pollfd pfd;
-        pfd.fd = c->fd();
-        pfd.events = POLLIN | POLLOUT;
-        pfd.revents = 0;
-        pfds_.push_back(pfd);
-    } catch (const std::exception& ex) {
-        delete c;
-        std::cerr << ex.what() << std::endl;
-    }
+    pollfd pfd;
+    pfd.fd = c->fd();
+    pfd.events = POLLIN | POLLOUT;
+    pfd.revents = 0;
+    pfds_.push_back(pfd);
+  } catch (const std::exception& ex) {
+    delete c;
+    std::cerr << ex.what() << std::endl;
+  }
 }
 
 void Server::receive_data(sock::Connection& c)
 {
-    char buf[BUFFER_SIZE];
-    ssize_t prev_read = 0;
-    ssize_t total_read = 0;
-    bool error = false;
+  char buf[BUFFER_SIZE];
+  ssize_t prev_read = 0;
+  ssize_t total_read = 0;
+  bool error = false;
 
-    while (true) {
-        ssize_t n = recv(c.fd(), buf, BUFFER_SIZE, 0);
+  while (true) {
+    ssize_t n = recv(c.fd(), buf, BUFFER_SIZE, 0);
 
-        // EAGAIN / EWOULDBLOCK
-        if (prev_read == BUFFER_SIZE && n < 0) {
-            break;
-        }
-
-        if (n < 0) {
-            error = true;
-            break;
-        }
-
-        prev_read = n;
-        total_read += n;
-        try {
-            c.append_data(buf, buf + n);
-        } catch (const std::exception& ex) {
-            error = true;
-            std::cerr << ex.what() << std::endl;
-            break;
-        }
-
-        if ((size_t)n < BUFFER_SIZE || total_read > MAX_REQ_SIZE) {
-            break;
-        }
+    // EAGAIN / EWOULDBLOCK
+    if (prev_read == BUFFER_SIZE && n < 0) {
+      break;
     }
 
-    if (error) {
-        close_connection(c);
-        return;
+    if (n < 0) {
+      error = true;
+      break;
     }
 
-    // Client closed connection
-    if (total_read == 0) {
-        close_connection(c);
-        return;
-    }
+    prev_read = n;
+    total_read += n;
+    c.append_data(buf, buf + n);
 
-    // Request too big
-    if (total_read > MAX_REQ_SIZE) {
-        close_connection(c);
-        return;
+    if ((size_t)n < BUFFER_SIZE || total_read > MAX_REQ_SIZE) {
+      break;
     }
+  }
 
-    switch (c.request_state()) {
-        case http::REQ_LINE:
-            http::parse_request_line(c);
-            break;
-        case http::REQ_HEADERS:
-            http::parse_headers(c);
-            break;
-        case http::REQ_BODY:
-            http::parse_body(c);
-            break;
-        case http::REQ_DONE:
-            if (c.buffer().size() != 0) {
-                // Bad request
-            }
-            c.set_write();
-            break;
-    }
+  if (error) {
+    close_connection(c);
+    return;
+  }
+
+  // Client closed connection
+  if (total_read == 0) {
+    close_connection(c);
+    return;
+  }
+
+  // Request too big
+  if (total_read > MAX_REQ_SIZE) {
+    close_connection(c);
+    return;
+  }
+
+  switch (c.request_state()) {
+    case http::REQ_LINE:
+      http::parse_request_line(c);
+      break;
+    case http::REQ_HEADERS:
+      http::parse_headers(c);
+      break;
+    case http::REQ_BODY:
+      http::parse_body(c);
+      break;
+    case http::REQ_DONE:
+      c.set_write();
+      break;
+  }
 }
 
 void Server::close_connection(sock::Connection& c)
 {
-    sock::SocketArray::iterator socket = sockets_.find(c.fd());
-    if (socket == sockets_.end()) {
-        std::cerr << "Can't find connection" << std::endl;
-        return;
-    }
+  sock::SocketArray::iterator socket = sockets_.find(c.fd());
+  if (socket == sockets_.end()) {
+    std::cerr << "Can't find connection" << std::endl;
+    return;
+  }
 
-    for (std::vector<pollfd>::iterator pfd = pfds_.begin(); pfd != pfds_.end(); ++pfd) {
-        if (pfd->fd == c.fd()) {
-            pfds_.erase(pfd);
-            break;
-        }
+  for (std::vector<pollfd>::iterator pfd = pfds_.begin(); pfd != pfds_.end(); ++pfd) {
+    if (pfd->fd == c.fd()) {
+      pfds_.erase(pfd);
+      break;
     }
+  }
 
-    sockets_.erase(socket);
+  sockets_.erase(socket);
+}
+
+std::vector<Config> getRespConfigs(http::HeaderMap header, std::vector<Config>& configList_){
+  std::vector<Config> responseConfigs;
+  http::HeaderMap::const_iterator it = header.get("host");
+  std::string host = it->second;
+  std::cout << "============This is host: " << host << "=============" << std::endl;
+  for(unsigned long i = 0; i < configList_.size(); i++){
+    if (host == configList_[i].listen.combined){
+      responseConfigs.push_back(configList_[i]);
+    }
+  }
+  return responseConfigs;
 }

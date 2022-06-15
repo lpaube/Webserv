@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:40:28 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/09 11:15:10 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/15 15:00:05 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,18 @@
 #include <algorithm>
 #include <ctype.h>
 #include <string>
+#include <unistd.h>
 #include <vector>
+
+void putstr_fd(std::vector<char> msg, std::size_t fd)
+{
+    std::vector<char>::iterator it = msg.begin();
+    std::vector<char>::iterator end = msg.end();
+    while (it != end) {
+        write(fd, &*it, 1);
+        it++;
+    }
+}
 
 bool vectorize_content(std::vector<std::string>& content, std::string& content_str)
 {
