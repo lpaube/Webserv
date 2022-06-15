@@ -6,17 +6,17 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 15:57:07 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/08 15:57:16 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/15 12:57:17 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
 #include "StatusCodes.hpp"
 
-Response::Response(sock::Connection c, std::vector<Config>& configs)
+Response::Response(http::Request& request, std::vector<Config>& configs)
 {
 	std::vector<Config> responseConfigs;
-	http::HeaderMap headers = c.request().headers();
+	http::HeaderMap headers = request.headers();
 	http::HeaderMap::const_iterator it = headers.get("host");
   std::string host = it->second;
   for(unsigned long i = 0; i < configs.size(); i++){
@@ -26,7 +26,7 @@ Response::Response(sock::Connection c, std::vector<Config>& configs)
 	}
   if (responseConfigs.size() == 0)
     throw "No config matches the request";
-  full_path = "." + c.request().requestLine().path();
+  full_path = "." + request.requestLine().path();
   this->config = responseConfigs[0];
 }
 
@@ -69,7 +69,7 @@ void Response::setHtmlHeader()
   std::stringstream header_stream;
 
   header_stream << "HTTP/1.1 " << status_code << " " << StatusCodes::getCodeMsg(status_code)
-    << "\r\n";
+    << "\r\n" << "Access-Control-Allow-Origin: *\r\n";
   header_size = header_stream.str().size();
   header_stream << "Content Length: " << header_size + body_size << "\r\n\r\n";
   header = header_stream.str();

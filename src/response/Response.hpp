@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 15:56:58 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/08 15:57:04 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/15 12:55:15 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ class Response
 {
   public:
     Response(/* args */) {}
-    Response(sock::Connection c, std::vector<Config>& configs);
+    Response(http::Request& request, std::vector<Config>& configs);
     ~Response() {}
     Config getConfig() const {return config;}
     void  setStatusCode(size_t code);

@@ -15,17 +15,18 @@ function submit() {
 
 
   (function(){
-    const userinput = document.querySelector(".user_input").value;
-    console.log(userinput);
-    var get_time = document.getElementById("get_time");
-    get_time.onclick = () =>	{
-      fetch("http://127.0.0.1:8000/cgi-bin/get_time.py", {
-        method: "GET"
-      }).then(response => response.text())
-        .then((content) => {
-          document.write(content);
-        });
-    }
+	const userinput = document.getElementById("input");
+	var get_time = document.getElementById("get_time");
+	get_time.onclick = () =>	{
+		fetch("http://127.0.0.1:8000/cgi-bin/get_time.py?" + new URLSearchParams(
+			{ user: userinput.value, test: "test"}
+		), {
+			method: "GET"
+		}).then(response => response.text())
+		.then((content) => {
+			document.write(content);
+		});
+	}
 
     var get_time = document.getElementById("test_html");
     get_time.onclick = () =>	{
@@ -37,3 +38,4 @@ function submit() {
         });
     }
   })();
+  
