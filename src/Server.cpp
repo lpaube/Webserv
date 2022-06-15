@@ -201,13 +201,14 @@ void Server::process_event_queue()
           			response.setHtmlBody();
           			response.setHtmlHeader();
 					msg = response.full_content.c_str();
+          send(c.fd(), msg, strlen(msg), 0);
 					std::cout << "|!|FILE RESPONSE BUILT|!|" << std::endl;
 					}
 					//else{
 					//msg = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>DEFAULT SERVER MESSAGE </h1>\r\n";
 					//}
 			std::cout << "|!|SENDING RESPONSE TO CLIENT|!|" << std::endl;
-			send(c.fd(), msg, strlen(msg), 0);
+			//send(c.fd(), msg, strlen(msg), 0);
 			std::cout << "|!|RESPONSE SENT|!|" << std::endl;
 			std::cout << "|!|CLOSING_CONNECTION|!|" << std::endl;
 			close_connection(c);
