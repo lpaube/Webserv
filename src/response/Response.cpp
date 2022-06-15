@@ -30,8 +30,8 @@ Response::Response(http::Request& request, std::vector<Config>& configs)
     std::cerr << "NO CONFIG MATCH" << std::endl;
     throw "No config matches the request";
   }
-  full_path = "." + request.requestLine().path();
   */
+  full_path = "." + request.requestLine().path();
   (void)request;
   this->config = configs[0];
 }
