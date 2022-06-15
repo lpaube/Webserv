@@ -15,6 +15,7 @@
 
 Response::Response(http::Request& request, std::vector<Config>& configs)
 {
+  /*
 	std::vector<Config> responseConfigs;
 	http::HeaderMap headers = request.headers();
 	http::HeaderMap::const_iterator it = headers.get("host");
@@ -30,7 +31,9 @@ Response::Response(http::Request& request, std::vector<Config>& configs)
     throw "No config matches the request";
   }
   full_path = "." + request.requestLine().path();
-  this->config = responseConfigs[0];
+  */
+  (void)request;
+  this->config = configs[0];
 }
 
 void Response::setStatusCode(size_t code)

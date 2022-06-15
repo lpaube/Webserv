@@ -197,7 +197,7 @@ void Server::process_event_queue()
 					stat(c.request().requestLine().path().c_str(), &info);
 					//if (S_ISREG(info.st_mode) == true){
 					std::cout << "|!|IN FILE RESPONSE|!|" << std::endl;
-					Response response(c.request(), resp_configs);
+					Response response(c.request(), ConfigList_);
           			response.setHtmlBody();
           			response.setHtmlHeader();
 					msg = response.full_content.c_str();
