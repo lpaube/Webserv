@@ -50,6 +50,7 @@ void Response::setHtmlBody()
 
   if (!requested_file.is_open())
   {
+    std::cerr << full_path.c_str() << std::endl;
     setStatusCode(400);
     std::cerr << "There was an error when trying to open the html file." << std::endl;
   }
