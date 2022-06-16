@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 17:17:57 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 15:05:14 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/16 16:12:07 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,8 @@ enum Method {
     BAD_METHOD,
     GET,
     POST,
-    DELETE
+    DELETE,
+	OPTIONS
 };
 
 class Request
