@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 15:57:07 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/16 17:05:06 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/16 17:46:02 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,6 @@
 
 Response::Response(const Request& request, std::vector<Config>& response_configs)
 {
-    if (response_configs.size() == 0) {
-        std::cerr << "NO CONFIG MATCH" << std::endl;
-        throw "No config matches the request";
-    }
     full_path = "." + request.path();
     this->config = response_configs[0];
 }

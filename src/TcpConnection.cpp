@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 17:15:53 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/16 17:41:00 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
 {
     std::cout << "|!|IN_CONNECTION_WRITE_EVENT|!|" << std::endl;
 
-    std::vector<Config> resp_configs = get_response_configs(server_configs);
+    std::vector<Config> resp_configs = server_configs;
 
     std::string msg;
     if (req_.path().find("cgi-bin/") != std::string::npos) {
@@ -329,6 +329,9 @@ void TcpConnection::parse_http_request_body_content_length()
 
 void TcpConnection::parse_http_request_body_chunked()
 {
+    req_.set_raw_body(data_);
+    data_.clear();
+    req_.decode_raw_body();
     set_state(S_WRITE);
 }
 

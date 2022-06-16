@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 19:04:31 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 17:16:29 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/16 17:37:38 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -247,6 +247,7 @@ void Request::decode_raw_body()
     } else {
         body_ = raw_body_;
     }
+    print_bytes(body());
 }
 
 Request::header_iterator Request::find_header(const std::string& name) const
