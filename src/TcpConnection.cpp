@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 17:41:00 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/16 18:26:14 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -300,7 +300,7 @@ void TcpConnection::parse_http_request_body()
 
 void TcpConnection::parse_http_request_body_plain()
 {
-    req_.set_raw_body(data_);
+    req_.append_raw_body(data_);
     req_.decode_raw_body();
     data_.clear();
     set_state(S_WRITE);
@@ -320,7 +320,7 @@ void TcpConnection::parse_http_request_body_content_length()
     req_.content_length_sub((size_t)n);
 
     if (done) {
-        req_.set_raw_body(data_);
+        req_.append_raw_body(data_);
         data_.clear();
         req_.decode_raw_body();
         set_state(S_WRITE);
@@ -329,10 +329,12 @@ void TcpConnection::parse_http_request_body_content_length()
 
 void TcpConnection::parse_http_request_body_chunked()
 {
-    req_.set_raw_body(data_);
+    req_.append_raw_body(data_);
     data_.clear();
     req_.decode_raw_body();
-    set_state(S_WRITE);
+    if (req_.all_chunks_received()) {
+        set_state(S_WRITE);
+    }
 }
 
 void TcpConnection::bad_request() const

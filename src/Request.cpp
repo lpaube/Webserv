@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 19:04:31 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 17:37:38 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/16 18:26:42 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -235,9 +235,9 @@ void Request::content_length_sub(size_t n)
     content_length_count_ -= n;
 }
 
-void Request::set_raw_body(const std::vector<char>& data)
+void Request::append_raw_body(const std::vector<char>& data)
 {
-    raw_body_ = data;
+    raw_body_.insert(raw_body_.end(), data.begin(), data.end());
 }
 
 void Request::decode_raw_body()
@@ -245,9 +245,28 @@ void Request::decode_raw_body()
     if (!is_chunked) {
         body_ = raw_body_;
     } else {
-        body_ = raw_body_;
+        if (cur_chunk_size_ > 0) {
+            while (true) {
+                ssize_t to_read = (ssize_t)raw_body_.size() < cur_chunk_size_
+                                      ? (ssize_t)raw_body_.size()
+                                      : cur_chunk_size_;
+                body_.insert(body_.end(), raw_body_.begin(), raw_body_.begin() + to_read);
+                cur_chunk_size_ -= to_read;
+
+                raw_body_.erase(raw_body_.begin(), raw_body_.begin() + to_read);
+
+                if (cur_chunk_size_ == 0) {
+                    cur_chunk_size_ = -1;
+                }
+            }
+        } else if (cur_chunk_size_ < 0) {
+        }
     }
-    print_bytes(body());
+}
+
+bool Request::all_chunks_received() const
+{
+    return cur_chunk_size_ == 0;
 }
 
 Request::header_iterator Request::find_header(const std::string& name) const
