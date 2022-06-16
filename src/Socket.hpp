@@ -1,29 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   RequestLine.hpp                                    :+:      :+:    :+:   */
+/*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/02 12:59:13 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/08 19:26:20 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/06/12 19:08:37 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/06/13 00:41:31 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "Buffer.hpp"
 #include "ExceptionBase.hpp"
-#include "Method.hpp"
-#include <cstddef>
-#include <string>
 
-#define SUPPORTED_HTTP_VERSION "HTTP/1.1"
-#define REQ_EOL "\r\n"
+enum SocketType {
+    TCP_LISTENER,
+    TCP_CONNECTION
+};
 
-namespace http
-{
-class RequestLine
+enum SocketState {
+    S_READ,
+    S_WRITE
+};
+
+class Socket
 {
 public:
     class Exception : public ExceptionBase
@@ -33,20 +34,23 @@ public:
     };
 
 public:
-    RequestLine();
-    RequestLine(Buffer& request_data);
+    Socket();
+    virtual ~Socket();
 
 public:
-    Method method() const;
-    const std::string& path() const;
-    const std::string& query() const;
-    const std::string& http_version() const;
+    virtual SocketType type() const = 0;
+
+public:
+    int fd() const;
+    bool is_init() const;
+    SocketState state() const;
+    void set_state(SocketState state);
+
+protected:
+    int fd_;
+    SocketState state_;
 
 private:
-    Method method_;
-    std::string path_;
-    std::string query_str_;
-    std::string http_version_;
+    Socket(const Socket&);
+    Socket& operator=(const Socket&);
 };
-
-} // namespace http

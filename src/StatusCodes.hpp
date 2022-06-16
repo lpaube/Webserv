@@ -1,7 +1,7 @@
 #pragma once
 
-#include <map>
 #include <iostream>
+#include <map>
 #include <string>
 
 /*
@@ -11,10 +11,10 @@
  */
 
 struct StatusCodes {
-  static std::map<int, std::string> status_code_map;
-  static bool initialized;
+    static std::map<int, std::string> status_code_map;
+    static bool initialized;
 
-  static std::string getCodeMsg(int code);
+    static std::string getCodeMsg(int code);
 
-  static void initialize_status_codes();
+    static void initialize_status_codes();
 };

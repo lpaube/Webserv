@@ -1,329 +1,142 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/15 15:02:52 by mleblanc         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "Server.hpp"
-#include "Utils.hpp"
-#include "response/Script.hpp"
-#include "event/ConnectionReadEvent.hpp"
-#include "event/ConnectionWriteEvent.hpp"
-#include "event/TcpListenerEvent.hpp"
-#include "http/Handlers.hpp"
-#include "http/Request.hpp"
-#include "http/RequestLine.hpp"
-#include "sock/Connection.hpp"
-#include "response/Response.hpp"
-#include "StatusCodes.hpp"
-#include <arpa/inet.h>
-#include <cstdio>
-#include <sys/time.h>
+#include "TcpConnection.hpp"
+#include "TcpListener.hpp"
+#include <cstring>
+#include <iostream>
+#include <signal.h>
+#include <sys/errno.h>
 #include <unistd.h>
-#include <fstream>
-#include <stdio.h>
-#include <sys/stat.h>
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
- # include <sys/errno.h>
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <sys/wait.h>
-# include <stdio.h>
-# include <unistd.h>
-# include <signal.h>
-# include <stdlib.h>
-# include <limits.h>
-# include <dirent.h>
-# include <stdbool.h>
 
-Server::Exception::Exception(const std::string& msg)
-    : ExceptionBase(msg)
+bool running = true;
+
+void stop_server(int sig)
 {
+    (void)sig;
+    running = false;
+    std::cout << "Stopping server..." << std::endl;
 }
 
-Server::Server()
-    : configured_(false)
+Server::Server(const std::vector<Config>& blocks)
 {
-}
+    typedef std::vector<TcpListener*>::const_iterator s_iter;
 
-void Server::configure(const std::vector<Config>& blocks)
-{
-    sockets_.clear();
-	this->configList_ = blocks;
-    if (blocks.empty()) {
-        throw Exception("No server configuration");
-    }
-
-    std::vector<sock::TcpListener> streams;
+    std::vector<TcpListener*> streams;
     for (std::vector<Config>::const_iterator it = blocks.begin(); it != blocks.end(); ++it) {
-        in_addr address;
-        address.s_addr = inet_addr(it->listen.address.c_str());
-        if (address.s_addr == INADDR_NONE) {
-            throw Exception("Malformed address: '" + it->listen.address + "'");
+        bool add = true;
+        for (s_iter s_it = streams.begin(); s_it != streams.end(); ++s_it) {
+            if ((*s_it)->address_str() == it->listen.address &&
+                (*s_it)->port() == it->listen.port) {
+                add = false;
+                break;
+            }
         }
 
-        sock::TcpListener s = sock::TcpListener(address, it->listen.port);
-        if (std::find(streams.begin(), streams.end(), s) == streams.end()) {
-            streams.push_back(s);
+        if (add) {
+            TcpListener* listener = new TcpListener(it->listen.address, it->listen.port, N_BACKLOG);
+            sockets_.insert(std::make_pair(listener->fd(), static_cast<Socket*>(listener)), POLLIN);
+
+            streams.push_back(listener);
+
+            std::cout << "Listening on " << listener->address_str() << ":";
+            std::cout << listener->port() << std::endl;
         }
     }
 
-    for (std::vector<sock::TcpListener>::const_iterator it = streams.begin(); it != streams.end();
-         ++it) {
-        sockets_.add(new sock::TcpListener(*it));
-    }
-
-    init_tcp_streams();
-    configured_ = true;
-}
-
-void Server::init_tcp_streams()
-{
-    for (sock::SocketArray::iterator it = sockets_.begin(); it != sockets_.end(); ++it) {
-        sock::TcpListener& s = static_cast<sock::TcpListener&>(**it);
-
-        s.init();
-        s.bind();
-        s.listen();
-
-        pollfd pfd;
-        pfd.fd = s.fd();
-        pfd.events = POLLIN;
-        pfd.revents = 0;
-        pfds_.push_back(pfd);
-    }
+    configs_ = blocks;
 }
 
 void Server::run()
 {
-    if (!configured_) {
-        throw Exception("Server is not configured");
-    }
+    signal(SIGINT, &stop_server);
 
-    while (true) {
-        int n_ready = poll(pfds_.data(), pfds_.size(), POLL_TIMEOUT);
-        if (n_ready == -1) {
-            exception_errno<Exception>("Error while polling sockets: ");
+    while (running) {
+        int nevents = poll(sockets_.pfds(), sockets_.size(), -1);
+        if (nevents < 0) {
+            if (errno != EINTR) {
+                std::cerr << "Poll error " << errno << std::endl;
+            }
+            continue;
         }
 
-        for (std::vector<pollfd>::iterator it = pfds_.begin(); it != pfds_.end() && n_ready > 0;
-             ++it) {
+        std::vector<int> to_close;
+        for (size_t i = 0; i < sockets_.size() && nevents > 0; ++i) {
+            pollfd pfd = sockets_.pfds()[i];
+            Socket* s = sockets_[pfd.fd];
             bool found = false;
- 
-            sock::SocketArray::iterator socket = sockets_.find(it->fd);
-            if (socket == sockets_.end()) {
-                // This should never happen
-                std::cerr << "Did not find socket: " << it->fd << std::endl;
-                continue;
+
+            if (pfd.revents & (POLLERR | POLLHUP | POLLNVAL)) {
+                pfd.revents |= (POLLIN | POLLOUT);
             }
 
-            if (it->revents & (POLLERR | POLLHUP | POLLNVAL)) {
-                // If there was an error, add POLLIN | POLLOUT to catch it in one of the handlers
-                it->revents |= POLLIN | POLLOUT;
-            }
-            if ((it->revents & POLLIN) && (*socket)->read()) {
+            if ((pfd.revents & POLLIN) && (s->state() == S_READ)) {
                 found = true;
-
-                switch ((*socket)->type()) {
-                    case sock::TCP_STREAM:
-                        events_.push(new event::TcpListenerEvent(*socket));
+                switch (s->type()) {
+                    case TCP_LISTENER:
+                        try {
+                            accept_connection(s);
+                        } catch (const std::exception& ex) {
+                            std::cerr << ex.what() << std::endl;
+                        }
                         break;
-                    case sock::CONNECTION:
-                        events_.push(new event::ConnectionReadEvent(*socket));
+                    case TCP_CONNECTION: {
+                        TcpConnection* c = static_cast<TcpConnection*>(s);
+                        try {
+                            c->handle_read_event();
+                        } catch (const std::exception& ex) {
+                            std::cerr << ex.what() << std::endl;
+                            to_close.push_back(c->fd());
+                        }
                         break;
+                    }
                 }
             }
-            if ((it->revents & POLLOUT) && !(*socket)->read()) {
+
+            if ((pfd.revents & POLLOUT) && (s->state() == S_WRITE)) {
                 found = true;
-                events_.push(new event::ConnectionWriteEvent(*socket));
+                TcpConnection* c = static_cast<TcpConnection*>(s);
+                try {
+                    c->handle_write_event(configs_);
+                } catch (const std::exception& ex) {
+                    std::cerr << ex.what() << std::endl;
+                }
+                // TODO: better write handling
+                to_close.push_back(c->fd());
             }
 
             if (found) {
-                --n_ready;
+                --nevents;
             }
         }
 
-        process_event_queue();
-    }
-}
-
-void Server::process_event_queue()
-{
-	const char* msg;
-	  while (!events_.empty()) {
-        event::Event* ev = events_.pop();
-
-        switch (ev->type()) {
-            case event::TCP_LISTENER_EVENT: {
-				std::cout <<	"|!|IN_CONNECTION_STREAM_EVENT|!|" << std::endl;
-                const sock::TcpListener& s = static_cast<sock::TcpListener&>(*ev->data());
-                accept_connection(s);
-                break;
-            }
-            case event::CONNECTION_READ_EVENT: {
-				std::cout << "|!|IN_CONNECTION_READ_EVENT|!|" << std::endl;
-                sock::Connection& c = static_cast<sock::Connection&>(*ev->data());
-                receive_data(c);
-                break;
-            }
-            case event::CONNECTION_WRITE_EVENT: {
-				std::cout << "|!|IN_CONNECTION_WRITE_EVENT|!|" << std::endl;
-                sock::Connection& c = static_cast<sock::Connection&>(*ev->data());
-				std::vector<Config> resp_configs = getRespConfigs(c.request().headers(), configList_);
-		
-				if(c.request().requestLine().path().find("cgi-bin", 0) == true){
-					std::cout << "|!|IN SCRIPT|!|" << std::endl;
-					Script script(resp_configs[0], c.request());
-					std::string ret =  script.exec();
-					msg = ret.c_str();
-					std::cout << "|!|OUT OF SCRIPT|!|" << std::endl;
-				}
-				else{
-					struct stat info;
-					stat(c.request().requestLine().path().c_str(), &info);
-					//if (S_ISREG(info.st_mode) == true){
-					std::cout << "|!|IN FILE RESPONSE|!|" << std::endl;
-					Response response(c.request(), resp_configs);
-          			response.setHtmlBody();
-          			response.setHtmlHeader();
-					msg = response.full_content.c_str();
-					std::cout << "|!|FILE RESPONSE BUILT|!|" << std::endl;
-					}
-					//else{
-					//msg = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>DEFAULT SERVER MESSAGE </h1>\r\n";
-					//}
-			std::cout << "|!|SENDING RESPONSE TO CLIENT|!|" << std::endl;
-			send(c.fd(), msg, strlen(msg), 0);
-			std::cout << "|!|RESPONSE SENT|!|" << std::endl;
-			std::cout << "|!|CLOSING_CONNECTION|!|" << std::endl;
-			close_connection(c);
-			std::cout << "|!|CONNECTION_CLOSED|!|" << std::endl;
-			break;
-			}
+        for (std::vector<int>::iterator it = to_close.begin(); it != to_close.end(); ++it) {
+            close_connection(sockets_[*it]);
         }
-		std::cout << "|!|DELETING EVENT|!|" << std::endl;
-        delete ev;
+        to_close.clear();
     }
+
+    sockets_.close_all();
 }
 
-
-void Server::accept_connection(const sock::TcpListener& stream)
+void Server::accept_connection(Socket* socket)
 {
-  sock::Connection* c = new sock::Connection(&stream, MAX_REQ_SIZE);
+    TcpConnection* c = new TcpConnection(socket->fd());
 
-  try {
-    c->init();
-    sockets_.add(static_cast<sock::Socket*>(c));
+    sockets_.insert(std::make_pair(c->fd(), static_cast<Socket*>(c)), POLLIN | POLLOUT);
+    std::cout << "Accepted connection: " << c->fd() << std::endl;
+}
 
-    pollfd pfd;
-    pfd.fd = c->fd();
-    pfd.events = POLLIN | POLLOUT;
-    pfd.revents = 0;
-    pfds_.push_back(pfd);
-  } catch (const std::exception& ex) {
+void Server::close_connection(Socket* c)
+{
+    close(c->fd());
+    sockets_.erase(c->fd());
+    std::cout << "Closed connection: " << c->fd() << std::endl;
     delete c;
-    std::cerr << ex.what() << std::endl;
-  }
 }
 
-void Server::receive_data(sock::Connection& c)
+void Server::print_body(const Request& r) const
 {
-  char buf[BUFFER_SIZE];
-  ssize_t prev_read = 0;
-  ssize_t total_read = 0;
-  bool error = false;
-
-  while (true) {
-    ssize_t n = recv(c.fd(), buf, BUFFER_SIZE, 0);
-
-    // EAGAIN / EWOULDBLOCK
-    if (prev_read == BUFFER_SIZE && n < 0) {
-      break;
+    for (std::vector<char>::const_iterator it = r.body().begin(); it != r.body().end(); ++it) {
+        std::cout << *it;
     }
-
-    if (n < 0) {
-      error = true;
-      break;
-    }
-
-    prev_read = n;
-    total_read += n;
-    c.append_data(buf, buf + n);
-
-    if ((size_t)n < BUFFER_SIZE || total_read > MAX_REQ_SIZE) {
-      break;
-    }
-  }
-
-  if (error) {
-    close_connection(c);
-    return;
-  }
-
-  // Client closed connection
-  if (total_read == 0) {
-    close_connection(c);
-    return;
-  }
-
-  // Request too big
-  if (total_read > MAX_REQ_SIZE) {
-    close_connection(c);
-    return;
-  }
-
-  switch (c.request_state()) {
-    case http::REQ_LINE:
-      http::parse_request_line(c);
-      break;
-    case http::REQ_HEADERS:
-      http::parse_headers(c);
-      break;
-    case http::REQ_BODY:
-      http::parse_body(c);
-      break;
-    case http::REQ_DONE:
-      c.set_write();
-      break;
-  }
-}
-
-void Server::close_connection(sock::Connection& c)
-{
-  sock::SocketArray::iterator socket = sockets_.find(c.fd());
-  if (socket == sockets_.end()) {
-    std::cerr << "Can't find connection" << std::endl;
-    return;
-  }
-
-  for (std::vector<pollfd>::iterator pfd = pfds_.begin(); pfd != pfds_.end(); ++pfd) {
-    if (pfd->fd == c.fd()) {
-      pfds_.erase(pfd);
-      break;
-    }
-  }
-
-  sockets_.erase(socket);
-}
-
-std::vector<Config> getRespConfigs(http::HeaderMap header, std::vector<Config>& configList_){
-  std::vector<Config> responseConfigs;
-  http::HeaderMap::const_iterator it = header.get("host");
-  std::string host = it->second;
-  std::cout << "============This is host: " << host << "=============" << std::endl;
-  for(unsigned long i = 0; i < configList_.size(); i++){
-    if (host == configList_[i].listen.combined){
-      responseConfigs.push_back(configList_[i]);
-    }
-  }
-  return responseConfigs;
+    std::cout << std::endl;
 }

@@ -1,37 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   EventQueue.hpp                                     :+:      :+:    :+:   */
+/*   TcpListener.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/04 19:05:05 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/05 04:28:15 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/06/12 19:31:21 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/06/15 22:51:42 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "Event.hpp"
-#include <queue>
+#include "Socket.hpp"
+#include <netinet/in.h>
+#include <string>
 
-namespace event
+class TcpListener : public Socket
 {
-class EventQueue
-{
 public:
-    typedef std::queue<Event*>::reference reference;
+    TcpListener(const std::string& address, uint16_t port, int backlog);
 
 public:
-    ~EventQueue();
+    virtual SocketType type() const;
 
 public:
-    reference front();
-    Event* pop();
-    void push(Event* event);
-    bool empty() const;
+    const std::string& address_str() const;
+    in_addr address() const;
+    uint16_t port() const;
 
 private:
-    std::queue<Event*> events_;
+    std::string addr_str_;
+    in_addr addr_;
+    uint16_t port_;
+    int backlog_;
 };
-} // namespace event

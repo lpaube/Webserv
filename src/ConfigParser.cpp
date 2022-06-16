@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParser.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:08:15 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/08 18:00:10 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/16 14:13:31 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ ConfigParser::Exception::Exception(const char* msg)
 {
 }
 
-ConfigParser::ConfigParser(std::string config_file)
+ConfigParser::ConfigParser(const std::string& config_file)
 {
     std::fstream file;
     min_server = false;
@@ -39,7 +39,6 @@ void ConfigParser::createConfig()
 {
     std::string::iterator start;
     std::string::iterator server_end;
-    std::string::iterator end;
 
     while (start != this->file_content.end()) {
         start = this->file_content.begin();
@@ -112,8 +111,9 @@ std::string ConfigParser::getContent(std::fstream& file)
     return ret;
 }
 
-unsigned int ConfigParser::nbServer() const{
-	return this->nb_server;
+unsigned int ConfigParser::nbServer() const
+{
+    return this->nb_server;
 }
 
 ConfigParser::~ConfigParser()

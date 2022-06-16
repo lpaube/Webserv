@@ -6,31 +6,18 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:37:34 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/15 15:00:16 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/15 23:46:16 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "Buffer.hpp"
-#include <cerrno>
-#include <cstring>
 #include <string>
 #include <vector>
 
 #define WHITESPACE "\t\n\v\f\r "
 
 std::string trim(const std::string& str, const std::string& sep);
-std::string get_next_word(Buffer& buf, const char* sep, size_t sep_size);
-std::string get_next_word(std::string& str, const std::string& sep);
 std::vector<std::string> split(const std::string& str, char sep);
-void to_lower(std::string& str);
+std::string to_lower(const std::string& str);
 bool vectorize_content(std::vector<std::string>& content, std::string& content_str);
-void putstr_fd(std::vector<char> msg, std::size_t fd);
-
-template <typename Exception>
-void exception_errno(std::string msg)
-{
-    msg.append(strerror(errno));
-    throw Exception(msg);
-}

@@ -273,8 +273,10 @@ void ServerParser::parse_location_vars()
                 } else if (directives[0] == "client_max_body_size") {
                     std::string tmp_str;
 
-                    if (directives.size() != 2)
+                    if (directives.size() != 2) {
+                        std::cerr << "LP ERROR 1" << std::endl;
                         throw("client_max_body_size: wrong args number");
+                    }
                     for (std::string::iterator it = directives[1].begin();
                          it != directives[1].end(); ++it) {
                         if (isdigit(*it))
@@ -283,8 +285,10 @@ void ServerParser::parse_location_vars()
                             unsigned long x;
                             std::istringstream(tmp_str) >> x;
                             new_location.client_max_body_size = x * BYTES_IN_MB;
-                        } else
+                        } else {
+                            std::cerr << "LP ERROR 2" << std::endl;
                             throw("client_max_body_size not a valid input");
+                        }
                     }
                 } else if (directives[0] == "limit_except") {
                     for (std::string::size_type j = 1; j < directives.size(); ++j) {
@@ -298,29 +302,39 @@ void ServerParser::parse_location_vars()
                         std::istringstream(directives[1]) >> x;
                         new_location.return_redirect.code = x;
                         new_location.return_redirect.url = directives[2];
-                    } else
+                    } else {
+                        std::cerr << "LP ERROR 3" << std::endl;
                         throw("return_redirect: error..");
+                    }
                 } else if (directives[0] == "root") {
-                    if (directives.size() != 2)
+                    if (directives.size() != 2) {
+                        std::cerr << "LP ERROR 4" << std::endl;
                         throw("root: wrong number of args");
+                    }
                     new_location.root = directives[1];
                 } else if (directives[0] == "autoindex") {
-                    if (directives.size() != 2)
+                    if (directives.size() != 2) {
+                        std::cerr << "LP ERROR 5" << std::endl;
                         throw("autoindex: wrong number of args");
+                    }
                     if (directives[1] == "on")
                         new_location.autoindex = true;
                     else if (directives[1] == "on")
                         new_location.autoindex = false;
-                    else
+                    else {
+                        std::cerr << "LP ERROR 6" << std::endl;
                         throw("autoindex: invalid argument");
+                    }
                 } else if (directives[0] == "index") {
                     for (std::vector<std::string>::iterator it = directives.begin() + 1;
                          it != directives.end(); ++it) {
                         new_location.index.push_back(*it);
                     }
                 } else if (directives[0] == "cgi_ext") {
-                    if (directives.size() != 3)
+                    if (directives.size() != 3) {
+                        std::cerr << "LP ERROR 7" << std::endl;
                         throw("cgi_ext: wrong number of args");
+                    }
 
                     Config::Cgi_ext tmp_cgi;
                     tmp_cgi.extension = directives[1];

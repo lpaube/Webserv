@@ -1,42 +1,44 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Header.hpp                                         :+:      :+:    :+:   */
+/*   Script.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/31 16:38:07 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/08 19:24:17 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/06/02 18:39:01 by mafortin          #+#    #+#             */
+/*   Updated: 2022/06/15 23:42:27 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
-
 #include "ExceptionBase.hpp"
-#include <string>
+#include "Request.hpp"
+#include "ServerParser.hpp"
 
-namespace http
-{
-class Header
+class Script
 {
 public:
     class Exception : public ExceptionBase
     {
     public:
-        Exception(const std::string& msg);
+        Exception(const char* msg);
     };
 
 public:
-    Header(const std::string& str);
-    Header(const std::string& n, const std::string& v);
-
-public:
-    const std::string& name() const;
-    const std::string& value() const;
+    Script(const Config& config, const Request& request);
+    ~Script();
+    std::string exec();
 
 private:
-    std::string name_;
-    std::string value_;
-};
+    void buildCmd(const std::string& path, const Config& config);
+    std::string get_ext(const std::string& path);
+    void buildEnv(Method method, const Config& config);
+    void printEnv() const;
 
-} // namespace http
+private:
+    std::vector<std::string> v_env;
+    char** envp;
+    char** cmd;
+    std::size_t envp_size;
+    const Request& request;
+};

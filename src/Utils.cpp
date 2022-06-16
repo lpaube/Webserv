@@ -6,26 +6,13 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:40:28 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/15 15:00:05 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/15 23:46:14 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Utils.hpp"
 #include <algorithm>
 #include <ctype.h>
-#include <string>
-#include <unistd.h>
-#include <vector>
-
-void putstr_fd(std::vector<char> msg, std::size_t fd)
-{
-    std::vector<char>::iterator it = msg.begin();
-    std::vector<char>::iterator end = msg.end();
-    while (it != end) {
-        write(fd, &*it, 1);
-        it++;
-    }
-}
 
 bool vectorize_content(std::vector<std::string>& content, std::string& content_str)
 {
@@ -65,36 +52,13 @@ std::string trim(const std::string& str, const std::string& sep)
     return std::string(start, end);
 }
 
-std::string get_next_word(Buffer& buf, const char* sep, size_t sep_size)
-{
-    const char* ptr = buf.find(sep, sep_size);
-    if (ptr == NULL) {
-        return "";
-    }
-    std::string word(buf.cursor(), ptr);
-    buf.advance_cursor((size_t)(ptr - buf.cursor()) + sep_size);
-    return word;
-}
-
-std::string get_next_word(std::string& str, const std::string& sep)
-{
-    std::string::size_type pos = str.find(sep);
-    if (pos == std::string::npos) {
-        return "";
-    }
-    std::string word = str.substr(0, pos);
-    str.erase(0, pos + sep.length());
-    return word;
-}
-
 std::vector<std::string> split(const std::string& str, char sep)
 {
     std::vector<std::string> arr;
     std::string::size_type p1 = 0;
     std::string::size_type p2 = str.find(sep);
 
-    while (p2 != std::string::npos)
-    {
+    while (p2 != std::string::npos) {
         if (p2 - p1 != 0) {
             arr.push_back(str.substr(p1, p2 - p1));
         }
@@ -107,9 +71,11 @@ std::vector<std::string> split(const std::string& str, char sep)
     return arr;
 }
 
-void to_lower(std::string& str)
+std::string to_lower(const std::string& str)
 {
-    for (std::string::iterator it = str.begin(); it != str.end(); ++it) {
+    std::string ret = str;
+    for (std::string::iterator it = ret.begin(); it != ret.end(); ++it) {
         *it = tolower(*it);
     }
+    return ret;
 }

@@ -86,6 +86,6 @@ void StatusCodes::initialize_status_codes()
 std::string StatusCodes::getCodeMsg(int code)
 {
     if (!initialized)
-      initialize_status_codes();
+        initialize_status_codes();
     return (status_code_map.find(code))->second;
 }

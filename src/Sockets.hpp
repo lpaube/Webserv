@@ -1,40 +1,45 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   SocketArray.hpp                                    :+:      :+:    :+:   */
+/*   Sockets.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/04 20:07:13 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/07 14:42:53 by mleblanc         ###   ########.fr       */
+/*   Created: 2022/06/12 19:15:38 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/06/15 22:44:25 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #include "Socket.hpp"
+#include <cstddef>
+#include <map>
+#include <poll.h>
 #include <vector>
 
-namespace sock
-{
-
-class SocketArray
+class Sockets
 {
 public:
-    typedef std::vector<Socket*>::iterator iterator;
+    typedef std::map<int, Socket*> SocketMap;
+    typedef SocketMap::iterator iterator;
 
 public:
-    ~SocketArray();
+    ~Sockets();
 
 public:
-    void add(Socket* socket);
-    iterator find(int fd);
-    void erase(iterator pos);
-    void clear();
-    iterator begin();
-    iterator end();
+    SocketMap::mapped_type& operator[](const int fd);
+
+public:
+    void close_all();
+
+public:
+    size_t erase(int fd);
+    std::pair<Sockets::iterator, bool> insert(std::pair<int, Socket*> value, int events);
+    pollfd* pfds();
+    size_t size();
 
 private:
-    std::vector<Socket*> sockets_;
+    SocketMap sockets_;
+    std::vector<pollfd> pfds_;
 };
-} // namespace sock
