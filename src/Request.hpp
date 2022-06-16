@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 17:17:57 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 00:01:20 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/16 15:22:06 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,8 @@ enum Method {
     BAD_METHOD,
     GET,
     POST,
-    DELETE
+    DELETE,
+	OPTIONS
 };
 
 class Request

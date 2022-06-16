@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Script.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:08 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/16 14:24:41 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/16 15:30:53 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ std::string Script::exec()
 
     // if method is POST the script will read from STDIN.
     // Create a file, write the body in it and change it to STDIN.
-    if (request.method() == POST) {
+   // if (request.method() == POST) {
         int in_file = open("in_file", O_CREAT | O_APPEND);
         // TODO: check err
         write(in_file, request.body().data(), request.body().size());
@@ -65,7 +65,7 @@ std::string Script::exec()
 
         dup2(in_file, STDIN_FILENO);
         // TODO: check err
-    }
+    //}
     // Create out file for the output of the script
     int out_file = open("out_file.tmp", O_CREAT | O_RDWR, 0777);
     // TODO: check err
@@ -239,7 +239,6 @@ void Script::buildEnv(Method method, const Config& config)
         v_env.push_back("REMOTE_HOST=" + it->second);
     // Returns the name of the HTTP method with which this request was made. For example, GET, POST,
     // or PUT.
-    std::cout << "REQUEST LINE : " << request.path();
     const char* method_name = method_str(request.method());
     std::string method_join("REQUEST_METHOD=");
     method_join += method_name;

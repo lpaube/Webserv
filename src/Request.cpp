@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 19:04:31 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 00:01:38 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/16 15:22:54 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,6 +156,8 @@ const char* method_str(Method method)
             return "POST";
         case DELETE:
             return "DELETE";
+		case OPTIONS:
+			return "OPTIONS";
         default:
             return "BAD METHOD";
     }
@@ -172,6 +174,9 @@ Method method_from_str(const std::string& str)
     if (method_str(DELETE) == str) {
         return DELETE;
     }
+	if (method_str(OPTIONS) == str){
+		return OPTIONS;
+	}
     return BAD_METHOD;
 }
 
