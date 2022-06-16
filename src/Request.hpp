@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 17:17:57 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 18:26:14 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/16 19:10:16 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <unistd.h>
 
 enum ParseState {
     REQ_METHOD,
