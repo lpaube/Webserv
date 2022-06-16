@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   TcpConnection.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 14:47:54 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/16 17:39:51 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
 {
     std::cout << "|!|IN_CONNECTION_WRITE_EVENT|!|" << std::endl;
 
-    std::vector<Config> resp_configs = get_response_configs(server_configs);
+    std::vector<Config> resp_configs = server_configs;
 
     std::string msg;
     if (req_.path().find("cgi-bin/") != std::string::npos) {
