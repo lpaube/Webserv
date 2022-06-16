@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/15 12:56:35 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/16 14:56:46 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,7 @@ void Server::run()
 
 void Server::process_event_queue()
 {
-	const char* msg;
+	std::string msg;
 	  while (!events_.empty()) {
         event::Event* ev = events_.pop();
 
@@ -185,7 +185,7 @@ void Server::process_event_queue()
                 sock::Connection& c = static_cast<sock::Connection&>(*ev->data());
 				std::vector<Config> resp_configs = getRespConfigs(c.request().headers(), configList_);
 		
-				if(c.request().requestLine().path().find("cgi-bin", 0) == true){
+				if(c.request().requestLine().path().find("/cgi-bin/", 0) != std::string::npos){
 					std::cout << "|!|IN SCRIPT|!|" << std::endl;
 					Script script(resp_configs[0], c.request());
 					std::string ret =  script.exec();
@@ -200,14 +200,15 @@ void Server::process_event_queue()
 					Response response(c.request(), resp_configs);
           			response.setHtmlBody();
           			response.setHtmlHeader();
-					msg = response.full_content.c_str();
+					msg = response.full_content;
 					std::cout << "|!|FILE RESPONSE BUILT|!|" << std::endl;
 					}
 					//else{
 					//msg = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n<h1>DEFAULT SERVER MESSAGE </h1>\r\n";
 					//}
+			std::cout << "|!|PRINTING MSG|!|\n" << msg << std::endl;
 			std::cout << "|!|SENDING RESPONSE TO CLIENT|!|" << std::endl;
-			send(c.fd(), msg, strlen(msg), 0);
+			send(c.fd(), msg.c_str(), msg.length() + 1, 0);
 			std::cout << "|!|RESPONSE SENT|!|" << std::endl;
 			std::cout << "|!|CLOSING_CONNECTION|!|" << std::endl;
 			close_connection(c);

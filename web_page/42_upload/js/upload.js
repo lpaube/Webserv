@@ -6,10 +6,9 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/09 17:17:01 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/11 18:27:44 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/16 15:01:13 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 var ADD = "http://localhost:8000";
 const form = document.querySelector("form");
@@ -18,7 +17,7 @@ const body = document.querySelector("body");
 const progressArea = document.querySelector(".progress-area");
 
 const	checkFile = () => {
-	fetch("http://127.0.0.1:8000/upload.html", {
+	fetch("http://127.0.0.1:8000/upload/", {
 		method: "GET",
 	}).then((result) => { 
 		return result.text();

@@ -29,6 +29,15 @@ body {
 	background-color: rgba(30, 30, 30, 0.5);
 }
 
+.apikey{
+	font-size: 20px;
+	color: rgb(208, 208, 208);
+	height: 35px;
+	width: 350px;
+	background-color: rgba(30, 30, 30, 0.5);
+	margin-top: 40px;
+}
+
 .sign_in{
 	margin-top: 50px;
 	display: flex;
@@ -39,7 +48,6 @@ body {
 .user_input{
 	border-color:  #00babc;
 	border-style: solid;
-	border-width: ;
 }
 
 .signin_button{
@@ -71,6 +79,3 @@ body {
 	color:rgb(218, 218, 218)
 }
 
-.footnotes:hover{
-	text-decoration: underline;
-}
