@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 17:17:57 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 16:12:07 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/16 17:14:22 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,8 +90,6 @@ private:
     void content_length_sub(size_t n);
     void set_raw_body(const std::vector<char>& data);
     void decode_raw_body();
-    bool check_multipart_formdata();
-    void process_multipart_form();
 
 private:
     ParseState state_;
@@ -108,7 +106,6 @@ private:
     ssize_t cur_chunk_size_;
     std::vector<char> raw_body_;
     std::vector<char> body_;
-    std::string boundary_;
 };
 
 const char* method_str(Method method);
