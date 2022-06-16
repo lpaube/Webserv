@@ -37,7 +37,7 @@ enum Method {
     GET,
     POST,
     DELETE,
-	OPTIONS
+    OPTIONS
 };
 
 class Request

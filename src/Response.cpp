@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 15:57:07 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/16 00:21:52 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/16 17:05:06 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ Response::Response(const Request& request, std::vector<Config>& response_configs
 void Response::setStatusCode(size_t code)
 {
     this->status_code = code;
-    this->status_code_msg = StatusCodes::getCodeMsg(code);
+    this->status_code_msg = StatusCode::get_code_msg(code);
 }
 
 void Response::setHtmlBody()
@@ -59,7 +59,7 @@ void Response::setHtmlHeader()
 {
     std::stringstream header_stream;
 
-    header_stream << "HTTP/1.1 " << status_code << " " << StatusCodes::getCodeMsg(status_code)
+    header_stream << "HTTP/1.1 " << status_code << " " << StatusCode::get_code_msg(status_code)
                   << "\r\n"
                   << "Access-Control-Allow-Origin: *\r\n";
     header_size = header_stream.str().size();

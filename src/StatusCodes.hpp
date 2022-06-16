@@ -1,6 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   StatusCodes.hpp                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/16 16:45:38 by mleblanc          #+#    #+#             */
+/*   Updated: 2022/06/16 17:03:31 by mleblanc         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #pragma once
 
-#include <iostream>
 #include <map>
 #include <string>
 
@@ -10,11 +21,9 @@
  * See StatusCodes.cpp for all the status codes
  */
 
-struct StatusCodes {
-    static std::map<int, std::string> status_code_map;
-    static bool initialized;
+namespace StatusCode
+{
+static std::map<int, const char*> codes;
 
-    static std::string getCodeMsg(int code);
-
-    static void initialize_status_codes();
-};
+std::string get_code_msg(int code);
+} // namespace StatusCode

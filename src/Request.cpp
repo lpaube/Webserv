@@ -156,8 +156,8 @@ const char* method_str(Method method)
             return "POST";
         case DELETE:
             return "DELETE";
-		case OPTIONS:
-			return "OPTIONS";
+        case OPTIONS:
+            return "OPTIONS";
         default:
             return "BAD METHOD";
     }
@@ -174,9 +174,9 @@ Method method_from_str(const std::string& str)
     if (method_str(DELETE) == str) {
         return DELETE;
     }
-	if (method_str(OPTIONS) == str){
-		return OPTIONS;
-	}
+    if (method_str(OPTIONS) == str) {
+        return OPTIONS;
+    }
     return BAD_METHOD;
 }
 

@@ -56,15 +56,15 @@ std::string Script::exec()
 
     // if method is POST the script will read from STDIN.
     // Create a file, write the body in it and change it to STDIN.
-   // if (request.method() == POST) {
-        int in_file = open("in_file", O_CREAT | O_APPEND);
-        // TODO: check err
-        write(in_file, request.body().data(), request.body().size());
-        // TODO: check err
-        close(in_file);
+    // if (request.method() == POST) {
+    int in_file = open("in_file", O_CREAT | O_APPEND);
+    // TODO: check err
+    write(in_file, request.body().data(), request.body().size());
+    // TODO: check err
+    close(in_file);
 
-        dup2(in_file, STDIN_FILENO);
-        // TODO: check err
+    dup2(in_file, STDIN_FILENO);
+    // TODO: check err
     //}
     // Create out file for the output of the script
     int out_file = open("out_file.tmp", O_CREAT | O_RDWR, 0777);
