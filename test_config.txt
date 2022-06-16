@@ -1,5 +1,5 @@
 server{
-	listen 159.203.8.84:80;
+	listen 127.0.0.1:8000;
   server_name Cyborgab www.Cyborgab.com;
   client_max_body_size 80m;
   error_page    404  ./resources/error/error404.html;
