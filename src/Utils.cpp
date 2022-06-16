@@ -91,7 +91,7 @@ std::vector<char>::const_iterator find_bytes(const std::vector<char>& data, cons
     size_t s = data.size() - needle_size + 1;
     for (size_t i = 0; i < s; ++i) {
         if (memcmp(data.data() + i, needle, needle_size) == 0) {
-            return data.begin() + (ptrdiff_t)i;
+            return data.begin() + (std::ptrdiff_t)i;
         }
     }
     return data.end();

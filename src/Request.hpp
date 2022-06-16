@@ -16,6 +16,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <unistd.h>
 
 enum ParseState {
     REQ_METHOD,
