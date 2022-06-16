@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 00:23:08 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/16 14:47:54 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,14 +72,12 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
 
     std::vector<Config> resp_configs = get_response_configs(server_configs);
 
-    const char* msg;
+    std::string msg;
     if (req_.path().find("cgi-bin/") != std::string::npos) {
         std::cout << "|!|IN SCRIPT|!|" << std::endl;
 
         Script script(resp_configs[0], req_);
-        std::string ret = script.exec();
-        // TODO: Bug here
-        msg = ret.c_str();
+        msg = script.exec();
 
         std::cout << "|!|OUT OF SCRIPT|!|" << std::endl;
     } else {
@@ -94,10 +92,12 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
         response.setHtmlBody();
         response.setHtmlHeader();
 
+        msg = response.full_content;
+
         std::cout << "|!|FILE RESPONSE BUILT|!|" << std::endl;
     }
 
-    write(fd(), msg, strlen(msg));
+    write(fd(), msg.c_str(), msg.length());
     // TODO: check err and if all bytes were sent
 }
 
