@@ -6,13 +6,14 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:40:28 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/15 23:46:14 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/16 16:06:38 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Utils.hpp"
 #include <algorithm>
 #include <ctype.h>
+#include <iostream>
 
 bool vectorize_content(std::vector<std::string>& content, std::string& content_str)
 {
@@ -78,4 +79,28 @@ std::string to_lower(const std::string& str)
         *it = tolower(*it);
     }
     return ret;
+}
+
+std::vector<char>::const_iterator find_bytes(const std::vector<char>& data, const char* needle,
+                                             size_t needle_size)
+{
+    if (data.size() < needle_size) {
+        return data.end();
+    }
+
+    size_t s = data.size() - needle_size + 1;
+    for (size_t i = 0; i < s; ++i) {
+        if (memcmp(data.data() + i, needle, needle_size) == 0) {
+            return data.begin() + (ptrdiff_t)i;
+        }
+    }
+    return data.end();
+}
+
+void print_bytes(const std::vector<char>& data)
+{
+    for (std::vector<char>::const_iterator it = data.begin(); it != data.end(); ++it) {
+        std::cout << *it;
+    }
+    std::cout << std::endl;
 }

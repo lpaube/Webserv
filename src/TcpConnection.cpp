@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 14:47:54 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/16 16:07:13 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -323,6 +323,7 @@ void TcpConnection::parse_http_request_body_content_length()
         req_.set_raw_body(data_);
         data_.clear();
         req_.decode_raw_body();
+        print_bytes(req_.body());
         set_state(S_WRITE);
     }
 }

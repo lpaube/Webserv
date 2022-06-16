@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 19:04:31 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 00:01:38 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/16 16:10:01 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,7 +180,7 @@ void Request::process_headers()
     typedef std::multimap<std::string, std::string>::const_iterator iter;
 
     iter it = headers_.find("content-length");
-    is_content_length = it != headers_.end();
+    is_content_length = it != headers_end();
     if (is_content_length) {
         std::pair<iter, iter> range = headers_.equal_range("content-length");
         if (range.second->first == "content-length") {
@@ -196,7 +196,7 @@ void Request::process_headers()
     }
 
     it = headers_.find("transfer-encoding");
-    if (it != headers_.end()) {
+    if (it != headers_end()) {
         std::pair<iter, iter> range = headers_.equal_range("transfer-encoding");
         for (iter it2 = range.first; it2 != range.second; ++it2) {
             std::vector<std::string> values = split(it2->second, ',');
@@ -216,7 +216,7 @@ void Request::process_headers()
     }
 
     it = headers_.find("host");
-    if (it != headers_.end()) {
+    if (it != headers_end()) {
         std::pair<iter, iter> range = headers_.equal_range("host");
         ++range.first;
         if (range.first != range.second) {
@@ -240,10 +240,67 @@ void Request::decode_raw_body()
     if (!is_content_length && !is_chunked) {
         body_ = raw_body_;
     } else if (is_content_length) {
-        body_ = raw_body_;
+        if (check_multipart_formdata()) {
+            process_multipart_form();
+        } else {
+            body_ = raw_body_;
+        }
     } else {
         body_ = raw_body_;
     }
+}
+
+bool Request::check_multipart_formdata()
+{
+    typedef std::multimap<std::string, std::string>::const_iterator iter;
+
+    header_iterator it = find_header("content-type");
+    if (it != headers_end()) {
+        std::pair<iter, iter> range = headers_.equal_range("content-type");
+        for (iter it2 = range.first; it2 != range.second; ++it2) {
+            std::vector<std::string> values = split(it2->second, ';');
+            std::string v = to_lower(trim(values[0], " "));
+            if (v == "multipart/form-data") {
+                if (values.size() != 2) {
+                    throw Exception("Bad request: Multipart/form-data doesn't have a boundary");
+                }
+
+                std::string boundary = trim(values[1], " ");
+                std::string::size_type pos = boundary.find("boundary=");
+                if (pos != 0) {
+                    throw Exception("Bad request: Bad multipart/form-data boundary");
+                }
+
+                boundary_ = boundary.substr(strlen("boundary="));
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+void Request::process_multipart_form()
+{
+    std::vector<char>::const_iterator start;
+    std::vector<char>::const_iterator end;
+    std::string needle = "--" + boundary_ + "\r\n";
+    if (find_bytes(raw_body_, needle.c_str(), needle.length()) == raw_body_.begin()) {
+        start = find_bytes(raw_body_, "\r\n\r\n", 4);
+
+        if (start != raw_body_.end()) {
+            start += 4;
+            needle = "\r\n--" + boundary_ + "--\r\n";
+            end = find_bytes(raw_body_, needle.c_str(), needle.length());
+
+            if (end != raw_body_.end()) {
+                body_ = std::vector<char>(start, end);
+                raw_body_.clear();
+                return;
+            }
+        }
+    }
+
+    throw Exception("Bad request: Bad multipart/form-data body");
 }
 
 Request::header_iterator Request::find_header(const std::string& name) const
