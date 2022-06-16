@@ -30,7 +30,7 @@ function submit() {
 
     var get_time = document.getElementById("test_html");
     get_time.onclick = () =>	{
-      fetch("http://127.0.0.1:8000/web_page/42_logtime/test.html", {
+      fetch("./test.html", {
         method: "GET"
       }).then(response => response.text())
         .then((content) => {

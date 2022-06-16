@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerParser.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/01 10:47:58 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/08 11:13:36 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/16 14:30:52 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -273,8 +273,9 @@ void ServerParser::parse_location_vars()
                 } else if (directives[0] == "client_max_body_size") {
                     std::string tmp_str;
 
-                    if (directives.size() != 2) {
-                        std::cerr << "LP ERROR 1" << std::endl;
+                    if (directives.size() != 2)
+                    {
+                      std::cerr << "LP ERROR 1" << std::endl;
                         throw("client_max_body_size: wrong args number");
                     }
                     for (std::string::iterator it = directives[1].begin();
@@ -285,8 +286,9 @@ void ServerParser::parse_location_vars()
                             unsigned long x;
                             std::istringstream(tmp_str) >> x;
                             new_location.client_max_body_size = x * BYTES_IN_MB;
-                        } else {
-                            std::cerr << "LP ERROR 2" << std::endl;
+                        } else
+                        {
+                          std::cerr << "LP ERROR 2" << std::endl;
                             throw("client_max_body_size not a valid input");
                         }
                     }
@@ -302,27 +304,31 @@ void ServerParser::parse_location_vars()
                         std::istringstream(directives[1]) >> x;
                         new_location.return_redirect.code = x;
                         new_location.return_redirect.url = directives[2];
-                    } else {
-                        std::cerr << "LP ERROR 3" << std::endl;
+                    } else
+                    {
+                      std::cerr << "LP ERROR 3" << std::endl;
                         throw("return_redirect: error..");
                     }
                 } else if (directives[0] == "root") {
-                    if (directives.size() != 2) {
-                        std::cerr << "LP ERROR 4" << std::endl;
+                    if (directives.size() != 2)
+                    {
+                      std::cerr << "LP ERROR 4" << std::endl;
                         throw("root: wrong number of args");
                     }
                     new_location.root = directives[1];
                 } else if (directives[0] == "autoindex") {
-                    if (directives.size() != 2) {
-                        std::cerr << "LP ERROR 5" << std::endl;
+                    if (directives.size() != 2)
+                    {
+                      std::cerr << "LP ERROR 5" << std::endl;
                         throw("autoindex: wrong number of args");
                     }
                     if (directives[1] == "on")
                         new_location.autoindex = true;
                     else if (directives[1] == "on")
                         new_location.autoindex = false;
-                    else {
-                        std::cerr << "LP ERROR 6" << std::endl;
+                    else
+                    {
+                      std::cerr << "LP ERROR 6" << std::endl;
                         throw("autoindex: invalid argument");
                     }
                 } else if (directives[0] == "index") {
@@ -331,8 +337,9 @@ void ServerParser::parse_location_vars()
                         new_location.index.push_back(*it);
                     }
                 } else if (directives[0] == "cgi_ext") {
-                    if (directives.size() != 3) {
-                        std::cerr << "LP ERROR 7" << std::endl;
+                    if (directives.size() != 3)
+                    {
+                      std::cerr << "LP ERROR 7" << std::endl;
                         throw("cgi_ext: wrong number of args");
                     }
 
