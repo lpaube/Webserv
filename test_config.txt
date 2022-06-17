@@ -12,7 +12,7 @@ server{
 	location test/{
     client_max_body_size 800m;
     limit_except GET POST DELETE;
-	cgi_ext		.py /usr/bin/python;
+	cgi_ext		.py /usr/bin/python3;
 	}
 	location test2/super/coucou{
     root /somepatfdsfh/fdf;

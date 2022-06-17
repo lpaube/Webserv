@@ -27,22 +27,19 @@ fn print_header(from: &str, to: &str) {
 
 fn print_user_logtime(easy: &mut Easy, config: &Config, login: &str, from: &str, to: &str) {
     if let Ok(token) = request::authenticate(easy, config) {
-        print_header(from, to);
 
         match request::get_user_logtime(easy, &token, login, from, to) {
             Ok(time) => {
                 let time = format!("{:01.0}h{:02.0}", time.trunc(), time.fract() * 60.0);
-                println!("{} ➜  🕑 {}", login, Color::Green.bold().paint(&time),);
+                println!("{time}");
             }
             Err(e) => {
                 // If curl error is set to 0 (curl success code), bad login
                 if e.code() == 0 {
-                    eprintln!("{} ➜  ❌ {}", login, Color::Red.bold().paint("bad login"),);
+                    println!("Wrong Username");
                 }
             }
         }
-
-        print_blue_line(LINE_LEN);
     }
 }
 

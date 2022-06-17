@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:08 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/17 14:48:02 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/17 15:22:34 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ Script::Script(const Config& config, const Request& request)
       cmd(NULL),
       request(request)
 {
-	std::cout << "IN FORK\n";
     buildCmd(request.path(), config);
     buildEnv(request.method(), config);
     // printEnv();
@@ -218,7 +217,6 @@ void Script::buildEnv(Method method, const Config& config)
 
     // The query string that is contained in the request URL after the path.
     v_env.push_back("QUERY_STRING=" + request.query_str());
-
     // Returns the IP address of the client that sent the request. For HTTP servlets, the value
     // returned is the same as the value of the CGI variable REMOTE_ADDR.
     v_env.push_back("REMOTE_ADDR=" + config.listen.address);
@@ -256,6 +254,7 @@ void Script::buildEnv(Method method, const Config& config)
 		envp[i][v_env[i].size()] = 0;
     }
     envp[envp_size] = NULL;
+	printEnv();
 }
 
 void Script::printEnv() const

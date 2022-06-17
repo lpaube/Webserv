@@ -47,16 +47,4 @@ while True:
 	start += 1
 
 f.close()
-print ("HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-type: text/html\r\n\r\n")
-print("<html>")
-print("<head>")
-print("<title>Hello - Second CGI Program</title>")
-print("</head>")
-print("<body>")
-print("TYPE:")
-print(filetype)
-print("NAME:")
-print(filename)
-print("</body>")
-print("</html>")
-
+print ("HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n")

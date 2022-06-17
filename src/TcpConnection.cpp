@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/17 14:48:36 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/17 16:31:14 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,8 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
     std::vector<Config> resp_configs = server_configs;
 
     std::string msg;
-    if (req_.path().find("cgi-bin/") != std::string::npos) {
+	std::size_t len = req_.path().length();
+    if (req_.path().find("cgi-bin/") != std::string::npos && req_.path()[len - 1] != '/') {
         std::cout << "|!|IN SCRIPT|!|" << std::endl;
 
         Script script(resp_configs[0], req_);
@@ -98,7 +99,7 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
 
         std::cout << "|!|FILE RESPONSE BUILT|!|" << std::endl;
     }
-
+	std::cout << "PRINTING RESPONSE\n" << msg << std::endl;
     write(fd(), msg.c_str(), msg.length());
     // TODO: check err and if all bytes were sent
 }

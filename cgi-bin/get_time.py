@@ -1,21 +1,15 @@
 #! /usr/bin/python
-import cgi, cgitb 
+import cgi
+import sys
 form = cgi.FieldStorage()
+import subprocess
 
 
 print ("HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-type: text/html\r\n\r\n")
-user_name = form.getvalue('username')
-
-
-print "<html>"
-print "<head>"
-print "<title>Hello - Second CGI Program</title>"
-print "</head>"
-print "<body>"
-print "<p>CGI OK<\p>"
-print "<h2>Hello %s ! How are you</h2>" % (user_name)
-print "</body>"
-print "</html>"
-
-
+user_name = form.getvalue('user')
+args = ("cgi-bin/Logtime-42/logtime42", "-c", "cgi-bin/Logtime-42/config.json", "-l", user_name)
+popen = subprocess.Popen(args, stdout=subprocess.PIPE)
+popen.wait()
+output = popen.stdout.read()
+print(output.decode("utf-8"))
 
