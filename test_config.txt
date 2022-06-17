@@ -5,7 +5,7 @@ server{
   error_page    404  ./resources/error/error404.html;
   error_page    504 505 ./resources/error/error50x.html;
   autoindex on;
-  cgi_ext		.py /usr/bin/python;
+  cgi_ext		.py /usr/bin/python3;
   cgi_ext		.sh /bin/bash;
   root /somepath/fdf;
 	location test/{

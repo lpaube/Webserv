@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/09 17:17:01 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/16 15:20:56 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/16 18:40:25 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,13 +53,21 @@ const uploadFile = () => {
 	fileInput.onchange = ({target}) =>{
 		let file = target.files[0];
 		data.append("file", file);
-		fetch("http://127.0.0.1:8000/upload", {
+		fetch("http://127.0.0.1:8000/cgi-bin/upload.py", {
 			method: "POST",
 			body: data
-		}).then(response => {
+		}).then(response => { 
+			return response.text();
+		}).then(content => {
+			document.write(content);
+		})
+		
+		
+		/*.then(response => {
 			console.log(response);
+			document.write(content);
 			showFile(file);
-		}).catch(e => alert(e.message));
+		}).catch(e => alert(e.message));*/
 	}
 }
 	/*fileInput.click();

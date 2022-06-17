@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:08 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/16 18:09:14 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/16 20:21:22 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,10 @@ std::string Script::exec()
         throw Exception("Error fatal, fork");
     if (id == 0) {
 		if (request.method() == POST) {
+			std::cout << " BODY DATA :\n" <<  request.body().data() << std::endl;
         	write(in_file, request.body().data(), request.body().size());
+			close(in_file);
+			in_file = open("in_file.tmp", O_RDWR );
         	dup2(in_file, STDIN_FILENO);
 		 }
 		dup2(out_file, STDOUT_FILENO);
@@ -79,12 +82,12 @@ std::string Script::exec()
     close(out_file);
     if (request.method() == POST) { // delete the in file after script
         close(in_file);
-        remove("in_file.tmp");
     }
     std::ifstream input_file("out_file.tmp");
     std::string script_output((std::istreambuf_iterator<char>(input_file)),
                               std::istreambuf_iterator<char>());
-    remove("out_file.tmp");
+	remove("in_file.tmp");
+	remove("out_file.tmp");
     return script_output;
 }
 
@@ -129,18 +132,18 @@ void Script::buildCmd(const std::string& path, const Config& config)
         i++;
     }
     std::string msg = "Error: script extension ." + path_ext;
-    if (found == false)
+    if (found == false){
         throw Exception(msg.c_str());
+	}
 
     // cmd[0] = the name of the program ex: (python or bash)
     //  cmd[1] will be the path where the script is.
     this->cmd = new char*[4];
-    this->cmd[0] = new char[config.cgi_ext[i].bin_path.length() + 1];
+    this->cmd[0] = new char[config.cgi_ext[i].bin_path.length() + 1]();
 	this->cmd[0] = strcpy(this->cmd[0], config.cgi_ext[i].bin_path.c_str());
-	this->cmd[1] = new char[path.length() + 1];
-    this->cmd[1] = strcpy(this->cmd[1], path.c_str());
-	this->cmd[2] = new char[1];
-    this->cmd[2] = strcpy(this->cmd[3], "\0");
+	this->cmd[1] = new char[path.length() + 1]();
+    this->cmd[1] = strcpy(this->cmd[1], path.c_str() + 1);
+	this->cmd[2] = new char[1]();
     this->cmd[3] = NULL;
 }
 
