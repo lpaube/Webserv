@@ -20,7 +20,7 @@ function submit() {
     const uid = document.getElementById("uid");
     var get_time = document.getElementById("test_html");
     get_time.onclick = () =>	{
-      fetch("http://127.0.0.1:8000/web_page/42_test/test.html", {
+      fetch("http://127.0.0.1:8000/web_page/42_test/", {
         method: "GET"
       }).then(response => response.text())
         .then((content) => {

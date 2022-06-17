@@ -35,35 +35,63 @@ void Response::setHtmlBody()
 {
     std::string line;
     std::stringstream body_stream;
-    std::ifstream requested_file(full_path.c_str());
+    std::ifstream requested_file;
+
+    if (access(full_path.c_str(), F_OK | R_OK) != 0)
+    {
+      status_code = 404;
+      std::cout << "This is a 404! (Response::setHtmlBody)" << std::endl;
+      return;
+    }
+
+    if (*(full_path.end() - 1) == '/')
+    {
+      for (std::vector<std::string>::iterator it = config.index.begin();
+          it != config.index.end();
+          ++it)
+      {
+        requested_file.open((full_path + *it).c_str());
+        std::cout << "It verifies config.index: " << *it << std::endl;
+        if (requested_file.is_open())
+        {
+          std::cout << "It opened config.index: " << *it << std::endl;
+          full_path += *it;
+          break;
+        }
+      }
+    }
+    else
+    {
+      requested_file.open(full_path.c_str());
+    }
 
     if (!requested_file.is_open()) {
-        setStatusCode(400);
-        std::cerr << "There was an error when trying to open the html file." << std::endl;
+      setStatusCode(400);
+      std::cerr << "There was an error when trying to open the html file." << std::endl;
     } else {
-        setStatusCode(200);
-        // body.clear();
-        while (getline(requested_file, line)) {
-            body_stream << line << "\r\n";
-        }
-        requested_file.close();
-        body_stream << "\r\n";
-        body = body_stream.str();
-        body_size = body.size();
-        if (body_size > getConfig().client_max_body_size)
-            setStatusCode(413);
+      setStatusCode(200);
+      // body.clear();
+      while (getline(requested_file, line)) {
+        body_stream << line << "\r\n";
+      }
+      requested_file.close();
+      body_stream << "\r\n";
+      body = body_stream.str();
+      body_size = body.size();
+      if (body_size > getConfig().client_max_body_size)
+        setStatusCode(413);
     }
 }
 
 void Response::setHtmlHeader()
 {
-    std::stringstream header_stream;
+  std::stringstream header_stream;
 
-    header_stream << "HTTP/1.1 " << status_code << " " << StatusCodes::getCodeMsg(status_code)
-                  << "\r\n"
-                  << "Access-Control-Allow-Origin: *\r\n";
-    header_size = header_stream.str().size();
-    header_stream << "Content Length: " << header_size + body_size << "\r\n\r\n";
-    header = header_stream.str();
-    full_content = header + body;
+  header_stream << "HTTP/1.1 " << status_code << " " << StatusCodes::getCodeMsg(status_code)
+    << "\r\n"
+    << "Access-Control-Allow-Origin: *\r\n";
+  header_size = header_stream.str().size();
+  header_stream << "Content Length: " << header_size + body_size << "\r\n\r\n";
+  header = header_stream.str();
+  full_content = header + body;
 }

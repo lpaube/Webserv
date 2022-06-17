@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <unistd.h>
 #include "Config.hpp"
 #include "Request.hpp"
 #include <string>
