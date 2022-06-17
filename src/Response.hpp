@@ -15,6 +15,7 @@
 #include "Request.hpp"
 #include <string>
 #include <unistd.h>
+#include <time.h>
 
 #pragma once
 
@@ -57,6 +58,7 @@ private:
     void createCodeMsg();
     void buildHeaderString();
     void setContentType();
+    void setDate();
 
 public:
     std::string body;
@@ -72,6 +74,7 @@ private:
     std::string status_code_msg;
     std::string full_path;
     std::string content_type;
+    std::string date_now;
     // std::string location;
     // std::string headerString;
     // std::string codeMsg;
