@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 18:26:14 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/17 12:41:24 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void TcpConnection::handle_read_event()
 {
     char buf[BUF_SIZE];
 
-    ssize_t n = read(fd(), buf, BUF_SIZE);
+    ssize_t n = recv(fd(), buf, BUF_SIZE, 0);
 
     if (n < 0) {
         throw Exception("Socket read error");
@@ -97,7 +97,7 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
         std::cout << "|!|FILE RESPONSE BUILT|!|" << std::endl;
     }
 
-    write(fd(), msg.c_str(), msg.length());
+    send(fd(), msg.c_str(), msg.length(), 0);
     // TODO: check err and if all bytes were sent
 }
 
@@ -333,6 +333,7 @@ void TcpConnection::parse_http_request_body_chunked()
     data_.clear();
     req_.decode_raw_body();
     if (req_.all_chunks_received()) {
+        print_bytes(req_.body());
         set_state(S_WRITE);
     }
 }

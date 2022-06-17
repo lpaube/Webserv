@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 17:17:57 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 19:10:16 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/17 12:13:36 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,8 @@
 #include "ExceptionBase.hpp"
 #include <map>
 #include <string>
-#include <vector>
 #include <unistd.h>
+#include <vector>
 
 enum ParseState {
     REQ_METHOD,
@@ -39,6 +39,12 @@ enum Method {
     POST,
     DELETE,
     OPTIONS
+};
+
+enum ChunkState {
+    CNK_SIZE,
+    CNK_CHUNK,
+    CNK_NL
 };
 
 class Request
@@ -68,6 +74,9 @@ public:
     header_iterator headers_end() const;
 
 private:
+    typedef std::vector<char>::const_iterator rbody_iter;
+
+private:
     bool chunked() const;
     ssize_t cur_chunk_size() const;
     bool content_length() const;
@@ -92,6 +101,8 @@ private:
     void append_raw_body(const std::vector<char>& data);
     void decode_raw_body();
     bool all_chunks_received() const;
+    bool read_chunk_size();
+    bool read_chunk();
 
 private:
     ParseState state_;
@@ -106,6 +117,7 @@ private:
     size_t content_length_count_;
     bool is_chunked;
     ssize_t cur_chunk_size_;
+    ChunkState cnk_state_;
     std::vector<char> raw_body_;
     std::vector<char> body_;
 };

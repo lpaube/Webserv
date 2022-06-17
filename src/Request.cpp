@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 19:04:31 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 18:26:42 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/17 13:38:36 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,8 @@ Request::Request()
       is_content_length(false),
       content_length_count_(0),
       is_chunked(false),
-      cur_chunk_size_(-1)
+      cur_chunk_size_(-1),
+      cnk_state_(CNK_SIZE)
 {
 }
 
@@ -245,28 +246,103 @@ void Request::decode_raw_body()
     if (!is_chunked) {
         body_ = raw_body_;
     } else {
-        if (cur_chunk_size_ > 0) {
-            while (true) {
-                ssize_t to_read = (ssize_t)raw_body_.size() < cur_chunk_size_
-                                      ? (ssize_t)raw_body_.size()
-                                      : cur_chunk_size_;
-                body_.insert(body_.end(), raw_body_.begin(), raw_body_.begin() + to_read);
-                cur_chunk_size_ -= to_read;
-
-                raw_body_.erase(raw_body_.begin(), raw_body_.begin() + to_read);
-
-                if (cur_chunk_size_ == 0) {
-                    cur_chunk_size_ = -1;
-                }
+        bool done = false;
+        while (!done) {
+            switch (cnk_state_) {
+                case CNK_SIZE:
+                    if (read_chunk_size()) {
+                        if (cur_chunk_size_ == 0) {
+                            done = true;
+                            break;
+                        }
+                        cnk_state_ = CNK_CHUNK;
+                    } else {
+                        done = true;
+                        break;
+                    }
+                    break;
+                case CNK_CHUNK:
+                    if (!read_chunk()) {
+                        done = true;
+                        break;
+                    }
+                    break;
+                case CNK_NL:
+                    if (raw_body_.size() >= 2) {
+                        rbody_iter it = find_bytes(raw_body_, "\r\n", 2);
+                        if (it != raw_body_.end() && it == raw_body_.begin()) {
+                            cnk_state_ = CNK_SIZE;
+                            raw_body_.erase(raw_body_.begin(), raw_body_.begin() + 2);
+                        }
+                    } else {
+                        done = true;
+                        break;
+                    }
+                    break;
             }
-        } else if (cur_chunk_size_ < 0) {
         }
     }
+    if (all_chunks_received()) {
+        rbody_iter it = find_bytes(raw_body_, "\r\n", 2);
+        if (it != raw_body_.end() && it == raw_body_.begin()) {
+            raw_body_.clear();
+        } else {
+            throw Exception("Bad request: chunked request did not end with \\r\\n");
+        }
+    }
+    return;
+}
+
+bool Request::read_chunk()
+{
+    ssize_t to_read =
+        cur_chunk_size_ > (ssize_t)raw_body_.size() ? (ssize_t)raw_body_.size() : cur_chunk_size_;
+
+    body_.insert(body_.end(), raw_body_.begin(), raw_body_.begin() + to_read);
+    raw_body_.erase(raw_body_.begin(), raw_body_.begin() + to_read);
+    cur_chunk_size_ -= to_read;
+
+    bool read_all_chunk = false;
+    if (cur_chunk_size_ == 0) {
+        cur_chunk_size_ = -1;
+        read_all_chunk = true;
+
+        if (raw_body_.size() >= 2) {
+            rbody_iter it = find_bytes(raw_body_, "\r\n", 2);
+            if (it == raw_body_.end() || it != raw_body_.begin()) {
+                throw Exception("Bad request: Chunk doesn't end with \\r\\n");
+            } else {
+                raw_body_.erase(raw_body_.begin(), raw_body_.begin() + 2);
+                cnk_state_ = CNK_SIZE;
+            }
+        } else {
+            cnk_state_ = CNK_NL;
+        }
+    }
+
+    return read_all_chunk;
 }
 
 bool Request::all_chunks_received() const
 {
     return cur_chunk_size_ == 0;
+}
+
+bool Request::read_chunk_size()
+{
+    rbody_iter it = find_bytes(raw_body_, "\r\n", 2);
+    if (it != raw_body_.end()) {
+        std::string chunk_size(rbody_iter(raw_body_.begin()), it);
+        std::stringstream ss(chunk_size);
+        ss << std::hex;
+        ss >> cur_chunk_size_;
+        if (!ss.eof()) {
+            throw Exception("Bad chunk size: " + chunk_size);
+        }
+        raw_body_.erase(raw_body_.begin(), it + 2);
+        return true;
+    }
+    return false;
 }
 
 Request::header_iterator Request::find_header(const std::string& name) const
