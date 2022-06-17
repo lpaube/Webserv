@@ -90,7 +90,9 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
 
         Response response(req_, resp_configs);
         response.setHtmlBody();
+        response.checkErrorCode();
         response.setHtmlHeader();
+        response.full_content = response.header + response.body;
 
         msg = response.full_content;
 

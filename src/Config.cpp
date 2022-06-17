@@ -8,7 +8,7 @@ void Config::Location::print_location()
     for (std::vector<Error_page>::iterator it = error_page.begin(); it != error_page.end();
          ++it, ++i) {
         std::cout << "--- error_page: " << i << " ---" << std::endl;
-        for (std::vector<int>::iterator it_code = it->code.begin(); it_code != it->code.end();
+        for (std::vector<size_t>::iterator it_code = it->code.begin(); it_code != it->code.end();
              ++it_code) {
             std::cout << "code: " << *it_code << std::endl;
         }
@@ -86,7 +86,7 @@ void Config::print_config()
     for (std::vector<Error_page>::iterator it = error_page.begin(); it != error_page.end();
          ++it, ++i) {
         std::cout << "--- error_page: " << i << " ---" << std::endl;
-        for (std::vector<int>::iterator it_code = it->code.begin(); it_code != it->code.end();
+        for (std::vector<size_t>::iterator it_code = it->code.begin(); it_code != it->code.end();
              ++it_code) {
             std::cout << "code: " << *it_code << std::endl;
         }

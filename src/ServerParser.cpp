@@ -264,7 +264,7 @@ void ServerParser::parse_location_vars()
 
           std::vector<std::string>::size_type i = 1;
           for (; i < directives.size() - 1; ++i) {
-            int x;
+            size_t x;
             std::istringstream(directives[i]) >> x;
             tmp_page.code.push_back(x);
           }
@@ -408,7 +408,7 @@ void ServerParser::parse_server_vars()
 
         std::vector<std::string>::size_type i = 1;
         for (; i < directives.size() - 1; ++i) {
-          int x;
+          size_t x;
           std::istringstream(directives[i]) >> x;
           tmp_page.code.push_back(x);
         }

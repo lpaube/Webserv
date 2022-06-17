@@ -24,6 +24,7 @@ Response::Response(const Request& request, std::vector<Config>& response_configs
     }
     full_path = "." + request.path();
     this->config = response_configs[0];
+    this->status_code = 200;
 }
 
 void Response::setStatusCode(size_t code)
@@ -32,12 +33,50 @@ void Response::setStatusCode(size_t code)
     this->status_code_msg = StatusCodes::getCodeMsg(code);
 }
 
+void Response::checkErrorCode()
+{
+  std::cout << "@@@This is the status_code: " << status_code << std::endl;
+  if (status_code != 200)
+  {
+    for (std::vector<Config::Error_page>::iterator it = config.error_page.begin();
+        it != config.error_page.end();
+        ++it)
+    {
+      for (std::vector<size_t>::iterator it_code = it->code.begin();
+          it_code != it->code.end();
+          ++it_code)
+      {
+        if (status_code == *it_code)
+        {
+          std::cout << "Status code match!" << std::endl;
+          if (access((it->uri).c_str(), F_OK | R_OK) == 0)
+          {
+            std::cout << "Erro code file access good!" << std::endl;
+            full_path = it->uri;
+            setHtmlBody();
+            return;
+          }
+          std::cout << "Erro code file access bad!" << std::endl;
+        }
+      }
+    }
+    if (status_code >= 300 && status_code < 600)
+    {
+      std::stringstream body_stream;
+
+      body.clear();
+      body_stream << "<h1>Error " << status_code << "</h1>\n\r\n\r";
+    }
+  }
+}
+
 void Response::setHtmlBody()
 {
     std::string line;
     std::stringstream body_stream;
     std::ifstream requested_file;
 
+    body.clear();
     /*
      * Check path access
      */
@@ -64,6 +103,9 @@ void Response::setHtmlBody()
           break;
         }
       }
+      /*
+       * Making the files hierarchy for autoindex
+       */
       if (config.autoindex == true && !requested_file.is_open())
       {
         DIR *dir;

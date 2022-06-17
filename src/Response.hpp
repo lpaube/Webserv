@@ -14,6 +14,7 @@
 #include "Config.hpp"
 #include "Request.hpp"
 #include <string>
+#include <unistd.h>
 
 #pragma once
 
@@ -46,6 +47,8 @@ public:
     {
         return status_code_msg;
     }
+
+    void checkErrorCode();
 
     void setHtmlBody();
     void setHtmlHeader();
