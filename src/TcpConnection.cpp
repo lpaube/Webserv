@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 17:39:51 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/17 13:28:19 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,9 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
 
         Response response(req_, resp_configs);
         response.setHtmlBody();
+        response.checkErrorCode();
         response.setHtmlHeader();
+        response.full_content = response.header + response.body;
 
         msg = response.full_content;
 
@@ -323,6 +325,7 @@ void TcpConnection::parse_http_request_body_content_length()
         req_.set_raw_body(data_);
         data_.clear();
         req_.decode_raw_body();
+        print_bytes(req_.body());
         set_state(S_WRITE);
     }
 }

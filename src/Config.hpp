@@ -14,7 +14,7 @@ public:
     };
 
     struct Error_page {
-        std::vector<int> code;
+        std::vector<size_t> code;
         std::string uri;
     };
 

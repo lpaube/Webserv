@@ -10,9 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <unistd.h>
 #include "Config.hpp"
 #include "Request.hpp"
 #include <string>
+#include <unistd.h>
 
 #pragma once
 
@@ -46,12 +48,15 @@ public:
         return status_code_msg;
     }
 
+    void checkErrorCode();
+
     void setHtmlBody();
     void setHtmlHeader();
 
 private:
     void createCodeMsg();
     void buildHeaderString();
+    void setContentType();
 
 public:
     std::string body;
@@ -66,6 +71,7 @@ private:
     size_t status_code;
     std::string status_code_msg;
     std::string full_path;
+    std::string content_type;
     // std::string location;
     // std::string headerString;
     // std::string codeMsg;

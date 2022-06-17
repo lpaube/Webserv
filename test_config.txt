@@ -2,8 +2,9 @@ server{
 	listen 127.0.0.1:8000;
   server_name Cyborgab www.Cyborgab.com;
   client_max_body_size 80m;
-  error_page    404  ./resources/error/error404.html;
-  error_page    504 505 ./resources/error/error50x.html;
+  error_page    404  ./web_page/Error/error404.html;
+  error_page    504 505 ./web_page/Error/default.html;
+  index teest.html;
   autoindex on;
   cgi_ext		.py /usr/bin/python3;
   cgi_ext		.sh /bin/bash;

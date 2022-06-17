@@ -11,7 +11,6 @@ int main(int argc, char** argv)
     }
     std::string config_file(argv[1]);
     ConfigParser config_parser(config_file);
-    config_parser.serverparser[0].config.print_config();
 
     std::vector<Config> configs;
     for (unsigned int i = 0; i < config_parser.nbServer(); i++) {
