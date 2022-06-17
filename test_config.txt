@@ -4,7 +4,7 @@ server{
   client_max_body_size 80m;
   error_page    404  ./resources/error/error404.html;
   error_page    504 505 ./resources/error/error50x.html;
-  index test.html;
+  index teest.html;
   autoindex on;
   cgi_ext		.py /usr/bin/python;
   cgi_ext		.sh /bin/bash;

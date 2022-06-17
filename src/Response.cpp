@@ -14,6 +14,7 @@
 #include "StatusCodes.hpp"
 #include <fstream>
 #include <sstream>
+#include <dirent.h>
 
 Response::Response(const Request& request, std::vector<Config>& response_configs)
 {
@@ -37,6 +38,9 @@ void Response::setHtmlBody()
     std::stringstream body_stream;
     std::ifstream requested_file;
 
+    /*
+     * Check path access
+     */
     if (access(full_path.c_str(), F_OK | R_OK) != 0)
     {
       status_code = 404;
@@ -44,6 +48,9 @@ void Response::setHtmlBody()
       return;
     }
 
+    /*
+     * Handle directives index and autoindex
+     */
     if (*(full_path.end() - 1) == '/')
     {
       for (std::vector<std::string>::iterator it = config.index.begin();
@@ -51,13 +58,35 @@ void Response::setHtmlBody()
           ++it)
       {
         requested_file.open((full_path + *it).c_str());
-        std::cout << "It verifies config.index: " << *it << std::endl;
         if (requested_file.is_open())
         {
-          std::cout << "It opened config.index: " << *it << std::endl;
           full_path += *it;
           break;
         }
+      }
+      if (config.autoindex == true && !requested_file.is_open())
+      {
+        DIR *dir;
+
+        body_stream << "<h1>Listing files in directory (autoindex=on)</h1>\r\n"
+                    << "<ul>\r\n";
+        struct dirent *ent;
+        if ((dir = opendir(full_path.c_str())) != NULL)
+        {
+          while ((ent = readdir(dir)) != NULL)
+          {
+            body_stream << "<li>" << ent->d_name << "</li>" << "\r\n";
+          }
+          closedir(dir);
+        }
+        body_stream << "</ul>\r\n";
+        // Can probably avoid repeat with below
+        body_stream << "\r\n";
+        body = body_stream.str();
+        body_size = body.size();
+        if (body_size > getConfig().client_max_body_size)
+          setStatusCode(413);
+        return;
       }
     }
     else
