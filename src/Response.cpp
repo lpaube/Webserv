@@ -166,6 +166,12 @@ void Response::setContentType()
     content_type = "image/gif";
   else if (extension == "mp4")
     content_type = "video/mp4";
+  else if (extension == "css")
+    content_type = "text/css";
+  else if (extension == "js")
+    content_type = "text/javascript";
+  else if (extension == "md")
+    content_type = "text/markdown";
 }
 
 void Response::setHtmlHeader()
