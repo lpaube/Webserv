@@ -18,14 +18,18 @@
 
 Response::Response(const Request& request, std::vector<Config>& response_configs)
 {
+  std::cout << "Starting response" << std::endl;
+    req = request;
     if (response_configs.size() == 0) {
         std::cerr << "NO CONFIG MATCH" << std::endl;
         throw "No config matches the request";
     }
-    full_path = "." + request.path();
+    full_path = "." + req.path();
     this->config = response_configs[0];
     this->status_code = 200;
     this->content_type = "text/html";
+    this->server = "Anginex";
+    std::cout << "Ending response" << std::endl;
 }
 
 void Response::setStatusCode(size_t code)
@@ -36,7 +40,6 @@ void Response::setStatusCode(size_t code)
 
 void Response::checkErrorCode()
 {
-  std::cout << "@@@This is the status_code: " << status_code << std::endl;
   if (status_code != 200)
   {
     for (std::vector<Config::Error_page>::iterator it = config.error_page.begin();
@@ -158,7 +161,6 @@ void Response::setHtmlBody()
 void Response::setContentType()
 {
   std::string extension = full_path.substr(full_path.find_last_of(".") + 1);
-  std::cout << "@@@@@This is extension: " << extension << std::endl;
   if (extension == "jpg" || extension == "jpeg")
     content_type = "image/jpeg";
   else if (extension == "png")
@@ -185,6 +187,30 @@ void Response::setDate()
   date_now = std::string(buf);
 }
 
+void Response::setHost()
+{
+  Request::header_iterator it = req.find_header("host");
+  host = it->second;
+}
+
+int Response::setAllow()
+{
+  /*
+  if (config.limit_except.size() == 0)
+    return 0;
+  allow = config.limit_except[0];
+  for (std::vector<std::string>::iterator it = config.limit_except.begin() + 1;
+      it != config.limit_except.end();
+      ++it)
+  {
+    allow += ", ";
+    allow += *it;
+  }
+  return 1;
+  */
+  return 0;
+}
+
 void Response::setHtmlHeader()
 {
   std::stringstream header_stream;
@@ -196,8 +222,12 @@ void Response::setHtmlHeader()
     << "Access-Control-Allow-Origin: *\r\n";
   header_size = header_stream.str().size();
   header_stream << "Date: " << date_now << "\r\n";
+  header_stream << "Host: " << host << "\r\n";
+  if (setAllow())
+    header_stream << "Allow: " << allow << "\r\n";
   header_stream << "Content Length: " << body_size << "\r\n";
   header_stream << "Content Type: " << content_type << "\r\n";
+  header_stream << "Server: " << server << "\r\n";
   header_stream << "\r\n";
   header = header_stream.str();
   full_content = header + body;
