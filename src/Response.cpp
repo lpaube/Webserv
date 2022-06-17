@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 15:57:07 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/16 00:21:52 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/17 14:49:42 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,6 @@
 
 Response::Response(const Request& request, std::vector<Config>& response_configs)
 {
-    if (response_configs.size() == 0) {
-        std::cerr << "NO CONFIG MATCH" << std::endl;
-        throw "No config matches the request";
-    }
     full_path = "." + request.path();
     this->config = response_configs[0];
     this->status_code = 200;
@@ -31,7 +27,7 @@ Response::Response(const Request& request, std::vector<Config>& response_configs
 void Response::setStatusCode(size_t code)
 {
     this->status_code = code;
-    this->status_code_msg = StatusCodes::getCodeMsg(code);
+    this->status_code_msg = StatusCode::get_code_msg(code);
 }
 
 void Response::checkErrorCode()
@@ -179,7 +175,7 @@ void Response::setHtmlHeader()
   std::stringstream header_stream;
 
   setContentType();
-  header_stream << "HTTP/1.1 " << status_code << " " << StatusCodes::getCodeMsg(status_code)
+  header_stream << "HTTP/1.1 " << status_code << " " << StatusCode::get_code_msg(status_code)
     << "\r\n"
     << "Access-Control-Allow-Origin: *\r\n";
   header_size = header_stream.str().size();

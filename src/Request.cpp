@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 19:04:31 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 16:12:03 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/16 17:37:38 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,8 +156,8 @@ const char* method_str(Method method)
             return "POST";
         case DELETE:
             return "DELETE";
-		case OPTIONS:
-			return "OPTIONS";
+        case OPTIONS:
+            return "OPTIONS";
         default:
             return "BAD METHOD";
     }
@@ -174,9 +174,9 @@ Method method_from_str(const std::string& str)
     if (method_str(DELETE) == str) {
         return DELETE;
     }
-	if (method_str(OPTIONS) == str){
-		return OPTIONS;
-	}
+    if (method_str(OPTIONS) == str) {
+        return OPTIONS;
+    }
     return BAD_METHOD;
 }
 
@@ -242,70 +242,12 @@ void Request::set_raw_body(const std::vector<char>& data)
 
 void Request::decode_raw_body()
 {
-    if (!is_content_length && !is_chunked) {
+    if (!is_chunked) {
         body_ = raw_body_;
-    } else if (is_content_length) {
-        if (check_multipart_formdata()) {
-            process_multipart_form();
-        } else {
-            body_ = raw_body_;
-        }
     } else {
         body_ = raw_body_;
     }
-}
-
-bool Request::check_multipart_formdata()
-{
-    typedef std::multimap<std::string, std::string>::const_iterator iter;
-
-    header_iterator it = find_header("content-type");
-    if (it != headers_end()) {
-        std::pair<iter, iter> range = headers_.equal_range("content-type");
-        for (iter it2 = range.first; it2 != range.second; ++it2) {
-            std::vector<std::string> values = split(it2->second, ';');
-            std::string v = to_lower(trim(values[0], " "));
-            if (v == "multipart/form-data") {
-                if (values.size() != 2) {
-                    throw Exception("Bad request: Multipart/form-data doesn't have a boundary");
-                }
-
-                std::string boundary = trim(values[1], " ");
-                std::string::size_type pos = boundary.find("boundary=");
-                if (pos != 0) {
-                    throw Exception("Bad request: Bad multipart/form-data boundary");
-                }
-
-                boundary_ = boundary.substr(strlen("boundary="));
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-void Request::process_multipart_form()
-{
-    std::vector<char>::const_iterator start;
-    std::vector<char>::const_iterator end;
-    std::string needle = "--" + boundary_ + "\r\n";
-    if (find_bytes(raw_body_, needle.c_str(), needle.length()) == raw_body_.begin()) {
-        start = find_bytes(raw_body_, "\r\n\r\n", 4);
-
-        if (start != raw_body_.end()) {
-            start += 4;
-            needle = "\r\n--" + boundary_ + "--\r\n";
-            end = find_bytes(raw_body_, needle.c_str(), needle.length());
-
-            if (end != raw_body_.end()) {
-                body_ = std::vector<char>(start, end);
-                raw_body_.clear();
-                return;
-            }
-        }
-    }
-
-    throw Exception("Bad request: Bad multipart/form-data body");
+    print_bytes(body());
 }
 
 Request::header_iterator Request::find_header(const std::string& name) const

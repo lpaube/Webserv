@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 15:12:33 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/16 17:04:18 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,8 @@ void Server::run()
                     case TCP_LISTENER:
                         try {
                             accept_connection(s);
+                        } catch (const Request::Exception& ex) {
+
                         } catch (const std::exception& ex) {
                             std::cerr << ex.what() << std::endl;
                         }
