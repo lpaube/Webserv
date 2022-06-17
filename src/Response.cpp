@@ -18,7 +18,6 @@
 
 Response::Response(const Request& request, std::vector<Config>& response_configs)
 {
-  std::cout << "Starting response" << std::endl;
     req = request;
     if (response_configs.size() == 0) {
         std::cerr << "NO CONFIG MATCH" << std::endl;
@@ -29,7 +28,6 @@ Response::Response(const Request& request, std::vector<Config>& response_configs
     this->status_code = 200;
     this->content_type = "text/html";
     this->server = "Anginex";
-    std::cout << "Ending response" << std::endl;
 }
 
 void Response::setStatusCode(size_t code)
@@ -195,7 +193,6 @@ void Response::setHost()
 
 int Response::setAllow()
 {
-  /*
   if (config.limit_except.size() == 0)
     return 0;
   allow = config.limit_except[0];
@@ -207,8 +204,6 @@ int Response::setAllow()
     allow += *it;
   }
   return 1;
-  */
-  return 0;
 }
 
 void Response::setHtmlHeader()
@@ -217,6 +212,7 @@ void Response::setHtmlHeader()
 
   setContentType();
   setDate();
+  setHost();
   header_stream << "HTTP/1.1 " << status_code << " " << StatusCodes::getCodeMsg(status_code)
     << "\r\n"
     << "Access-Control-Allow-Origin: *\r\n";

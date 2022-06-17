@@ -9,6 +9,7 @@ server{
   cgi_ext		.py /usr/bin/python;
   cgi_ext		.sh /bin/bash;
   root /somepath/fdf;
+  limit_except GET POST DELETE;
 	location test/{
     client_max_body_size 800m;
     limit_except GET POST DELETE;

@@ -353,6 +353,7 @@ void ServerParser::init_server_vars()
   config.root = "html";
   config.autoindex = false;
   config.index.push_back("index.html");
+  //config.limit_except.push_back("GET");
 }
 
 void ServerParser::parse_server_vars()
@@ -424,12 +425,10 @@ void ServerParser::parse_server_vars()
             throw("client_max_body_size not a valid input");
         }
         } else if (directives[0] == "limit_except") {
-          throw("Should not be limit_except in server context");
-          /*
+          //throw("Should not be limit_except in server context");
           for (std::string::size_type j = 1; j < directives.size(); ++j) {
             config.limit_except.push_back(directives[j]);
           }
-          */
       } else if (directives[0] == "return") {
         if (directives.size() == 2)
           config.return_redirect.url = directives[1];
