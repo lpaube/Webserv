@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:08 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/17 15:22:34 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/17 16:51:46 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,27 +26,27 @@ Script::Exception::Exception(const char* msg)
 {
 }
 
-// script constructor takes 2 args, a config and a specific request.
-Script::Script(const Config& config, const Request& request)
-    : envp(NULL),
-      cmd(NULL),
-      request(request)
+// script constructor takes 2 args, a config and a specific request_.
+Script::Script(const Config& config, const Request& request_)
+    : envp_(NULL),
+      cmd_(NULL),
+      request_(request_)
 {
-    buildCmd(request.path(), config);
-    buildEnv(request.method(), config);
-    // printEnv();
+   build_cmd(request_.path(), config);
+    build_env(request_.method(), config);
+    // print_env();
 }
 
 Script::~Script(){
 
-	for (std::size_t i = 0; i < envp_size; i++) {
-        delete[] envp[i];
+	for (std::size_t i = 0; i < envp_size_; i++) {
+        delete[] envp_[i];
     }
-    delete[] envp;
+    delete[] envp_;
 	for (int i = 0; i < 3; i++){
-		delete[] cmd[i];
+		delete[] cmd_[i];
 	}
-    delete[] cmd;
+    delete[] cmd_;
 }
 
 // execute the script and returns the output of the script in a string.
@@ -56,7 +56,7 @@ std::string Script::exec()
     int status;
 	int in_file;
 	
-	if (request.method() == POST) {
+	if (request_.method() == POST) {
 		in_file = open("in_file.tmp", O_CREAT | O_RDWR, 0777);
 	}
 	int out_file = open("out_file.tmp", O_CREAT | O_RDWR, 0777); // Create out file for the output of the script
@@ -64,22 +64,22 @@ std::string Script::exec()
     if (id < 0)
         throw Exception("Error fatal, fork");
     if (id == 0) {
-		if (request.method() == POST) {
-			std::cout << " BODY DATA :\n" <<  request.body().data() << std::endl;
-        	write(in_file, request.body().data(), request.body().size());
+		if (request_.method() == POST) {
+			std::cout << " BODY DATA :\n" <<  request_.body().data() << std::endl;
+        	write(in_file, request_.body().data(), request_.body().size());
 			close(in_file);
 			in_file = open("in_file.tmp", O_RDWR );
         	dup2(in_file, STDIN_FILENO);
 		 }
 		dup2(out_file, STDOUT_FILENO);
-        execve(cmd[0], cmd, envp);
+        execve(cmd_[0], cmd_, envp_);
         throw Exception("Error fatal, execve\n\n");
    	}
 	else{
         waitpid(id, &status, 0);
 	}
     close(out_file);
-    if (request.method() == POST) { // delete the in file after script
+    if (request_.method() == POST) { // delete the in file after script
         close(in_file);
     }
     std::ifstream input_file("out_file.tmp");
@@ -115,8 +115,8 @@ std::string Script::get_ext(const std::string& path)
     return ext;
 }
 
-// build the cmd with the config file and the type of the script in the request.
-void Script::buildCmd(const std::string& path, const Config& config)
+// build the cmd_ with the config file and the type of the script in the request_.
+void Script::build_cmd(const std::string& path, const Config& config)
 {
     std::size_t ext_size = config.cgi_ext.size();
     std::string path_ext = "." + get_ext(path);
@@ -135,20 +135,20 @@ void Script::buildCmd(const std::string& path, const Config& config)
         throw Exception(msg.c_str());
 	}
 
-    // cmd[0] = the name of the program ex: (python or bash)
-    //  cmd[1] will be the path where the script is.
-    this->cmd = new char*[4];
-    this->cmd[0] = new char[config.cgi_ext[i].bin_path.length() + 1]();
-	this->cmd[0] = strcpy(this->cmd[0], config.cgi_ext[i].bin_path.c_str());
-	this->cmd[1] = new char[path.length() + 1]();
-    this->cmd[1] = strcpy(this->cmd[1], path.c_str() + 1);
-	this->cmd[2] = new char[1]();
-    this->cmd[3] = NULL;
+    // cmd_[0] = the name of the program ex: (python or bash)
+    //  cmd_[1] will be the path where the script is.
+    this->cmd_ = new char*[4];
+    this->cmd_[0] = new char[config.cgi_ext[i].bin_path.length() + 1]();
+	this->cmd_[0] = strcpy(this->cmd_[0], config.cgi_ext[i].bin_path.c_str());
+	this->cmd_[1] = new char[path.length() + 1]();
+    this->cmd_[1] = strcpy(this->cmd_[1], path.c_str() + 1);
+	this->cmd_[2] = new char[1]();
+    this->cmd_[3] = NULL;
 }
 
 // resource :
 // https://www.ibm.com/docs/en/netcoolomnibus/8.1?topic=scripts-environment-variables-in-cgi-script
-void Script::buildEnv(Method method, const Config& config)
+void Script::build_env(Method method, const Config& config)
 {
     Request::header_iterator it;
     std::stringstream ss;
@@ -156,113 +156,113 @@ void Script::buildEnv(Method method, const Config& config)
     (void)config;
 
     if (method == POST) {
-        // The MIME type of the body of the request, or null if the type is not known
-        it = request.find_header("Content-Type");
-        if (it != request.headers_end())
-            v_env.push_back("CONTENT_TYPE=" + it->second);
+        // The MIME type of the body of the request_, or null if the type is not known
+        it = request_.find_header("Content-Type");
+        if (it != request_.headers_end())
+            v_env_.push_back("CONTENT_TYPE=" + it->second);
     }
 
-    // The length of the request body in bytes made available by the input stream or -1 if the
+    // The length of the request_ body in bytes made available by the input stream or -1 if the
     // length is not known.
-    ss << request.body().size();
-    v_env.push_back("CONTENT_LENGTH=" + ss.str() + "");
+    ss << request_.body().size();
+    v_env_.push_back("CONTENT_LENGTH=" + ss.str() + "");
 
     // The revision of the CGI specification being used by the server to communicate with the
     // script. It is "CGI/1.1"
-    v_env.push_back("GATEWAY_INTERFACE=CGI/1.1");
+    v_env_.push_back("GATEWAY_INTERFACE=CGI/1.1");
 
     // specifies the content types your browser supports. For example, text/xml.
-    it = request.find_header("Accept");
-    if (it != request.headers_end())
-        v_env.push_back("HTTP_ACCEPT=" + it->second);
+    it = request_.find_header("Accept");
+    if (it != request_.headers_end())
+        v_env_.push_back("HTTP_ACCEPT=" + it->second);
 
     // Defines the type of encoding that may be carried out on content returned to the client. For
     // example, compress;q=0.5
-    it = request.find_header("Accept-Encoding");
-    if (it != request.headers_end())
-        v_env.push_back("HTTP_ACCEPT_ENCODING=" + it->second);
+    it = request_.find_header("Accept-Encoding");
+    if (it != request_.headers_end())
+        v_env_.push_back("HTTP_ACCEPT_ENCODING=" + it->second);
 
     // Used to define which languages you would prefer to receive content in. For example, en;q=0.5.
     // If nothing is returned, no language preference is indicated.
-    it = request.find_header("Accept Language");
-    if (it != request.headers_end())
-        v_env.push_back("HTTP_ACCEPT_LANGUAGE=" + it->second);
+    it = request_.find_header("Accept Language");
+    if (it != request_.headers_end())
+        v_env_.push_back("HTTP_ACCEPT_LANGUAGE=" + it->second);
 
-    // If the request was forwarded, shows the address and port through of the proxy server.
-    it = request.find_header("Forwarded");
-    if (it != request.headers_end())
-        v_env.push_back("HTTP_FOWARDED=" + it->second);
+    // If the request_ was forwarded, shows the address and port through of the proxy server.
+    it = request_.find_header("Forwarded");
+    if (it != request_.headers_end())
+        v_env_.push_back("HTTP_FOWARDED=" + it->second);
 
-    // Specifies the Internet host and port number of the resource being requested.
-    it = request.find_header("Host");
-    if (it != request.headers_end())
-        v_env.push_back("HTTP_HOST=" + it->second);
+    // Specifies the Internet host and port number of the resource being request_ed.
+    it = request_.find_header("Host");
+    if (it != request_.headers_end())
+        v_env_.push_back("HTTP_HOST=" + it->second);
 
     // Used by a client to identify itself (or its user) to a proxy which requires authentication.
-    it = request.find_header("Proxy-Authorization");
-    if (it != request.headers_end())
-        v_env.push_back("PROXY_AUTHORIZATION=" + it->second);
+    it = request_.find_header("Proxy-Authorization");
+    if (it != request_.headers_end())
+        v_env_.push_back("PROXY_AUTHORIZATION=" + it->second);
 
-    // The type and version of the browser the client is using to send the request. For example,
+    // The type and version of the browser the client is using to send the request_. For example,
     // Mozilla/1.5
-    it = request.find_header("User-Agent");
-    if (it != request.headers_end())
-        v_env.push_back("HTTP_USER_AGENT=" + it->second);
+    it = request_.find_header("User-Agent");
+    if (it != request_.headers_end())
+        v_env_.push_back("HTTP_USER_AGENT=" + it->second);
 
-    // Optionally contains extra path information from the HTTP request that invoked the script,
+    // Optionally contains extra path information from the HTTP request_ that invoked the script,
     // specifying a path to be interpreted by the CGI script. PATH_INFO identifies the resource or
     // sub-resource to be returned by the CGI script, and it is derived from the portion of the URI
     // path following the script name but preceding any query data.
-    v_env.push_back("PATH_INFO=" + request.path());
+    v_env_.push_back("PATH_INFO=" + request_.path());
 
-    // The query string that is contained in the request URL after the path.
-    v_env.push_back("QUERY_STRING=" + request.query_str());
-    // Returns the IP address of the client that sent the request. For HTTP servlets, the value
+    // The query string that is contained in the request_ URL after the path.
+    v_env_.push_back("QUERY_STRING=" + request_.query_str());
+    // Returns the IP address of the client that sent the request_. For HTTP servlets, the value
     // returned is the same as the value of the CGI variable REMOTE_ADDR.
-    v_env.push_back("REMOTE_ADDR=" + config.listen.address);
+    v_env_.push_back("REMOTE_ADDR=" + config.listen.address);
 
-    // The fully-qualified name of the client that sent the request, or the IP address of the client
+    // The fully-qualified name of the client that sent the request_, or the IP address of the client
     // if the name cannot be determined
-    it = request.find_header("Host");
-    if (it != request.headers_end())
-        v_env.push_back("REMOTE_HOST=" + it->second);
-    // Returns the name of the HTTP method with which this request was made. For example, GET, POST,
+    it = request_.find_header("Host");
+    if (it != request_.headers_end())
+        v_env_.push_back("REMOTE_HOST=" + it->second);
+    // Returns the name of the HTTP method with which this request_ was made. For example, GET, POST,
     // or PUT.
-    const char* method_name = method_str(request.method());
-    std::string method_join("REQUEST_METHOD=");
+    const char* method_name = method_str(request_.method());
+    std::string method_join("request__METHOD=");
     method_join += method_name;
-    v_env.push_back(method_join);
+    v_env_.push_back(method_join);
 
     // Returns the part of the URL from the protocol name up to the query string in the first line
-    // of the HTTP request.
+    // of the HTTP request_.
     std::string join("SCRIPT_NAME=");
-    join += cmd[0];
-    v_env.push_back(join);
+    join += cmd_[0];
+    v_env_.push_back(join);
     if (config.server_name.size() > 0)
-        v_env.push_back("SERVER_NAME=" + config.server_name[0]);
+        v_env_.push_back("SERVER_NAME=" + config.server_name[0]);
 
-    // Returns the port number on which this request was received. For HTTP servlets, the value
+    // Returns the port number on which this request_ was received. For HTTP servlets, the value
     // returned is the same as the value of the CGI variable SERVER_PORT.
     ss << config.listen.port;
-    v_env.push_back("SERVER_PORT=" + ss.str() + "");
+    v_env_.push_back("SERVER_PORT=" + ss.str() + "");
 
-    envp_size = v_env.size();
-    envp = new char*[envp_size + 1];
-    for (std::size_t i = 0; i < envp_size; i++) {
-        envp[i] = new char[v_env[i].size() + 1];
-        strcpy(envp[i], v_env[i].c_str());
-		envp[i][v_env[i].size()] = 0;
+    envp_size_ = v_env_.size();
+    envp_ = new char*[envp_size_ + 1];
+    for (std::size_t i = 0; i < envp_size_; i++) {
+        envp_[i] = new char[v_env_[i].size() + 1];
+        strcpy(envp_[i], v_env_[i].c_str());
+		envp_[i][v_env_[i].size()] = 0;
     }
-    envp[envp_size] = NULL;
-	printEnv();
+    envp_[envp_size_] = NULL;
+	print_env();
 }
 
-void Script::printEnv() const
+void Script::print_env() const
 {
     std::size_t i = 0;
     std::cout << "|!|PRINTING CGI ENV|!|\n";
-    while (envp[i]) {
-        std::cout << envp[i] << "\n";
+    while (envp_[i]) {
+        std::cout << envp_[i] << "\n";
         i++;
     }
     std::cout << std::flush;
