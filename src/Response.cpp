@@ -155,10 +155,24 @@ void Response::setHtmlBody()
     }
 }
 
+void Response::setContentType()
+{
+  std::string extension = body.substr(body.find_last_of(".") + 1);
+  if (extension == "jpg" || extension == "jpeg")
+    content_type = "image/jpeg";
+  else if (extension == "png")
+    content_type = "image/png";
+  else if (extension == "gif")
+    content_type = "image/gif";
+  else if (extension == "mp4")
+    content_type = "video/mp4";
+}
+
 void Response::setHtmlHeader()
 {
   std::stringstream header_stream;
 
+  setContentType();
   header_stream << "HTTP/1.1 " << status_code << " " << StatusCodes::getCodeMsg(status_code)
     << "\r\n"
     << "Access-Control-Allow-Origin: *\r\n";

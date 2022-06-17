@@ -56,6 +56,7 @@ public:
 private:
     void createCodeMsg();
     void buildHeaderString();
+    void setContentType();
 
 public:
     std::string body;
