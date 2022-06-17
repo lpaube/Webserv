@@ -70,6 +70,7 @@ private:
     size_t status_code;
     std::string status_code_msg;
     std::string full_path;
+    std::string content_type;
     // std::string location;
     // std::string headerString;
     // std::string codeMsg;

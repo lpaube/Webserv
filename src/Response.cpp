@@ -25,6 +25,7 @@ Response::Response(const Request& request, std::vector<Config>& response_configs
     full_path = "." + request.path();
     this->config = response_configs[0];
     this->status_code = 200;
+    this->content_type = "text/html";
 }
 
 void Response::setStatusCode(size_t code)
@@ -162,7 +163,9 @@ void Response::setHtmlHeader()
     << "\r\n"
     << "Access-Control-Allow-Origin: *\r\n";
   header_size = header_stream.str().size();
-  header_stream << "Content Length: " << header_size + body_size << "\r\n\r\n";
+  header_stream << "Content Length: " << header_size + body_size << "\r\n";
+  header_stream << "Content Type: " << content_type << "\r\n";
+  header_stream << "\r\n";
   header = header_stream.str();
   full_content = header + body;
 }
