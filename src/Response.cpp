@@ -26,8 +26,9 @@ Response::Response(const Request& request, std::vector<Config>& response_configs
     this->config = response_configs[0];
     this->status_code = 200;
     this->content_type = "text/html";
-    this->server = "Anginex";
+    this->server = "Anginex/1.0";
     this->root = config.root;
+    this->method = req.method();
     full_path = "." + this->root + req.path();
     std::cerr << "FULL path: " << full_path << std::endl;
 }

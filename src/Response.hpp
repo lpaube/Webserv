@@ -53,6 +53,7 @@ public:
 
     void setHtmlBody();
     void setHtmlHeader();
+    Method getMethod() {return method;};
 
 private:
     void createCodeMsg();
@@ -74,6 +75,7 @@ private:
     size_t body_size;
     size_t header_size;
     size_t status_code;
+    Method method;
     std::string status_code_msg;
     std::string root;
     std::string full_path;
