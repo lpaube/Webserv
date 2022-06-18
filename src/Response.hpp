@@ -70,7 +70,6 @@ public:
     std::string full_content;
 
 private:
-    // std::map<int, std::string> codeList;
     Config config;
     Request req;
     size_t body_size;
@@ -85,7 +84,5 @@ private:
     std::string host;
     std::string allow;
     std::string server;
-    // std::string location;
-    // std::string headerString;
-    // std::string codeMsg;
+    std::string location_match;
 };

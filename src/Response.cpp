@@ -23,6 +23,7 @@ Response::Response(const Request& request, std::vector<Config>& response_configs
     throw "No config matches the request";
   }
   req = request;
+  this->location_match = "";
   config = getSingularConfig(response_configs[0]);
   this->status_code = 200;
   this->content_type = "text/html";
@@ -41,8 +42,13 @@ Config Response::getSingularConfig(Config og_config)
       it != og_config.location.end();
       ++it)
   {
+    //std::cout << "this is location.size(): " << og_config.location.size() << std::endl;
+    //std::cout << "this is location_match: " << it->location_match << std::endl;
+    //std::cout << "this is req.path(): " << req.path() << std::endl;
     if (it->location_match == req.path())
     {
+      og_config.location_match = it->location_match;
+
       og_config.error_page = it->error_page;
       og_config.client_max_body_size = it->client_max_body_size;
       og_config.limit_except = it->limit_except;

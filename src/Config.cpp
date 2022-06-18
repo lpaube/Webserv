@@ -16,6 +16,9 @@ Config& Config::operator=(const Config& other)
 
 void Config::Location::print_location()
 {
+  // location_match
+    std::cout << "===== location_match =====" << std::endl;
+    std::cout << location_match << std::endl;
     // error_page
     std::cout << "===== error_page =====" << std::endl;
     int i = 0;

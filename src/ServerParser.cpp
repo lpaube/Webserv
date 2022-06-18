@@ -233,7 +233,11 @@ void ServerParser::parse_location_vars()
 {
   for (std::vector<LocationContent>::iterator location_it = location.begin();
       location_it != location.end(); ++location_it) {
+    std::cout << "THIS IS A NEW LOCATION_IT" << std::endl;
     Config::Location new_location;
+    
+    //Adding path to location_match of location
+    new_location.location_match = location_it->path;
     this->init_location_vars(new_location);
     for (std::vector<std::string>::iterator it = location_it->loc_content.begin();
         it != location_it->loc_content.end(); ++it) {
@@ -298,7 +302,7 @@ void ServerParser::parse_location_vars()
           }
           if (directives[1] == "on")
             new_location.autoindex = true;
-          else if (directives[1] == "on")
+          else if (directives[1] == "off")
             new_location.autoindex = false;
           else {
             throw("autoindex: invalid argument");
@@ -323,8 +327,9 @@ void ServerParser::parse_location_vars()
       } else {
         throw("In new_location file: Not enough arguments provided");
       }
-      config.location.push_back(new_location);
     }
+      std::cout << "NEW LOCATION:=======" << std::endl;
+      config.location.push_back(new_location);
   }
 }
 
@@ -421,7 +426,7 @@ void ServerParser::parse_location_vars()
             throw("autoindex: wrong number of args");
           if (directives[1] == "on")
             config.autoindex = true;
-          else if (directives[1] == "on")
+          else if (directives[1] == "off")
             config.autoindex = false;
           else
             throw("autoindex: invalid argument");
