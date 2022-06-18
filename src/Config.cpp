@@ -1,5 +1,19 @@
 #include "Config.hpp"
 
+Config& Config::operator=(const Config& other)
+{
+  listen = other.listen;
+  server_name = other.server_name;
+  error_page = other.error_page;
+  client_max_body_size = other.client_max_body_size;
+  limit_except = other.limit_except;
+  root = other.root;
+  autoindex = other.autoindex;
+  index = other.index;
+  cgi_ext = other.cgi_ext;
+  return *this;
+}
+
 void Config::Location::print_location()
 {
     // error_page
@@ -19,12 +33,6 @@ void Config::Location::print_location()
     // client_max_body_size
     std::cout << "===== client_max_body_size =====" << std::endl;
     std::cout << "max_body_size: " << client_max_body_size << std::endl;
-    std::cout << std::endl;
-
-    // return
-    std::cout << "===== return =====" << std::endl;
-    std::cout << "code: " << return_redirect.code << std::endl;
-    std::cout << "redirection url: " << return_redirect.url << std::endl;
     std::cout << std::endl;
 
     // root
@@ -97,12 +105,6 @@ void Config::print_config()
     // client_max_body_size
     std::cout << "===== client_max_body_size =====" << std::endl;
     std::cout << "max_body_size: " << client_max_body_size << std::endl;
-    std::cout << std::endl;
-
-    // return
-    std::cout << "===== return =====" << std::endl;
-    std::cout << "code: " << return_redirect.code << std::endl;
-    std::cout << "redirection url: " << return_redirect.url << std::endl;
     std::cout << std::endl;
 
     // root

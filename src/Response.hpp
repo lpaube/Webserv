@@ -62,6 +62,7 @@ private:
     void setDate();
     void setHost();
     int setAllow();
+    Config getSingularConfig(Config og_config);
 
 public:
     std::string body;

@@ -18,27 +18,47 @@
 
 Response::Response(const Request& request, std::vector<Config>& response_configs)
 {
-    req = request;
-    if (response_configs.size() == 0) {
-        std::cerr << "NO CONFIG MATCH" << std::endl;
-        throw "No config matches the request";
+  if (response_configs.size() == 0) {
+    std::cerr << "NO CONFIG MATCH" << std::endl;
+    throw "No config matches the request";
+  }
+  req = request;
+  config = getSingularConfig(response_configs[0]);
+  this->status_code = 200;
+  this->content_type = "text/html";
+  this->server = "Anginex/1.0";
+  this->root = config.root;
+  this->method = req.method();
+  full_path = "." + this->root + req.path();
+  std::cerr << "Req path: " << req.path() << std::endl;
+  std::cerr << "Root path: " << this->root << std::endl;
+  std::cerr << "FULL path: " << full_path << std::endl;
+}
+
+Config Response::getSingularConfig(Config og_config)
+{
+  for (std::vector<Config::Location>::iterator it = og_config.location.begin();
+      it != og_config.location.end();
+      ++it)
+  {
+    if (it->location_match == req.path())
+    {
+      og_config.error_page = it->error_page;
+      og_config.client_max_body_size = it->client_max_body_size;
+      og_config.limit_except = it->limit_except;
+      og_config.root = it->root;
+      og_config.autoindex = it->autoindex;
+      og_config.index = it->index;
+      og_config.cgi_ext = it->cgi_ext;
     }
-    this->config = response_configs[0];
-    this->status_code = 200;
-    this->content_type = "text/html";
-    this->server = "Anginex/1.0";
-    this->root = config.root;
-    this->method = req.method();
-    full_path = "." + this->root + req.path();
-    std::cerr << "Req path: " << req.path() << std::endl;
-    std::cerr << "Root path: " << this->root << std::endl;
-    std::cerr << "FULL path: " << full_path << std::endl;
+  }
+  return og_config;
 }
 
 void Response::setStatusCode(size_t code)
 {
-    this->status_code = code;
-    this->status_code_msg = StatusCode::get_code_msg(code);
+  this->status_code = code;
+  this->status_code_msg = StatusCode::get_code_msg(code);
 }
 
 void Response::checkErrorCode()
@@ -79,85 +99,85 @@ void Response::checkErrorCode()
 
 void Response::setHtmlBody()
 {
-    std::string line;
-    std::stringstream body_stream;
-    std::ifstream requested_file;
+  std::string line;
+  std::stringstream body_stream;
+  std::ifstream requested_file;
 
-    body.clear();
-    /*
-     * Check path access
-     */
-    if (access(full_path.c_str(), F_OK | R_OK) != 0)
-    {
-      status_code = 404;
-      return;
-    }
+  body.clear();
+  /*
+   * Check path access
+   */
+  if (access(full_path.c_str(), F_OK | R_OK) != 0)
+  {
+    status_code = 404;
+    return;
+  }
 
-    /*
-     * Handle directives index and autoindex
-     */
-    if (*(full_path.end() - 1) == '/')
+  /*
+   * Handle directives index and autoindex
+   */
+  if (*(full_path.end() - 1) == '/')
+  {
+    for (std::vector<std::string>::iterator it = config.index.begin();
+        it != config.index.end();
+        ++it)
     {
-      for (std::vector<std::string>::iterator it = config.index.begin();
-          it != config.index.end();
-          ++it)
+      requested_file.open((full_path + *it).c_str());
+      if (requested_file.is_open())
       {
-        requested_file.open((full_path + *it).c_str());
-        if (requested_file.is_open())
-        {
-          full_path += *it;
-          break;
-        }
-      }
-      /*
-       * Making the files hierarchy for autoindex
-       */
-      if (config.autoindex == true && !requested_file.is_open())
-      {
-        DIR *dir;
-
-        body_stream << "<h1>Listing files in directory (autoindex=on)</h1>\r\n"
-                    << "<ul>\r\n";
-        struct dirent *ent;
-        if ((dir = opendir(full_path.c_str())) != NULL)
-        {
-          while ((ent = readdir(dir)) != NULL)
-          {
-            body_stream << "<li>" << ent->d_name << "</li>" << "\r\n";
-          }
-          closedir(dir);
-        }
-        body_stream << "</ul>\r\n";
-        // Can probably avoid repeat with below
-        body_stream << "\r\n";
-        body = body_stream.str();
-        body_size = body.size();
-        if (body_size > getConfig().client_max_body_size)
-          setStatusCode(413);
-        return;
+        full_path += *it;
+        break;
       }
     }
-    else
+    /*
+     * Making the files hierarchy for autoindex
+     */
+    if (config.autoindex == true && !requested_file.is_open())
     {
-      requested_file.open(full_path.c_str());
-    }
+      DIR *dir;
 
-    if (!requested_file.is_open()) {
-      setStatusCode(400);
-      std::cerr << "There was an error when trying to open the html file." << std::endl;
-    } else {
-      setStatusCode(200);
-      // body.clear();
-      while (getline(requested_file, line)) {
-        body_stream << line << "\r\n";
+      body_stream << "<h1>Listing files in directory (autoindex=on)</h1>\r\n"
+        << "<ul>\r\n";
+      struct dirent *ent;
+      if ((dir = opendir(full_path.c_str())) != NULL)
+      {
+        while ((ent = readdir(dir)) != NULL)
+        {
+          body_stream << "<li>" << ent->d_name << "</li>" << "\r\n";
+        }
+        closedir(dir);
       }
-      requested_file.close();
+      body_stream << "</ul>\r\n";
+      // Can probably avoid repeat with below
       body_stream << "\r\n";
       body = body_stream.str();
       body_size = body.size();
       if (body_size > getConfig().client_max_body_size)
         setStatusCode(413);
+      return;
     }
+  }
+  else
+  {
+    requested_file.open(full_path.c_str());
+  }
+
+  if (!requested_file.is_open()) {
+    setStatusCode(400);
+    std::cerr << "There was an error when trying to open the html file." << std::endl;
+  } else {
+    setStatusCode(200);
+    // body.clear();
+    while (getline(requested_file, line)) {
+      body_stream << line << "\r\n";
+    }
+    requested_file.close();
+    body_stream << "\r\n";
+    body = body_stream.str();
+    body_size = body.size();
+    if (body_size > getConfig().client_max_body_size)
+      setStatusCode(413);
+  }
 }
 
 void Response::setContentType()
