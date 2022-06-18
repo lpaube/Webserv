@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 15:57:07 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/17 14:49:42 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/17 16:36:41 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,8 @@ void Response::setHtmlBody()
 
 void Response::setContentType()
 {
-  std::string extension = body.substr(body.find_last_of(".") + 1);
+  std::string extension = full_path.substr(full_path.find_last_of(".") + 1);
+  std::cout << "@@@@@This is extension: " << extension << std::endl;
   if (extension == "jpg" || extension == "jpeg")
     content_type = "image/jpeg";
   else if (extension == "png")
@@ -170,16 +171,28 @@ void Response::setContentType()
     content_type = "text/markdown";
 }
 
+void Response::setDate()
+{
+  char buf[1000];
+
+  time_t now = time(0);
+  struct tm tm = *gmtime(&now);
+  strftime(buf, sizeof buf, "%a, %d %b %Y %H:%S %Z", &tm);
+  date_now = std::string(buf);
+}
+
 void Response::setHtmlHeader()
 {
   std::stringstream header_stream;
 
   setContentType();
+  setDate();
   header_stream << "HTTP/1.1 " << status_code << " " << StatusCode::get_code_msg(status_code)
     << "\r\n"
     << "Access-Control-Allow-Origin: *\r\n";
   header_size = header_stream.str().size();
-  header_stream << "Content Length: " << header_size + body_size << "\r\n";
+  header_stream << "Date: " << date_now << "\r\n";
+  header_stream << "Content Length: " << body_size << "\r\n";
   header_stream << "Content Type: " << content_type << "\r\n";
   header_stream << "\r\n";
   header = header_stream.str();
