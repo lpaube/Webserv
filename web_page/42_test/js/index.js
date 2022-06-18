@@ -5,7 +5,7 @@
 
     var get_test_html = document.getElementById("test_html");
     get_test_html.onclick = () =>	{
-      fetch("http://127.0.0.1:8000/web_page/42_test/test.html", {
+      fetch("http://127.0.0.1:8000/test.html", {
         method: "GET"
       }).then(response => response.text())
         .then((content) => {
@@ -15,7 +15,7 @@
 
     var image_test = document.getElementById("image_test");
     image_test.onclick = () =>	{
-      fetch("http://127.0.0.1:8000/web_page/42_test/test_image.png", {
+      fetch("http://127.0.0.1:8000/test_image.png", {
         method: "GET"
       }).then(response => response.text())
         .then((content) => {

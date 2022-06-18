@@ -75,6 +75,7 @@ private:
     size_t header_size;
     size_t status_code;
     std::string status_code_msg;
+    std::string root;
     std::string full_path;
     std::string content_type;
     std::string date_now;

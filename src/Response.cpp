@@ -23,11 +23,13 @@ Response::Response(const Request& request, std::vector<Config>& response_configs
         std::cerr << "NO CONFIG MATCH" << std::endl;
         throw "No config matches the request";
     }
-    full_path = "." + req.path();
     this->config = response_configs[0];
     this->status_code = 200;
     this->content_type = "text/html";
     this->server = "Anginex";
+    this->root = config.root;
+    full_path = "." + this->root + req.path();
+    std::cerr << "FULL path: " << full_path << std::endl;
 }
 
 void Response::setStatusCode(size_t code)
@@ -85,7 +87,6 @@ void Response::setHtmlBody()
     if (access(full_path.c_str(), F_OK | R_OK) != 0)
     {
       status_code = 404;
-      std::cout << "This is a 404! (Response::setHtmlBody)" << std::endl;
       return;
     }
 
