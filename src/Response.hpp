@@ -63,6 +63,7 @@ private:
     void setHost();
     int setAllow();
     Config getSingularConfig(Config og_config);
+    int getSingularLocation(Location loc, std::string path);
 
 public:
     std::string body;

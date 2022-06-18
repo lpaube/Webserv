@@ -12,7 +12,7 @@ server{
 	cgi_ext		.py /usr/bin/python;
 
 	location / {
-    root /web_page/;
+    root ./web_page;
     client_max_body_size 800m;
     index index.html;
 	}

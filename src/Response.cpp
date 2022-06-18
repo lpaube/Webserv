@@ -30,10 +30,16 @@ Response::Response(const Request& request, std::vector<Config>& response_configs
   this->server = "Anginex/1.0";
   this->root = config.root;
   this->method = req.method();
-  full_path = "." + this->root + req.path();
+  full_path = this->root + req.path();
   std::cerr << "Req path: " << req.path() << std::endl;
   std::cerr << "Root path: " << this->root << std::endl;
   std::cerr << "FULL path: " << full_path << std::endl;
+}
+
+int Response::getSingularLocation(Location loc, std::string path)
+{
+  
+  return 0;
 }
 
 Config Response::getSingularConfig(Config og_config)
@@ -45,7 +51,7 @@ Config Response::getSingularConfig(Config og_config)
     //std::cout << "this is location.size(): " << og_config.location.size() << std::endl;
     //std::cout << "this is location_match: " << it->location_match << std::endl;
     //std::cout << "this is req.path(): " << req.path() << std::endl;
-    if (it->location_match == req.path())
+    if (getSingularLocation(*it, req.path()) == 1)
     {
       og_config.location_match = it->location_match;
 
