@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   TcpConnection.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 16:07:13 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/17 16:31:14 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,10 +70,11 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
 {
     std::cout << "|!|IN_CONNECTION_WRITE_EVENT|!|" << std::endl;
 
-    std::vector<Config> resp_configs = get_response_configs(server_configs);
+    std::vector<Config> resp_configs = server_configs;
 
     std::string msg;
-    if (req_.path().find("cgi-bin/") != std::string::npos) {
+	std::size_t len = req_.path().length();
+    if (req_.path().find("cgi-bin/") != std::string::npos && req_.path()[len - 1] != '/') {
         std::cout << "|!|IN SCRIPT|!|" << std::endl;
 
         Script script(resp_configs[0], req_);
@@ -105,7 +106,7 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
 
         std::cout << "|!|FILE RESPONSE BUILT|!|" << std::endl;
     }
-
+	std::cout << "PRINTING RESPONSE\n" << msg << std::endl;
     write(fd(), msg.c_str(), msg.length());
     // TODO: check err and if all bytes were sent
 }
@@ -332,13 +333,15 @@ void TcpConnection::parse_http_request_body_content_length()
         req_.set_raw_body(data_);
         data_.clear();
         req_.decode_raw_body();
-        print_bytes(req_.body());
         set_state(S_WRITE);
     }
 }
 
 void TcpConnection::parse_http_request_body_chunked()
 {
+    req_.set_raw_body(data_);
+    data_.clear();
+    req_.decode_raw_body();
     set_state(S_WRITE);
 }
 
