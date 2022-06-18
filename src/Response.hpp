@@ -15,6 +15,7 @@
 #include "Request.hpp"
 #include <string>
 #include <unistd.h>
+#include <time.h>
 
 #pragma once
 
@@ -52,11 +53,15 @@ public:
 
     void setHtmlBody();
     void setHtmlHeader();
+    Method getMethod() {return method;};
 
 private:
     void createCodeMsg();
     void buildHeaderString();
     void setContentType();
+    void setDate();
+    void setHost();
+    int setAllow();
 
 public:
     std::string body;
@@ -66,12 +71,19 @@ public:
 private:
     // std::map<int, std::string> codeList;
     Config config;
+    Request req;
     size_t body_size;
     size_t header_size;
     size_t status_code;
+    Method method;
     std::string status_code_msg;
+    std::string root;
     std::string full_path;
     std::string content_type;
+    std::string date_now;
+    std::string host;
+    std::string allow;
+    std::string server;
     // std::string location;
     // std::string headerString;
     // std::string codeMsg;

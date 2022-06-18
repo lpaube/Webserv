@@ -90,16 +90,23 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
         }
 
         Response response(req_, resp_configs);
-        response.setHtmlBody();
-        response.checkErrorCode();
-        response.setHtmlHeader();
-        response.full_content = response.header + response.body;
+        if (response.getMethod() == GET)
+        {
+          response.setHtmlBody();
+          response.checkErrorCode();
+          response.setHtmlHeader();
+          response.full_content = response.header + response.body;
+        }
+        else if (response.getMethod() == DELETE)
+        {
+          
+        }
 
         msg = response.full_content;
 
         std::cout << "|!|FILE RESPONSE BUILT|!|" << std::endl;
     }
-	std::cout << "PRINTING RESPONSE\n" << msg << std::endl;
+	//std::cout << "PRINTING RESPONSE\n" << msg << std::endl;
     write(fd(), msg.c_str(), msg.length());
     // TODO: check err and if all bytes were sent
 }
