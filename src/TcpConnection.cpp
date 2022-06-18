@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/17 16:31:14 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/18 12:54:10 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #define BUF_SIZE (1024 * 8)
 
@@ -69,7 +71,6 @@ void TcpConnection::handle_read_event()
 void TcpConnection::handle_write_event(const std::vector<Config>& server_configs)
 {
     std::cout << "|!|IN_CONNECTION_WRITE_EVENT|!|" << std::endl;
-
     std::vector<Config> resp_configs = server_configs;
 
     std::string msg;
@@ -375,11 +376,14 @@ TcpConnection::get_response_configs(const std::vector<Config>& server_configs) c
     std::vector<Config> response_configs;
     Request::header_iterator it = req_.find_header("host");
 
-    // TODO: if it == end();
-
+    if(it == req_.headers_end())
+		throw Exception("Cannot find host");
     const std::string& host = it->second;
-    std::cout << "============This is host: " << host << "=============" << std::endl;
     for (unsigned long i = 0; i < server_configs.size(); i++) {
+
+		in_addr addr_config;
+		addr_config.s_addr = inet_addr(server_configs[i].listen.address.c_str());
+		//if (addr_config.s_addr == addr_.s_addr)
         if (host == server_configs[i].listen.combined) {
             response_configs.push_back(server_configs[i]);
         }

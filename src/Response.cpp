@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 15:57:07 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/17 16:36:41 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/18 12:29:48 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,12 +48,12 @@ void Response::checkErrorCode()
           std::cout << "Status code match!" << std::endl;
           if (access((it->uri).c_str(), F_OK | R_OK) == 0)
           {
-            std::cout << "Erro code file access good!" << std::endl;
+            std::cout << "Error code file access good!" << std::endl;
             full_path = it->uri;
             setHtmlBody();
             return;
           }
-          std::cout << "Erro code file access bad!" << std::endl;
+          std::cout << "Error code file access bad!" << std::endl;
         }
       }
     }
