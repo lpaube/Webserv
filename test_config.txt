@@ -1,22 +1,20 @@
 server{
 	listen 127.0.0.1:8000;
-  server_name Cyborgab www.Cyborgab.com;
+  server_name redxred.com www.redxred.com;
   client_max_body_size 80m;
   error_page    404  ./web_page/Error/error404.html;
   error_page    504 505 ./web_page/Error/default.html;
-  index teest.html;
+  index index.html;
   autoindex on;
-  cgi_ext		.py /usr/bin/python3;
+ 
   cgi_ext		.sh /bin/bash;
-  root /somepath/fdf;
-	location test/{
-    client_max_body_size 800m;
-    limit_except GET POST DELETE;
-	cgi_ext		.py /usr/bin/python3;
-	}
-	location test2/super/coucou{
-    root /somepatfdsfh/fdf;
-	}
-  return 345 /somereturn/url;
-}
+  cgi_ext		.py /usr/bin/python3;
+  limit_except GET POST DELETE;
 
+	location /test {
+    root /hello;
+    client_max_body_size 800m;
+    index test.html;
+	}
+
+}

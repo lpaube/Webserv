@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 17:04:18 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/18 18:13:32 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ void Server::run()
                 switch (s->type()) {
                     case TCP_LISTENER:
                         try {
-                            accept_connection(s);
+                            accept_connection(static_cast<TcpListener*>(s));
                         } catch (const Request::Exception& ex) {
 
                         } catch (const std::exception& ex) {
@@ -131,11 +131,13 @@ void Server::run()
     sockets_.close_all();
 }
 
-void Server::accept_connection(Socket* socket)
+void Server::accept_connection(TcpListener* socket)
 {
     TcpConnection* c = new TcpConnection(socket->fd());
 
     sockets_.insert(std::make_pair(c->fd(), static_cast<Socket*>(c)), POLLIN | POLLOUT);
+	c->set_addr(socket->address());
+	c->set_port(socket->port());
     std::cout << "Accepted connection: " << c->fd() << std::endl;
 }
 

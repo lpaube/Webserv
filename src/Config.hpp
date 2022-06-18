@@ -50,6 +50,7 @@ public:
     std::vector<std::string> server_name;
     std::vector<Error_page> error_page;
     unsigned long client_max_body_size; // Represented in bytes but only takes m in config
+    std::vector<std::string> limit_except;
     Return_redirect return_redirect;
     std::string root;
     bool autoindex;

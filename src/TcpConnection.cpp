@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/18 12:54:10 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/18 18:15:43 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,9 +78,30 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
     if (req_.path().find("cgi-bin/") != std::string::npos && req_.path()[len - 1] != '/') {
         std::cout << "|!|IN SCRIPT|!|" << std::endl;
 
-        Script script(resp_configs[0], req_);
-        msg = script.exec();
-
+        try{
+			Script script(resp_configs[0], req_);
+			msg = script.exec();
+			if (write(fd(), msg.c_str(), msg.length()) < 0){
+				throw Exception("Error fatal, write");
+			}
+		} catch(const std::exception& ex){
+			std::cout << ex.what() << std::endl;
+			Response response(req_, resp_configs);
+			std::string exec_msg("Error fatal, execve\n");
+			std::string ext_msg("Error: No script extention found\n");
+			if (exec_msg.compare(ex.what()) == 0 || ext_msg.compare(ex.what()) == 0){
+				response.setStatusCode(404);
+			}
+			else{
+				response.setStatusCode(500);
+			}
+          	response.checkErrorCode();
+          	response.setHtmlHeader();
+          	msg = response.header + response.body;
+			write(fd(), msg.c_str(), msg.length());
+	}
+	Script script(resp_configs[0], req_);
+	msg = script.exec();
         std::cout << "|!|OUT OF SCRIPT|!|" << std::endl;
     } else {
         std::cout << "|!|IN FILE RESPONSE|!|" << std::endl;
@@ -91,23 +112,35 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
         }
 
         Response response(req_, resp_configs);
-        response.setHtmlBody();
-        response.checkErrorCode();
-        response.setHtmlHeader();
-        response.full_content = response.header + response.body;
+        if (response.getMethod() == GET)
+        {
+          response.setHtmlBody();
+          response.checkErrorCode();
+          response.setHtmlHeader();
+          response.full_content = response.header + response.body;
+        }
+        else if (response.getMethod() == DELETE)
+        {
+          
+        }
 
         msg = response.full_content;
-
+		write(fd(), msg.c_str(), msg.length()); // TODO: check err and if all bytes were sent
         std::cout << "|!|FILE RESPONSE BUILT|!|" << std::endl;
     }
-	std::cout << "PRINTING RESPONSE\n" << msg << std::endl;
-    write(fd(), msg.c_str(), msg.length());
-    // TODO: check err and if all bytes were sent
 }
 
 const Request& TcpConnection::request() const
 {
     return req_;
+}
+
+void TcpConnection::set_addr(in_addr addr){
+	this->inaddr_ = addr;
+}
+
+void	TcpConnection::set_port(uint16_t port){
+	this->port_ = port;
 }
 
 void TcpConnection::parse_http_request_line()
@@ -383,7 +416,9 @@ TcpConnection::get_response_configs(const std::vector<Config>& server_configs) c
 
 		in_addr addr_config;
 		addr_config.s_addr = inet_addr(server_configs[i].listen.address.c_str());
-		//if (addr_config.s_addr == addr_.s_addr)
+		if (addr_config.s_addr == this->inaddr_.s_addr && server_configs[i].listen.port == this->port_){
+			
+		}
         if (host == server_configs[i].listen.combined) {
             response_configs.push_back(server_configs[i]);
         }

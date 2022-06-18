@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 19:31:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/18 12:52:43 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/18 18:10:47 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include "Socket.hpp"
 #include <sys/socket.h>
 #include <vector>
+#include <netinet/in.h>
 
 class TcpConnection : public Socket
 {
@@ -40,6 +41,8 @@ public:
     void handle_read_event();
     void handle_write_event(const std::vector<Config>& server_configs);
     const Request& request() const;
+	void set_addr(in_addr addr);
+	void set_port(uint16_t port);
 
 private:
     void parse_http_request_line();
@@ -59,7 +62,9 @@ private:
 private:
     int listener_fd_;
     sockaddr addr_;
+	uint16_t port_;
     socklen_t addrlen_;
+	in_addr inaddr_;
     std::vector<char> data_;
     void (TcpConnection::*request_handler)();
     size_t req_size_;
