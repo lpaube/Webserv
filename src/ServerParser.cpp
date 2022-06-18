@@ -350,7 +350,7 @@ void ServerParser::init_server_vars()
   // config.server_name.push_back("");
   config.client_max_body_size = 1000;
   config.return_redirect.code = -1;
-  config.root = "html";
+  config.root = "";
   config.autoindex = false;
   config.index.push_back("index.html");
   //config.limit_except.push_back("GET");

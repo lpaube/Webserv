@@ -30,6 +30,8 @@ Response::Response(const Request& request, std::vector<Config>& response_configs
     this->root = config.root;
     this->method = req.method();
     full_path = "." + this->root + req.path();
+    std::cerr << "Req path: " << req.path() << std::endl;
+    std::cerr << "Root path: " << this->root << std::endl;
     std::cerr << "FULL path: " << full_path << std::endl;
 }
 
