@@ -224,9 +224,11 @@ void Response::setHtmlHeader()
   header_stream << "Date: " << date_now << "\r\n";
   header_stream << "Host: " << host << "\r\n";
   if (setAllow())
+  {
     header_stream << "Allow: " << allow << "\r\n";
-  header_stream << "Content Length: " << body_size << "\r\n";
-  header_stream << "Content Type: " << content_type << "\r\n";
+  }
+  header_stream << "Content-Length: " << body_size << "\r\n";
+  header_stream << "Content-Type: " << content_type << "\r\n";
   header_stream << "Server: " << server << "\r\n";
   header_stream << "\r\n";
   header = header_stream.str();

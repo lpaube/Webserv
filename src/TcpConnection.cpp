@@ -106,7 +106,7 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
 
         std::cout << "|!|FILE RESPONSE BUILT|!|" << std::endl;
     }
-	std::cout << "PRINTING RESPONSE\n" << msg << std::endl;
+	//std::cout << "PRINTING RESPONSE\n" << msg << std::endl;
     write(fd(), msg.c_str(), msg.length());
     // TODO: check err and if all bytes were sent
 }
