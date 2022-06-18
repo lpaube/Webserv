@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 19:04:31 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/17 13:38:36 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/17 22:34:52 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -269,7 +269,7 @@ void Request::decode_raw_body()
                     break;
                 case CNK_NL:
                     if (raw_body_.size() >= 2) {
-                        rbody_iter it = find_bytes(raw_body_, "\r\n", 2);
+                        const_rbody_iter it = find_bytes(raw_body_, "\r\n", 2);
                         if (it != raw_body_.end() && it == raw_body_.begin()) {
                             cnk_state_ = CNK_SIZE;
                             raw_body_.erase(raw_body_.begin(), raw_body_.begin() + 2);
@@ -283,7 +283,7 @@ void Request::decode_raw_body()
         }
     }
     if (all_chunks_received()) {
-        rbody_iter it = find_bytes(raw_body_, "\r\n", 2);
+        const_rbody_iter it = find_bytes(raw_body_, "\r\n", 2);
         if (it != raw_body_.end() && it == raw_body_.begin()) {
             raw_body_.clear();
         } else {
@@ -308,7 +308,7 @@ bool Request::read_chunk()
         read_all_chunk = true;
 
         if (raw_body_.size() >= 2) {
-            rbody_iter it = find_bytes(raw_body_, "\r\n", 2);
+            const_rbody_iter it = find_bytes(raw_body_, "\r\n", 2);
             if (it == raw_body_.end() || it != raw_body_.begin()) {
                 throw Exception("Bad request: Chunk doesn't end with \\r\\n");
             } else {
@@ -332,7 +332,7 @@ bool Request::read_chunk_size()
 {
     rbody_iter it = find_bytes(raw_body_, "\r\n", 2);
     if (it != raw_body_.end()) {
-        std::string chunk_size(rbody_iter(raw_body_.begin()), it);
+        std::string chunk_size(raw_body_.begin(), it);
         std::stringstream ss(chunk_size);
         ss << std::hex;
         ss >> cur_chunk_size_;

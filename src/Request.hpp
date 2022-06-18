@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 17:17:57 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/17 12:13:36 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/17 22:34:29 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@
 #include <unistd.h>
 #include <vector>
 
-enum ParseState {
+enum ParseState
+{
     REQ_METHOD,
     REQ_PATH,
     REQ_QUERY,
@@ -33,7 +34,8 @@ enum ParseState {
     REQ_BODY
 };
 
-enum Method {
+enum Method
+{
     BAD_METHOD,
     GET,
     POST,
@@ -41,7 +43,8 @@ enum Method {
     OPTIONS
 };
 
-enum ChunkState {
+enum ChunkState
+{
     CNK_SIZE,
     CNK_CHUNK,
     CNK_NL
@@ -74,7 +77,8 @@ public:
     header_iterator headers_end() const;
 
 private:
-    typedef std::vector<char>::const_iterator rbody_iter;
+    typedef std::vector<char>::const_iterator const_rbody_iter;
+    typedef std::vector<char>::iterator rbody_iter;
 
 private:
     bool chunked() const;
