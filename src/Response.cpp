@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: laube <laube@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 15:57:07 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/18 13:29:36 by laube            ###   ########.fr       */
+/*   Updated: 2022/06/18 16:38:00 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,7 +146,6 @@ void Response::setHtmlBody()
       setStatusCode(400);
       std::cerr << "There was an error when trying to open the html file." << std::endl;
     } else {
-      setStatusCode(200);
       // body.clear();
       while (getline(requested_file, line)) {
         body_stream << line << "\r\n";

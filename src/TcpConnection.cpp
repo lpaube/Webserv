@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/17 16:31:14 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/18 16:38:22 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,9 +77,30 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
     if (req_.path().find("cgi-bin/") != std::string::npos && req_.path()[len - 1] != '/') {
         std::cout << "|!|IN SCRIPT|!|" << std::endl;
 
-        Script script(resp_configs[0], req_);
-        msg = script.exec();
-
+        try{
+			Script script(resp_configs[0], req_);
+			msg = script.exec();
+			if (write(fd(), msg.c_str(), msg.length()) < 0){
+				throw Exception("Error fatal, write");
+			}
+		} catch(const std::exception& ex){
+			std::cout << ex.what() << std::endl;
+			Response response(req_, resp_configs);
+			std::string exec_msg("Error fatal, execve\n");
+			std::string ext_msg("Error: No script extention found\n");
+			if (exec_msg.compare(ex.what()) == 0 || ext_msg.compare(ex.what()) == 0){
+				response.setStatusCode(404);
+			}
+			else{
+				response.setStatusCode(500);
+			}
+          	response.checkErrorCode();
+          	response.setHtmlHeader();
+          	msg = response.header + response.body;
+			write(fd(), msg.c_str(), msg.length());
+	}
+	Script script(resp_configs[0], req_);
+	msg = script.exec();
         std::cout << "|!|OUT OF SCRIPT|!|" << std::endl;
     } else {
         std::cout << "|!|IN FILE RESPONSE|!|" << std::endl;
@@ -103,12 +124,9 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
         }
 
         msg = response.full_content;
-
+		write(fd(), msg.c_str(), msg.length()); // TODO: check err and if all bytes were sent
         std::cout << "|!|FILE RESPONSE BUILT|!|" << std::endl;
     }
-	//std::cout << "PRINTING RESPONSE\n" << msg << std::endl;
-    write(fd(), msg.c_str(), msg.length());
-    // TODO: check err and if all bytes were sent
 }
 
 const Request& TcpConnection::request() const

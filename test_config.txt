@@ -6,10 +6,10 @@ server{
   error_page    504 505 ./web_page/Error/default.html;
   index index.html;
   autoindex on;
-  cgi_ext		.py /usr/bin/python3;
+ 
   cgi_ext		.sh /bin/bash;
+  cgi_ext		.py /usr/bin/python3;
   limit_except GET POST DELETE;
-	cgi_ext		.py /usr/bin/python;
 
 	location /test {
     root /hello;
