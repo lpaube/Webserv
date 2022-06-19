@@ -23,18 +23,35 @@ Response::Response(const Request& request, std::vector<Config>& response_configs
     std::cerr << "NO CONFIG MATCH" << std::endl;
     throw "No config matches the request";
   }
-  req = request;
+  this->req = request;
+  this->requested_path = req.path();
   this->location_path = "";
-  config = getSingularConfig(response_configs[0]);
   this->status_code = 200;
-  this->content_type = "text/html";
   this->server = "Anginex/1.0";
-  this->root = config.root;
+  this->content_type = "text/html";
   this->method = req.method();
+
+  std::cout << "=====PRINTING CONFIG PRE======" << std::endl;
+  response_configs[0].print_config();
+  init_response(response_configs[0]);
+  std::cout << "=====PRINTING CONFIG POST======" << std::endl;
+  config.print_config();
+  this->root = config.root;
   full_path = this->root + req.path();
+
   std::cerr << "Req path: " << req.path() << std::endl;
   std::cerr << "Root path: " << this->root << std::endl;
   std::cerr << "FULL path: " << full_path << std::endl;
+}
+
+void Response::init_response(Config og_config)
+{
+  std::cout << "=====PRINTING CONFIG INIT RESPONSE======" << std::endl;
+  og_config.print_config();
+
+  config = getSingularConfig(og_config);
+  this->root = config.root;
+  full_path = this->root + requested_path;
 }
 
 bool Response::method_allowed(Method method)
@@ -66,9 +83,7 @@ void Response::remove_file()
   }
 }
 
-Config::Location Response::getSingularLocation(std::vector<Config::Location> locations,
-                                  std::string req_path,
-                                  bool& has_location)
+Config::Location Response::getSingularLocation(std::vector<Config::Location> locations, bool& has_location)
 {
   /*
    * Counts the number of directory matches in 
@@ -82,23 +97,28 @@ Config::Location Response::getSingularLocation(std::vector<Config::Location> loc
   int slash_count;
   int curr_count;
   
+  //config.print_config();
   for (std::vector<Config::Location>::iterator it = locations.begin();
       it != locations.end();
       ++it)
   {
+    //it->print_location();
     curr_count = 0;
     slash_count = 0;
+    std::cerr << "=====getSingularLocation: it->location: " <<
+      it->location_path << " | requested path: " << requested_path << std::endl;
     
     for (size_t i = 0;
-        i < req_path.size() && i < it->location_path.size() && req_path[i] == it->location_path[i];
+        i < requested_path.size() && i < it->location_path.size() && requested_path[i] == it->location_path[i];
         ++i)
     {
-      if (req_path[i] == '/')
+      if (requested_path[i] == '/')
         slash_count++;
       curr_count++;
     }
     if (curr_count > best_count && slash_count > 0)
     {
+      std::cout << "=====getSingularLocation: LOCATION IDENTIFIED: " << it->location_path << std::endl;
       single_location = *it;
       has_location = 1;
       best_count = curr_count;
@@ -119,7 +139,8 @@ Config Response::getSingularConfig(Config og_config)
   //std::cout << "this is location.size(): " << og_config.location.size() << std::endl;
   //std::cout << "this is location_path: " << it->location_path << std::endl;
   //std::cout << "this is req.path(): " << req.path() << std::endl;
-  single_location = getSingularLocation(og_config.location, req.path(), has_location);
+  std::cerr << "(getSingularConfig): Calling getSingularLocation" << std::endl;
+  single_location = getSingularLocation(og_config.location, has_location);
   if (has_location)
   {
     location_path = single_location.location_path;
@@ -155,15 +176,17 @@ void Response::checkErrorCode()
       {
         if (status_code == *it_code)
         {
-          std::cout << "Status code match!" << std::endl;
-          if (access((it->uri).c_str(), F_OK | R_OK) == 0)
-          {
-            std::cout << "Erro code file access good!" << std::endl;
-            full_path = it->uri;
+          std::cout << "checkErrorCode: Status code match!" << std::endl;
+          //if (access((it->uri).c_str(), F_OK | R_OK) == 0)
+          //{
+            //std::cout << "checkErrorCode: Error code file access good!" << std::endl;
+            requested_path = it->uri;
+            init_response(config);
+            //full_path = root + it->uri;
             setHtmlBody();
             return;
-          }
-          std::cout << "Erro code file access bad!" << std::endl;
+          //}
+          //std::cout << "checkErrorCode: Error code file access bad!" << std::endl;
         }
       }
     }

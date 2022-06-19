@@ -114,7 +114,10 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
         if (response.getMethod() == GET)
         {
           if (response.method_allowed(GET) == false)
+          {
+            std::cerr << "===GET method not allowed===" << std::endl;
             response.setStatusCode(405);
+          }
           else
             response.setHtmlBody();
           response.checkErrorCode();
@@ -124,7 +127,10 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
         else if (response.getMethod() == DELETE)
         {
           if (response.method_allowed(DELETE) == false)
+          {
+            std::cerr << "===DELETE method not allowed===" << std::endl;
             response.setStatusCode(405);
+          }
           else
           {
             response.remove_file();

@@ -2,8 +2,8 @@ server{
 	listen 127.0.0.1:8000;
   server_name redxred.com www.redxred.com;
   client_max_body_size 80m;
-  error_page    404  ./web_page/Error/error404.html;
-  error_page    504 505 ./web_page/Error/default.html;
+  error_page    404  /Error/error404.html;
+  error_page    405 504 505 /Error/default.html;
   index web_page/42_test/index.html;
   autoindex on;
  
@@ -12,7 +12,7 @@ server{
   limit_except GET POST DELETE;
 
 	location / {
-    root ./web_page/42_logtime;
+    root ./web_page/42_test;
     client_max_body_size 800m;
     index index.html;
     limit_except GET;

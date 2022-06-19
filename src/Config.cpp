@@ -38,6 +38,12 @@ void Config::Location::print_location()
     std::cout << "max_body_size: " << client_max_body_size << std::endl;
     std::cout << std::endl;
 
+    // return
+    std::cout << "===== return =====" << std::endl;
+    std::cout << "code: " << return_redirect.code << std::endl;
+    std::cout << "redirection url: " << return_redirect.url << std::endl;
+    std::cout << std::endl;
+
     // root
     std::cout << "===== root =====" << std::endl;
     std::cout << "root: " << root << std::endl;
@@ -108,6 +114,12 @@ void Config::print_config()
     // client_max_body_size
     std::cout << "===== client_max_body_size =====" << std::endl;
     std::cout << "max_body_size: " << client_max_body_size << std::endl;
+    std::cout << std::endl;
+
+    // return
+    std::cout << "===== return =====" << std::endl;
+    std::cout << "code: " << return_redirect.code << std::endl;
+    std::cout << "redirection url: " << return_redirect.url << std::endl;
     std::cout << std::endl;
 
     // root

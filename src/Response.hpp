@@ -66,7 +66,8 @@ private:
     void setHost();
     int setAllow();
     Config getSingularConfig(Config og_config);
-    Config::Location getSingularLocation(std::vector<Config::Location> locations, std::string req_path, bool& has_location);
+    Config::Location getSingularLocation(std::vector<Config::Location> locations, bool& has_location);
+    void init_response(Config og_config);
 
 public:
     std::string body;
@@ -82,6 +83,7 @@ private:
     Method method;
     std::string status_code_msg;
     std::string root;
+    std::string requested_path;
     std::string full_path;
     std::string content_type;
     std::string date_now;

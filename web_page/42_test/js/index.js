@@ -33,9 +33,19 @@
         });
     }
 
-    var error_404 = document.getElementById("delete_method");
-    error_404.onclick = () =>	{
+    var delete_method = document.getElementById("delete_method");
+    delete_method.onclick = () =>	{
       fetch("test1.txt", {
+        method: "DELETE"
+      }).then(response => response.text())
+        .then((content) => {
+          document.write(content);
+        });
+    }
+
+    var redirection = document.getElementById("redirection");
+    redirection.onclick = () =>	{
+      fetch("/redirected/test.txt", {
         method: "DELETE"
       }).then(response => response.text())
         .then((content) => {

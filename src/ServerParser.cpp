@@ -196,6 +196,7 @@ void ServerParser::init_location_vars(Config::Location& new_location)
 {
   new_location.error_page = config.error_page;
   new_location.client_max_body_size = config.client_max_body_size;
+  new_location.return_redirect = config.return_redirect;
   new_location.root = config.root;
   new_location.autoindex = config.autoindex;
   new_location.index = config.index;
@@ -263,6 +264,18 @@ void ServerParser::parse_location_vars()
           for (std::string::size_type j = 1; j < directives.size(); ++j) {
             new_location.limit_except.push_back(directives[j]);
           }
+        } else if (directives[0] == "return") {
+          if (directives.size() == 2)
+            new_location.return_redirect.url = directives[1];
+          else if (directives.size() == 3) {
+            int x;
+            std::istringstream(directives[1]) >> x;
+            new_location.return_redirect.code = x;
+            new_location.return_redirect.url = directives[2];
+          } else {
+            std::cerr << "LP ERROR 3" << std::endl;
+            throw("return_redirect: error..");
+          }
         } else if (directives[0] == "root") {
           if (directives.size() != 2) {
             throw("root: wrong number of args");
@@ -310,6 +323,7 @@ void ServerParser::parse_location_vars()
     config.listen.port = -1;
     // config.server_name.push_back("");
     config.client_max_body_size = 1000;
+    config.return_redirect.code = -1;
     config.root = "";
     config.autoindex = false;
     config.index.push_back("index.html");
@@ -389,6 +403,16 @@ void ServerParser::parse_server_vars()
           for (std::string::size_type j = 1; j < directives.size(); ++j) {
             config.limit_except.push_back(directives[j]);
           }
+        } else if (directives[0] == "return") {
+          if (directives.size() == 2)
+            config.return_redirect.url = directives[1];
+          else if (directives.size() == 3) {
+            int x;
+            std::istringstream(directives[1]) >> x;
+            config.return_redirect.code = x;
+            config.return_redirect.url = directives[2];
+          } else
+            throw("return_redirect: error..");
         } else if (directives[0] == "root") {
           if (directives.size() != 2)
             throw("root: wrong number of args");
@@ -404,11 +428,6 @@ void ServerParser::parse_server_vars()
             throw("autoindex: invalid argument");
         } else if (directives[0] == "index") {
           config.index.clear();
-          for (std::vector<std::string>::iterator it = directives.begin() + 1;
-              it != directives.end(); ++it) {
-            config.index.push_back(*it);
-          }
-        } else if (directives[0] == "index") {
           for (std::vector<std::string>::iterator it = directives.begin() + 1;
               it != directives.end(); ++it) {
             config.index.push_back(*it);
