@@ -55,6 +55,8 @@ public:
     void setHtmlHeader();
     Method getMethod() {return method;};
     std::string get_full_path() {return full_path;}
+    void remove_file();
+    bool method_allowed(Method method);
 
 private:
     void createCodeMsg();

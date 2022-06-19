@@ -113,22 +113,26 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
         Response response(req_, resp_configs);
         if (response.getMethod() == GET)
         {
-          std::cout << "%%%%%% full_path1: " << response.get_full_path() << std::endl;
-          std::cout << "====response status_code: " << response.getStatusCode() << "=====" << std::endl;
-          response.setHtmlBody();
-          std::cout << "%%%%%% full_path2: " << response.get_full_path() << std::endl;
-          std::cout << "====response status_code: " << response.getStatusCode() << "=====" << std::endl;
+          if (response.method_allowed(GET) == false)
+            response.setStatusCode(405);
+          else
+            response.setHtmlBody();
           response.checkErrorCode();
-          std::cout << "%%%%%% full_path3: " << response.get_full_path() << std::endl;
-        std::cout << "====response status_code: " << response.getStatusCode() << "=====" << std::endl;
           response.setHtmlHeader();
-          std::cout << "%%%%%% full_path4: " << response.get_full_path() << std::endl;
-        std::cout << "====response status_code: " << response.getStatusCode() << "=====" << std::endl;
           response.full_content = response.header + response.body;
         }
         else if (response.getMethod() == DELETE)
         {
-          
+          if (response.method_allowed(DELETE) == false)
+            response.setStatusCode(405);
+          else
+          {
+            response.remove_file();
+            //response.setHtmlBody();
+          }
+          response.checkErrorCode();
+          response.setHtmlHeader();
+          response.full_content = response.header + response.body;
         }
 
         msg = response.full_content;

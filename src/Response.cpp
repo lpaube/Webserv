@@ -15,6 +15,7 @@
 #include <fstream>
 #include <sstream>
 #include <dirent.h>
+#include <stdio.h>
 
 Response::Response(const Request& request, std::vector<Config>& response_configs)
 {
@@ -34,6 +35,35 @@ Response::Response(const Request& request, std::vector<Config>& response_configs
   std::cerr << "Req path: " << req.path() << std::endl;
   std::cerr << "Root path: " << this->root << std::endl;
   std::cerr << "FULL path: " << full_path << std::endl;
+}
+
+bool Response::method_allowed(Method method)
+{
+  if (config.limit_except.empty())
+    return true;
+  for (std::vector<std::string>::iterator it = config.limit_except.begin();
+      it != config.limit_except.end();
+      ++it)
+  {
+    if ((method == GET && *it == "GET") ||
+        (method == POST && *it == "POST") ||
+        (method == DELETE && *it == "DELETE") ||
+        (method == OPTIONS && *it == "OPETIONS"))
+      return true;
+  }
+  return false;
+}
+
+void Response::remove_file()
+{
+  if (std::remove(full_path.c_str()) != 0)
+  {
+    std::cout << "Could not delete the file: " << full_path << std::endl;
+  }
+  else
+  {
+    std::cout << "Deleted file: " << full_path << std::endl;
+  }
 }
 
 Config::Location Response::getSingularLocation(std::vector<Config::Location> locations,
