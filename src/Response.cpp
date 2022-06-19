@@ -23,7 +23,7 @@ Response::Response(const Request& request, std::vector<Config>& response_configs
     throw "No config matches the request";
   }
   req = request;
-  this->location_match = "";
+  this->location_path = "";
   config = getSingularConfig(response_configs[0]);
   this->status_code = 200;
   this->content_type = "text/html";
@@ -36,33 +36,71 @@ Response::Response(const Request& request, std::vector<Config>& response_configs
   std::cerr << "FULL path: " << full_path << std::endl;
 }
 
-int Response::getSingularLocation(Location loc, std::string path)
+Config::Location Response::getSingularLocation(std::vector<Config::Location> locations,
+                                  std::string req_path,
+                                  bool& has_location)
 {
+  /*
+   * Counts the number of directory matches in 
+   * the req.path compared to location path
+   * And returns the highest.
+   */
+
+  Config::Location single_location;
+  int best_count = 0;
+  int best_slash_count = 0;
+  int slash_count;
+  int curr_count;
   
-  return 0;
+  for (std::vector<Config::Location>::iterator it = locations.begin();
+      it != locations.end();
+      ++it)
+  {
+    curr_count = 0;
+    slash_count = 0;
+    
+    for (size_t i = 0;
+        i < req_path.size() && i < it->location_path.size() && req_path[i] == it->location_path[i];
+        ++i)
+    {
+      if (req_path[i] == '/')
+        slash_count++;
+      curr_count++;
+    }
+    if (curr_count > best_count && slash_count > 0)
+    {
+      single_location = *it;
+      has_location = 1;
+      best_count = curr_count;
+      best_slash_count = slash_count;
+    }
+  }
+  if (best_slash_count > 1)
+    single_location.location_path += "/";
+  return single_location;
 }
 
 Config Response::getSingularConfig(Config og_config)
 {
-  for (std::vector<Config::Location>::iterator it = og_config.location.begin();
-      it != og_config.location.end();
-      ++it)
-  {
-    //std::cout << "this is location.size(): " << og_config.location.size() << std::endl;
-    //std::cout << "this is location_match: " << it->location_match << std::endl;
-    //std::cout << "this is req.path(): " << req.path() << std::endl;
-    if (getSingularLocation(*it, req.path()) == 1)
-    {
-      og_config.location_match = it->location_match;
+  bool has_location = false;
+  Config::Location single_location;
 
-      og_config.error_page = it->error_page;
-      og_config.client_max_body_size = it->client_max_body_size;
-      og_config.limit_except = it->limit_except;
-      og_config.root = it->root;
-      og_config.autoindex = it->autoindex;
-      og_config.index = it->index;
-      og_config.cgi_ext = it->cgi_ext;
-    }
+
+  //std::cout << "this is location.size(): " << og_config.location.size() << std::endl;
+  //std::cout << "this is location_path: " << it->location_path << std::endl;
+  //std::cout << "this is req.path(): " << req.path() << std::endl;
+  single_location = getSingularLocation(og_config.location, req.path(), has_location);
+  if (has_location)
+  {
+    location_path = single_location.location_path;
+
+    og_config.error_page = single_location.error_page;
+    og_config.client_max_body_size = single_location.client_max_body_size;
+    og_config.limit_except = single_location.limit_except;
+    og_config.root = single_location.root;
+    og_config.autoindex = single_location.autoindex;
+    og_config.index = single_location.index;
+    og_config.cgi_ext = single_location.cgi_ext;
   }
   return og_config;
 }
@@ -121,6 +159,7 @@ void Response::setHtmlBody()
    */
   if (access(full_path.c_str(), F_OK | R_OK) != 0)
   {
+    std::cout << "OH NO CANT ACCESS PATH: " << full_path << "=====" << std::endl;
     status_code = 404;
     return;
   }
@@ -178,7 +217,6 @@ void Response::setHtmlBody()
     setStatusCode(400);
     std::cerr << "There was an error when trying to open the html file." << std::endl;
   } else {
-    setStatusCode(200);
     // body.clear();
     while (getline(requested_file, line)) {
       body_stream << line << "\r\n";
@@ -209,6 +247,9 @@ void Response::setContentType()
     content_type = "text/javascript";
   else if (extension == "md")
     content_type = "text/markdown";
+
+  std::cout << "this is full_path: " << full_path << std::endl;
+  std::cout << "this is content_type: " << content_type << std::endl;
 }
 
 void Response::setDate()
@@ -261,6 +302,7 @@ void Response::setHtmlHeader()
   }
   header_stream << "Content-Length: " << body_size << "\r\n";
   header_stream << "Content-Type: " << content_type << "\r\n";
+  header_stream << "Accept-Ranges: bytes" << "\r\n";
   header_stream << "Server: " << server << "\r\n";
   header_stream << "\r\n";
   header = header_stream.str();

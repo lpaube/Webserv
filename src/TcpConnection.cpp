@@ -92,9 +92,17 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
         Response response(req_, resp_configs);
         if (response.getMethod() == GET)
         {
+          std::cout << "%%%%%% full_path1: " << response.get_full_path() << std::endl;
+          std::cout << "====response status_code: " << response.getStatusCode() << "=====" << std::endl;
           response.setHtmlBody();
+          std::cout << "%%%%%% full_path2: " << response.get_full_path() << std::endl;
+          std::cout << "====response status_code: " << response.getStatusCode() << "=====" << std::endl;
           response.checkErrorCode();
+          std::cout << "%%%%%% full_path3: " << response.get_full_path() << std::endl;
+        std::cout << "====response status_code: " << response.getStatusCode() << "=====" << std::endl;
           response.setHtmlHeader();
+          std::cout << "%%%%%% full_path4: " << response.get_full_path() << std::endl;
+        std::cout << "====response status_code: " << response.getStatusCode() << "=====" << std::endl;
           response.full_content = response.header + response.body;
         }
         else if (response.getMethod() == DELETE)

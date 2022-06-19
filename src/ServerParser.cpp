@@ -236,8 +236,8 @@ void ServerParser::parse_location_vars()
     std::cout << "THIS IS A NEW LOCATION_IT" << std::endl;
     Config::Location new_location;
     
-    //Adding path to location_match of location
-    new_location.location_match = location_it->path;
+    //Adding path to location_path of location
+    new_location.location_path = location_it->path;
     this->init_location_vars(new_location);
     for (std::vector<std::string>::iterator it = location_it->loc_content.begin();
         it != location_it->loc_content.end(); ++it) {

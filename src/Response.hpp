@@ -54,6 +54,7 @@ public:
     void setHtmlBody();
     void setHtmlHeader();
     Method getMethod() {return method;};
+    std::string get_full_path() {return full_path;}
 
 private:
     void createCodeMsg();
@@ -63,7 +64,7 @@ private:
     void setHost();
     int setAllow();
     Config getSingularConfig(Config og_config);
-    int getSingularLocation(Location loc, std::string path);
+    Config::Location getSingularLocation(std::vector<Config::Location> locations, std::string req_path, bool& has_location);
 
 public:
     std::string body;
@@ -85,5 +86,5 @@ private:
     std::string host;
     std::string allow;
     std::string server;
-    std::string location_match;
+    std::string location_path;
 };
