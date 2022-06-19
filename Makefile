@@ -9,8 +9,8 @@ MKDIR		=	mkdir -p
 SRC_DIR		=	src
 OBJ_DIR		=	obj
 DIRS		=	$(shell find $(SRC_DIR) -type d)
-INCS		=	$(shell find $(SRC_DIR) -type f -name *.hpp)
-SRCS		=	$(shell find $(SRC_DIR) -type f -name *.cpp)
+INCS		=	$(shell find $(SRC_DIR) -type f -name "*.hpp")
+SRCS		=	$(shell find $(SRC_DIR) -type f -name "*.cpp")
 SRCS_BASE	=	$(foreach file, $(SRCS), $(shell basename -a $(file)))
 OBJS		=	$(addprefix $(OBJ_DIR)/, $(SRCS_BASE:.cpp=.o))
 
