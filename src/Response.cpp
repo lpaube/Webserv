@@ -189,7 +189,7 @@ void Response::setHtmlBody()
    */
   if (access(full_path.c_str(), F_OK | R_OK) != 0)
   {
-    std::cout << "OH NO CANT ACCESS PATH: " << full_path << "=====" << std::endl;
+    std::cout << "(setHtmlBody): OH NO CANT ACCESS PATH: " << full_path << std::endl;
     status_code = 404;
     return;
   }
@@ -240,16 +240,32 @@ void Response::setHtmlBody()
   }
   else
   {
-    requested_file.open(full_path.c_str());
+    std::string path_extension = full_path.substr(full_path.find_last_of(".") + 1);
+    if (path_extension == "jpeg" || path_extension == "jpg" ||
+        path_extension == "png" || path_extension == "gif")
+    {
+      file_type = "IMAGE";
+      requested_file.open(full_path.c_str(), std::ios_base::in | std::ios_base::binary);
+    }
+    else
+      requested_file.open(full_path.c_str());
   }
 
   if (!requested_file.is_open()) {
     setStatusCode(400);
-    std::cerr << "There was an error when trying to open the html file." << std::endl;
+    std::cerr << "(setHtmlBody): There was an error when trying to open the html file." << std::endl;
   } else {
     // body.clear();
-    while (getline(requested_file, line)) {
-      body_stream << line << "\r\n";
+    if (file_type == "IMAGE")
+    {
+      std::cerr << "setHtmlBody: This is an image" << std::endl;
+      body_stream << requested_file.rdbuf();
+    }
+    else
+    {
+      while (getline(requested_file, line)) {
+        body_stream << line << "\r\n";
+      }
     }
     requested_file.close();
     body_stream << "\r\n";
@@ -262,20 +278,20 @@ void Response::setHtmlBody()
 
 void Response::setContentType()
 {
-  std::string extension = full_path.substr(full_path.find_last_of(".") + 1);
-  if (extension == "jpg" || extension == "jpeg")
+  std::string path_extension = full_path.substr(full_path.find_last_of(".") + 1);
+  if (path_extension == "jpg" || path_extension == "jpeg")
     content_type = "image/jpeg";
-  else if (extension == "png")
+  else if (path_extension == "png")
     content_type = "image/png";
-  else if (extension == "gif")
+  else if (path_extension == "gif")
     content_type = "image/gif";
-  else if (extension == "mp4")
+  else if (path_extension == "mp4")
     content_type = "video/mp4";
-  else if (extension == "css")
+  else if (path_extension == "css")
     content_type = "text/css";
-  else if (extension == "js")
+  else if (path_extension == "js")
     content_type = "text/javascript";
-  else if (extension == "md")
+  else if (path_extension == "md")
     content_type = "text/markdown";
 
   std::cout << "this is full_path: " << full_path << std::endl;

@@ -89,4 +89,5 @@ private:
     std::string allow;
     std::string server;
     std::string location_path;
+    std::string file_type;
 };

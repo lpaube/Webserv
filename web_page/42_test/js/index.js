@@ -15,7 +15,7 @@
 
     var image_test = document.getElementById("image_test");
     image_test.onclick = () =>	{
-      fetch("test_image.png", {
+      fetch("cat_test1.jpg", {
         method: "GET"
       }).then(response => response.text())
         .then((content) => {
