@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerParser.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: laube <louis-philippe.aube@hotmail.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/01 10:47:58 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/16 14:30:52 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/18 22:04:42 by laube            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,20 +22,16 @@
 #define BYTES_IN_MB 1000000
 
 ServerParser::ServerParser(std::string::iterator beg, std::string::iterator end)
-  : str_content(beg, end)
+  : str_content_(beg, end)
 {
   nb_location = 0;
-  buildLocation();
+  build_location();
   for (unsigned long i = 0; i < static_cast<unsigned long>(this->nb_location); i++) {
-    std::string line = this->location[i].loc_content_str;
-    vectorize_content(this->location[i].loc_content, line);
+    std::string line = this->location_[i].loc_content_str;
+    vectorize_content(this->location_[i].loc_content, line);
   }
-  if (vectorize_content(this->server_content, str_content) == false)
+  if (vectorize_content(this->server_content_, str_content_) == false)
     throw NoSepException();
-  // DEBUGING SERVER/LOCATION PARSER
-  // printContent();
-  // printLocation();
-
   // Building config
   try {
     parse_server_vars();
@@ -45,101 +41,78 @@ ServerParser::ServerParser(std::string::iterator beg, std::string::iterator end)
   }
 }
 
-void ServerParser::printLocation() const
+void ServerParser::print_location() const
 {
-  unsigned long size = location.size();
+  unsigned long size = location_.size();
   std::cout << "PRINTING LOCATION CONTENT\n";
   for (unsigned long i = 0; i < size; i++) {
-    std::cout << "LOCATION : " << location[i].path << '\n';
-    for (unsigned long j = 0; j < location[i].loc_content.size(); j++) {
-      std::cout << location[i].loc_content[j] << '\n';
+    std::cout << "LOCATION : " << location_[i].path << '\n';
+    for (unsigned long j = 0; j < location_[i].loc_content.size(); j++) {
+      std::cout << location_[i].loc_content[j] << '\n';
     }
   }
 }
 
-void ServerParser::printContent() const
+void ServerParser::print_content() const
 {
-  int size = server_content.size();
+  int size = server_content_.size();
   std::cout << "PRINTING SERVER CONTENT\n";
   for (int i = 0; i < size; i++) {
-    std::cout << server_content[static_cast<unsigned long>(i)] << std::endl;
+    std::cout << server_content_[static_cast<unsigned long>(i)] << std::endl;
   }
 }
 
-std::size_t ServerParser::findLocStart(std::size_t i)
+std::size_t ServerParser::find_loc_start(std::size_t i)
 {
-  i = str_content.find("location");
+  i = str_content_.find("location");
   if (i == std::string::npos)
     return i;
   nb_location++;
-  location.resize(static_cast<unsigned long>(nb_location));
+  location_.resize(static_cast<unsigned long>(nb_location));
   i += 8;
-  while (str_content[i] > 0 && str_content[i] < 33)
+  while (str_content_[i] > 0 && str_content_[i] < 33)
     i++;
-  while (str_content[i] && str_content[i] != '{' && str_content[i] >= 33) {
-    location[static_cast<unsigned long>(nb_location - 1)].path.push_back(str_content[i]);
+  while (str_content_[i] && str_content_[i] != '{' && str_content_[i] >= 33) {
+    location_[static_cast<unsigned long>(nb_location - 1)].path.push_back(str_content_[i]);
     i++;
   }
-  while (str_content[i] > 0 && str_content[i] < 33)
+  while (str_content_[i] > 0 && str_content_[i] < 33)
     i++;
-  if (str_content[i] != '{')
+  if (str_content_[i] != '{')
     throw SyntaxException();
   i++;
   return i;
 }
 
-std::size_t ServerParser::findLocEnd(std::size_t i, std::size_t end)
+std::size_t ServerParser::find_loc_end(std::size_t i, std::size_t end)
 {
   while (i != end) {
-    if (this->str_content[i] == '{')
+    if (this->str_content_[i] == '{')
       throw SyntaxException();
-    if (this->str_content[i] == '}')
+    if (this->str_content_[i] == '}')
       return i - 1;
     i++;
   }
   throw SyntaxException();
 }
 
-void ServerParser::buildLocation()
+void ServerParser::build_location()
 {
   std::size_t i = 0;
   std::size_t scope_end;
-  std::size_t end = str_content.length();
+  std::size_t end = str_content_.length();
   while (i != end) {
-    i = findLocStart(i);
+    i = find_loc_start(i);
     if (i == std::string::npos) {
       return;
     }
-    scope_end = findLocEnd(i, end);
-    this->location[static_cast<unsigned long>(nb_location - 1)].loc_content_str =
-      str_content.substr(i, scope_end - i);
-    i = str_content.find("location");
-    str_content.erase(i, scope_end + 2 - i);
+    scope_end = find_loc_end(i, end);
+    this->location_[static_cast<unsigned long>(nb_location - 1)].loc_content_str =
+      str_content_.substr(i, scope_end - i);
+    i = str_content_.find("location");
+    str_content_.erase(i, scope_end + 2 - i);
     i = 0;
-    end = str_content.length();
-  }
-}
-
-void ServerParser::buildContent()
-{
-  std::string::iterator start = str_content.begin();
-  std::string::iterator end = str_content.end();
-  std::string::iterator current = start;
-
-  while (start != end) {
-    while (*start > 0 && *start < 33)
-      start++;
-    current = start;
-    if (start != end) {
-      while (*current != ';') {
-        if (current == end)
-          throw NoSepException();
-        current++;
-      }
-      std::string add(start, current);
-      server_content.push_back(trim(add, WHITESPACE));
-      start = current + 1;
-    }
+    end = str_content_.length();
   }
 }
 
@@ -231,9 +204,8 @@ void ServerParser::init_location_vars(Config::Location& new_location)
 
 void ServerParser::parse_location_vars()
 {
-  for (std::vector<LocationContent>::iterator location_it = location.begin();
-      location_it != location.end(); ++location_it) {
-    std::cout << "THIS IS A NEW LOCATION_IT" << std::endl;
+  for (std::vector<LocationContent>::iterator location_it = location_.begin();
+      location_it != location_.end(); ++location_it) {
     Config::Location new_location;
     
     //Adding path to location_path of location
@@ -344,27 +316,27 @@ void ServerParser::parse_location_vars()
     //config.limit_except.push_back("GET");
   }
 
-  void ServerParser::parse_server_vars()
-  {
-    this->init_server_vars();
+void ServerParser::parse_server_vars()
+{
+  this->init_server_vars();
 
-    /*
-     * Splitting directives into words
-     */
-    for (std::vector<std::string>::iterator it = server_content.begin(); it != server_content.end();
-        ++it) {
-      std::string tmp_str = clean_spaces(*it);
-      std::vector<std::string> directives;
-      std::string::size_type pos = 0;
+  /*
+   * Splitting directives into words
+   */
+  for (std::vector<std::string>::iterator it = server_content_.begin(); it != server_content_.end();
+      ++it) {
+    std::string tmp_str = clean_spaces(*it);
+    std::vector<std::string> directives;
+    std::string::size_type pos = 0;
 
-      directives.push_back(tmp_str.substr(0, tmp_str.find(" ")));
-      tmp_str.erase(0, tmp_str.find(" ") + 1);
+    directives.push_back(tmp_str.substr(0, tmp_str.find(" ")));
+    tmp_str.erase(0, tmp_str.find(" ") + 1);
 
-      while ((pos = tmp_str.find(" ")) != std::string::npos) {
-        directives.push_back(tmp_str.substr(0, pos));
-        tmp_str.erase(0, pos + 1);
-      }
-      directives.push_back(tmp_str);
+    while ((pos = tmp_str.find(" ")) != std::string::npos) {
+      directives.push_back(tmp_str.substr(0, pos));
+      tmp_str.erase(0, pos + 1);
+    }
+    directives.push_back(tmp_str);
 
       /*
        * Parsing directives

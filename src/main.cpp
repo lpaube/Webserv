@@ -13,7 +13,7 @@ int main(int argc, char** argv)
     ConfigParser config_parser(config_file);
 
     std::vector<Config> configs;
-    for (unsigned int i = 0; i < config_parser.nbServer(); i++) {
+    for (unsigned int i = 0; i < config_parser.nbserver(); i++) {
         configs.push_back(config_parser.serverparser[i].config);
     }
 
