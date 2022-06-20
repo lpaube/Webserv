@@ -24,7 +24,6 @@ public:
 public:
     Server(const std::vector<Config>& blocks);
 
-public:
     void run();
 
 private:

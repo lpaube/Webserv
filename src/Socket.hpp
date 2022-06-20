@@ -37,10 +37,8 @@ public:
     Socket();
     virtual ~Socket();
 
-public:
     virtual SocketType type() const = 0;
 
-public:
     int fd() const;
     bool is_init() const;
     SocketState state() const;

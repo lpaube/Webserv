@@ -21,10 +21,8 @@ class TcpListener : public Socket
 public:
     TcpListener(const std::string& address, uint16_t port, int backlog);
 
-public:
     virtual SocketType type() const;
 
-public:
     const std::string& address_str() const;
     in_addr address() const;
     uint16_t port() const;

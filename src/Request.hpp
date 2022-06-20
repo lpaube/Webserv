@@ -67,7 +67,6 @@ public:
 public:
     Request();
 
-public:
     Method method() const;
     const std::string& path() const;
     const std::string& query_str() const;
