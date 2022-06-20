@@ -27,10 +27,8 @@ public:
 public:
     ~Sockets();
 
-public:
     SocketMap::mapped_type& operator[](const int fd);
 
-public:
     void close_all();
 
 public:

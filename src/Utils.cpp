@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: laube <louis-philippe.aube@hotmail.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:40:28 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 16:06:38 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/20 15:18:57 by laube            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,22 @@ std::string to_lower(const std::string& str)
 }
 
 std::vector<char>::const_iterator find_bytes(const std::vector<char>& data, const char* needle,
+                                             size_t needle_size)
+{
+    if (data.size() < needle_size) {
+        return data.end();
+    }
+
+    size_t s = data.size() - needle_size + 1;
+    for (size_t i = 0; i < s; ++i) {
+        if (memcmp(data.data() + i, needle, needle_size) == 0) {
+            return data.begin() + (std::ptrdiff_t)i;
+        }
+    }
+    return data.end();
+}
+
+std::vector<char>::iterator find_bytes(std::vector<char>& data, const char* needle,
                                              size_t needle_size)
 {
     if (data.size() < needle_size) {

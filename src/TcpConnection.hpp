@@ -26,10 +26,8 @@ public:
 public:
     TcpConnection(int listener_fd);
 
-public:
     virtual SocketType type() const;
 
-public:
     template <typename Iter>
     void append_data(Iter first, Iter last)
     {

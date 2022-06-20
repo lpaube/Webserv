@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   TcpConnection.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: laube <louis-philippe.aube@hotmail.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/20 11:32:10 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/20 15:22:44 by laube            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void TcpConnection::handle_read_event()
 {
     char buf[BUF_SIZE];
 
-    ssize_t n = read(fd(), buf, BUF_SIZE);
+    ssize_t n = recv(fd(), buf, BUF_SIZE, 0);
 
     if (n < 0) {
         throw Exception("Socket read error");
@@ -152,6 +152,9 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
 		write(fd(), msg.c_str(), msg.length()); // TODO: check err and if all bytes were sent
         std::cout << "|!|FILE RESPONSE BUILT|!|" << std::endl;
     }
+
+    // send(fd(), msg.c_str(), msg.length(), 0);
+    // TODO: check err and if all bytes were sent
 }
 
 const Request& TcpConnection::request() const
@@ -353,7 +356,7 @@ void TcpConnection::parse_http_request_body()
 
 void TcpConnection::parse_http_request_body_plain()
 {
-    req_.set_raw_body(data_);
+    req_.append_raw_body(data_);
     req_.decode_raw_body();
     data_.clear();
     set_state(S_WRITE);
@@ -373,7 +376,7 @@ void TcpConnection::parse_http_request_body_content_length()
     req_.content_length_sub((size_t)n);
 
     if (done) {
-        req_.set_raw_body(data_);
+        req_.append_raw_body(data_);
         data_.clear();
         req_.decode_raw_body();
         set_state(S_WRITE);
@@ -382,10 +385,13 @@ void TcpConnection::parse_http_request_body_content_length()
 
 void TcpConnection::parse_http_request_body_chunked()
 {
-    req_.set_raw_body(data_);
+    req_.append_raw_body(data_);
     data_.clear();
     req_.decode_raw_body();
-    set_state(S_WRITE);
+    if (req_.all_chunks_received()) {
+        print_bytes(req_.body());
+        set_state(S_WRITE);
+    }
 }
 
 void TcpConnection::bad_request() const

@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 17:17:57 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/16 17:14:22 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/17 22:34:29 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,12 @@
 #include "ExceptionBase.hpp"
 #include <map>
 #include <string>
+#include <unistd.h>
 #include <vector>
 #include <unistd.h>
 
-enum ParseState {
+enum ParseState
+{
     REQ_METHOD,
     REQ_PATH,
     REQ_QUERY,
@@ -33,12 +35,20 @@ enum ParseState {
     REQ_BODY
 };
 
-enum Method {
+enum Method
+{
     BAD_METHOD,
     GET,
     POST,
     DELETE,
     OPTIONS
+};
+
+enum ChunkState
+{
+    CNK_SIZE,
+    CNK_CHUNK,
+    CNK_NL
 };
 
 class Request
@@ -58,7 +68,6 @@ public:
 public:
     Request();
 
-public:
     Method method() const;
     const std::string& path() const;
     const std::string& query_str() const;
@@ -66,6 +75,10 @@ public:
     const std::vector<char>& body() const;
     header_iterator find_header(const std::string& name) const;
     header_iterator headers_end() const;
+
+private:
+    typedef std::vector<char>::const_iterator const_rbody_iter;
+    typedef std::vector<char>::iterator rbody_iter;
 
 private:
     bool chunked() const;
@@ -89,8 +102,11 @@ private:
     void add_header(const std::string& name, const std::string& value);
     void process_headers();
     void content_length_sub(size_t n);
-    void set_raw_body(const std::vector<char>& data);
+    void append_raw_body(const std::vector<char>& data);
     void decode_raw_body();
+    bool all_chunks_received() const;
+    bool read_chunk_size();
+    bool read_chunk();
 
 private:
     ParseState state_;
@@ -105,6 +121,7 @@ private:
     size_t content_length_count_;
     bool is_chunked;
     ssize_t cur_chunk_size_;
+    ChunkState cnk_state_;
     std::vector<char> raw_body_;
     std::vector<char> body_;
 };
