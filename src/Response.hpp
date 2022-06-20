@@ -10,9 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <unistd.h>
 #include "Config.hpp"
 #include "Request.hpp"
 #include <string>
+#include <unistd.h>
+#include <time.h>
 
 #pragma once
 
@@ -34,9 +37,9 @@ public:
         return config;
     }
 
-    void setStatusCode(size_t code);
+    void setStatusCode(int code);
 
-    size_t getStatusCode() const
+    int getStatusCode() const
     {
         return status_code;
     }
@@ -46,12 +49,28 @@ public:
         return status_code_msg;
     }
 
+    void checkErrorCode();
+
     void setHtmlBody();
     void setHtmlHeader();
+    Method getMethod() {return method;};
+    bool has_return_redirect();
+    void redirect();
+    std::string get_full_path() {return full_path;}
+    void remove_file();
+    bool method_allowed(Method method);
 
 private:
     void createCodeMsg();
     void buildHeaderString();
+    void setContentType();
+    void setDate();
+    void setHost();
+    int generate_autoindex(std::ifstream& requested_file, std::stringstream& body_stream);
+    int setAllow();
+    Config getSingularConfig(Config og_config);
+    Config::Location getSingularLocation(std::vector<Config::Location> locations, bool& has_location);
+    void init_response(Config og_config);
 
 public:
     std::string body;
@@ -59,14 +78,21 @@ public:
     std::string full_content;
 
 private:
-    // std::map<int, std::string> codeList;
     Config config;
+    Request req;
     size_t body_size;
     size_t header_size;
-    size_t status_code;
+    int status_code;
+    Method method;
     std::string status_code_msg;
+    std::string root;
+    std::string requested_path;
     std::string full_path;
-    // std::string location;
-    // std::string headerString;
-    // std::string codeMsg;
+    std::string content_type;
+    std::string date_now;
+    std::string host;
+    std::string allow;
+    std::string server;
+    std::string location_path;
+    std::string file_type;
 };
