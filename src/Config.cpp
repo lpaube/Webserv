@@ -11,6 +11,7 @@ Config& Config::operator=(const Config& other)
   autoindex = other.autoindex;
   index = other.index;
   cgi_ext = other.cgi_ext;
+  location = other.location;
   return *this;
 }
 
