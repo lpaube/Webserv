@@ -35,7 +35,7 @@
 
     var delete_method = document.getElementById("delete_method");
     delete_method.onclick = () =>	{
-      fetch("test1.txt", {
+      fetch("/42_test/special_directory/test1.txt", {
         method: "DELETE"
       }).then(response => response.text())
         .then((content) => {

@@ -9,7 +9,7 @@ server{
  
   cgi_ext		.sh /bin/bash;
   cgi_ext		.py /usr/bin/python3;
-  limit_except GET POST DELETE;
+  limit_except GET POST;
 
 	location / {
     root ./web_page/42_test;
@@ -21,6 +21,11 @@ server{
   location /Error {
     root ./web_page;
     index index_test.html;
+  }
+
+  location /42_test/special_directory {
+    root ./web_page;
+    limit_except GET POST DELETE;
   }
 
   location /42_test/special_directory/special_path {
