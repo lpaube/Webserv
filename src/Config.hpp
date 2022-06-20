@@ -20,6 +20,7 @@ public:
 
     struct Return_redirect {
         // code is initialized to -1
+        //bool is_active;
         int code;
         std::string url;
     };
@@ -32,7 +33,7 @@ public:
     class Location
     {
     public:
-        std::string location_match;
+        std::string location_path;
         std::vector<Error_page> error_page;
         unsigned long client_max_body_size; // Represented in bytes but only takes m in config
         std::vector<std::string> limit_except;
@@ -51,11 +52,13 @@ public:
     std::vector<Error_page> error_page;
     unsigned long client_max_body_size; // Represented in bytes but only takes m in config
     Return_redirect return_redirect;
+    std::vector<std::string> limit_except;
     std::string root;
     bool autoindex;
     std::vector<std::string> index;
     std::vector<Cgi_ext> cgi_ext;
     std::vector<Location> location;
+    Config& operator=(const Config& other);
 
     void print_config();
 };
