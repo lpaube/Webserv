@@ -16,34 +16,21 @@ function submit() {
 
   (function(){
 	const userinput = document.getElementById("input");
-	const apikey = document.getElementById("apikey");
-	const uid = document.getElementById("uid");
 	var get_time = document.getElementById("get_time");
 	get_time.onclick = () =>	{
-		if (userinput.value.length == 0 || apikey.value.length == 0 || uid.value.length == 0){
+		if (userinput.value.length == 0 ){
 			alert("Empty field!");
 			return ;
 		}
-		fetch("http://127.0.0.1:8000/cgi-bin/get_time.py", {
-			method: "POST",
-			headers: {
-				'Content-Type': 'application/json'},
-				 referrerPolicy: 'no-referrer',
-				 body: JSON.stringify({ username: userinput, pkey: apikey, uid: uid})
+		fetch("http://127.0.0.1:8000/cgi-bin/get_time.py?" + new URLSearchParams(
+			{ user: userinput.value, test: "test"}
+		), {
+			method: "GET",
+			headers: {}
 		}).then(response => response.text())
 		.then((content) => {
-			document.write(content);
+			alert("Nombre d'heur ce mois ci : " + content);
 		});
 	}
-
-    var get_time = document.getElementById("test_html");
-    get_time.onclick = () =>	{
-      fetch("./test.html", {
-        method: "GET"
-      }).then(response => response.text())
-        .then((content) => {
-          document.write(content);
-        });
-    }
   })();
   

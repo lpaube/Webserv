@@ -1,0 +1,81 @@
+
+
+body {
+	background-image: url(../assets/background.jpg);
+	align-content: center;
+}
+
+.top{
+	display: flex;
+	justify-content: center;
+}
+
+.title{
+	font-size: 100px;
+	color: white;
+	font-family: Futura;
+}
+
+.content{
+	display: flex;
+	justify-content: center;
+}
+
+.user_input{
+	font-size: 20px;
+	color: rgb(208, 208, 208);
+	height: 35px;
+	width: 350px;
+	background-color: rgba(30, 30, 30, 0.5);
+}
+
+.apikey{
+	font-size: 20px;
+	color: rgb(208, 208, 208);
+	height: 35px;
+	width: 350px;
+	background-color: rgba(30, 30, 30, 0.5);
+	margin-top: 40px;
+}
+
+.sign_in{
+	margin-top: 50px;
+	display: flex;
+	justify-content: center;
+	margin-bottom: 10px;
+}
+
+.user_input{
+	border-color:  #00babc;
+	border-style: solid;
+}
+
+.signin_button{
+	background-color: #00babc;
+	color: white;
+	border: none;
+	font-weight: bolder;
+	padding-left: 125px;
+	padding-right: 125px;
+	height: 48px;
+	font-size: 28px;
+	cursor: pointer;
+}
+.signin_button:hover{
+	background-color: rgb(3, 167, 167)
+}
+
+#test_html {
+	background-color: #42baEE;
+}
+#test_html:hover{
+	background-color: rgb(3, 200, 200)
+}
+
+.footnotes{
+	margin-bottom: 2px;
+	display: flex;
+	justify-content: center;
+	color:rgb(218, 218, 218)
+}
+

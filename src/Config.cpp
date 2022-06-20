@@ -1,7 +1,26 @@
 #include "Config.hpp"
 
+Config& Config::operator=(const Config& other)
+{
+  listen = other.listen;
+  server_name = other.server_name;
+  error_page = other.error_page;
+  client_max_body_size = other.client_max_body_size;
+  limit_except = other.limit_except;
+  return_redirect = other.return_redirect;
+  root = other.root;
+  autoindex = other.autoindex;
+  index = other.index;
+  cgi_ext = other.cgi_ext;
+  location = other.location;
+  return *this;
+}
+
 void Config::Location::print_location()
 {
+  // location_path
+    std::cout << "===== location_path =====" << std::endl;
+    std::cout << location_path << std::endl;
     // error_page
     std::cout << "===== error_page =====" << std::endl;
     int i = 0;
