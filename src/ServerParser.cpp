@@ -265,13 +265,19 @@ void ServerParser::parse_location_vars()
             new_location.limit_except.push_back(directives[j]);
           }
         } else if (directives[0] == "return") {
+          /*
           if (directives.size() == 2)
             new_location.return_redirect.url = directives[1];
-          else if (directives.size() == 3) {
+            */
+          if (directives.size() == 3) {
             int x;
             std::istringstream(directives[1]) >> x;
+            if (x < 0)
+              std::cerr << "Error: new_location.return_redirect code is smaller than 0" << std::endl;
             new_location.return_redirect.code = x;
             new_location.return_redirect.url = directives[2];
+            //new_location.return_redirect.is_active = true;
+
           } else {
             std::cerr << "LP ERROR 3" << std::endl;
             throw("return_redirect: error..");
@@ -313,7 +319,7 @@ void ServerParser::parse_location_vars()
         throw("In new_location file: Not enough arguments provided");
       }
     }
-      std::cout << "NEW LOCATION:=======" << std::endl;
+      std::cerr << "NEW LOCATION:=======" << std::endl;
       config.location.push_back(new_location);
   }
 }
@@ -323,7 +329,9 @@ void ServerParser::parse_location_vars()
     config.listen.port = -1;
     // config.server_name.push_back("");
     config.client_max_body_size = 1000;
+    //config.return_redirect.is_active = false;
     config.return_redirect.code = -1;
+    config.return_redirect.url = "";
     config.root = "";
     config.autoindex = false;
     config.index.push_back("index.html");
@@ -404,13 +412,19 @@ void ServerParser::parse_server_vars()
             config.limit_except.push_back(directives[j]);
           }
         } else if (directives[0] == "return") {
+          /*
           if (directives.size() == 2)
             config.return_redirect.url = directives[1];
-          else if (directives.size() == 3) {
+            */
+          if (directives.size() == 3) {
             int x;
+            std::cerr << "Shouldn't be Config" << std::endl;
             std::istringstream(directives[1]) >> x;
+            if (x < 0)
+              std::cerr << "Error: return_redirect code is smaller than 0" << std::endl;
             config.return_redirect.code = x;
             config.return_redirect.url = directives[2];
+            //config.return_redirect.is_active = true;
           } else
             throw("return_redirect: error..");
         } else if (directives[0] == "root") {

@@ -45,8 +45,8 @@
 
     var redirection = document.getElementById("redirection");
     redirection.onclick = () =>	{
-      fetch("/redirected/test.txt", {
-        method: "DELETE"
+      fetch("/Error/special_path", {
+        method: "GET"
       }).then(response => response.text())
         .then((content) => {
           document.write(content);

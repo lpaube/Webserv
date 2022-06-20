@@ -37,9 +37,9 @@ public:
         return config;
     }
 
-    void setStatusCode(size_t code);
+    void setStatusCode(int code);
 
-    size_t getStatusCode() const
+    int getStatusCode() const
     {
         return status_code;
     }
@@ -82,7 +82,7 @@ private:
     Request req;
     size_t body_size;
     size_t header_size;
-    size_t status_code;
+    int status_code;
     Method method;
     std::string status_code_msg;
     std::string root;

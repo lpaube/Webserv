@@ -14,12 +14,13 @@ public:
     };
 
     struct Error_page {
-        std::vector<size_t> code;
+        std::vector<int> code;
         std::string uri;
     };
 
     struct Return_redirect {
         // code is initialized to -1
+        //bool is_active;
         int code;
         std::string url;
     };

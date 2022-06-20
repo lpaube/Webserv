@@ -42,7 +42,6 @@ Response::Response(const Request& request, std::vector<Config>& response_configs
 
 void Response::init_response(Config og_config)
 {
-
   config = getSingularConfig(og_config);
   this->root = config.root;
   full_path = this->root + requested_path;
@@ -97,20 +96,22 @@ Config::Location Response::getSingularLocation(std::vector<Config::Location> loc
   {
     curr_count = 0;
     slash_count = 0;
-    std::cerr << "=====getSingularLocation: it->location: " <<
-      it->location_path << " | requested path: " << requested_path << std::endl;
     
     for (size_t i = 0;
-        i < requested_path.size() && i < it->location_path.size() && requested_path[i] == it->location_path[i];
+        i < it->location_path.size() /* && requested_path[i] == it->location_path[i] */;
         ++i)
     {
+      if (requested_path[i] != it->location_path[i])
+      {
+        curr_count = 0;
+        break;
+      }
       if (requested_path[i] == '/')
         slash_count++;
       curr_count++;
     }
     if (curr_count > best_count && slash_count > 0)
     {
-      std::cout << "=====getSingularLocation: LOCATION IDENTIFIED: " << it->location_path << std::endl;
       single_location = *it;
       has_location = 1;
       best_count = curr_count;
@@ -128,10 +129,6 @@ Config Response::getSingularConfig(Config og_config)
   Config::Location single_location;
 
 
-  //std::cout << "this is location.size(): " << og_config.location.size() << std::endl;
-  //std::cout << "this is location_path: " << it->location_path << std::endl;
-  //std::cout << "this is req.path(): " << req.path() << std::endl;
-  std::cerr << "(getSingularConfig): Calling getSingularLocation" << std::endl;
   single_location = getSingularLocation(og_config.location, has_location);
   if (has_location)
   {
@@ -144,11 +141,12 @@ Config Response::getSingularConfig(Config og_config)
     og_config.autoindex = single_location.autoindex;
     og_config.index = single_location.index;
     og_config.cgi_ext = single_location.cgi_ext;
+    og_config.return_redirect = single_location.return_redirect;
   }
   return og_config;
 }
 
-void Response::setStatusCode(size_t code)
+void Response::setStatusCode(int code)
 {
   this->status_code = code;
   this->status_code_msg = StatusCode::get_code_msg(code);
@@ -156,13 +154,13 @@ void Response::setStatusCode(size_t code)
 
 void Response::checkErrorCode()
 {
-  if (status_code != 200)
+  if (status_code < 200 || status_code >= 400)
   {
     for (std::vector<Config::Error_page>::iterator it = config.error_page.begin();
         it != config.error_page.end();
         ++it)
     {
-      for (std::vector<size_t>::iterator it_code = it->code.begin();
+      for (std::vector<int>::iterator it_code = it->code.begin();
           it_code != it->code.end();
           ++it_code)
       {
@@ -173,6 +171,7 @@ void Response::checkErrorCode()
           //{
             //std::cout << "checkErrorCode: Error code file access good!" << std::endl;
             requested_path = it->uri;
+            std::cout << "CheckErrorCode root: " << config.root << std::endl;
             init_response(config);
             //full_path = root + it->uri;
             setHtmlBody();
@@ -237,7 +236,7 @@ int Response::generate_autoindex(std::ifstream& requested_file, std::stringstrea
 
 void Response::redirect()
 {
-  
+  status_code = config.return_redirect.code;
 }
 
 bool Response::has_return_redirect()
@@ -254,6 +253,16 @@ void Response::setHtmlBody()
   std::ifstream requested_file;
 
   body.clear();
+  std::cerr << "location_path: " << location_path << std::endl;
+  std::cerr << "has_return_redirect: " << has_return_redirect() << std::endl;
+  std::cerr << "#### code: " << config.return_redirect.code << std::endl;
+  //config.print_config();
+  if (has_return_redirect())
+  {
+    status_code = config.return_redirect.code;
+    requested_path = config.return_redirect.url;
+    full_path = root + "/" + requested_path;
+  }
   /*
    * Check path access
    */
@@ -329,7 +338,6 @@ void Response::setContentType()
   else if (path_extension == "md")
     content_type = "text/markdown";
 
-  std::cout << "this is full_path: " << full_path << std::endl;
   std::cout << "this is content_type: " << content_type << std::endl;
 }
 

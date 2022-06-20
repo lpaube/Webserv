@@ -111,11 +111,13 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
         }
 
         Response response(req_, resp_configs);
+        /*
         if (response.has_return_redirect())
         {
           response.redirect();
         }
-        else if (response.getMethod() == GET)
+        */
+        if (response.getMethod() == GET)
         {
           if (response.method_allowed(GET) == false)
           {
@@ -124,6 +126,7 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
           }
           else
             response.setHtmlBody();
+          std::cerr << "THIS IS BODY: " << response.body << std::endl;
           response.checkErrorCode();
           response.setHtmlHeader();
           response.full_content = response.header + response.body;
