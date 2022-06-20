@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   TcpConnection.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: laube <louis-philippe.aube@hotmail.com>    +#+  +:+       +#+        */
+/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/20 15:22:44 by laube            ###   ########.fr       */
+/*   Updated: 2022/06/17 12:41:24 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,35 +73,12 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
     std::vector<Config> resp_configs = server_configs;
 
     std::string msg;
-	std::size_t len = req_.path().length();
-    if (req_.path().find("cgi-bin/") != std::string::npos && req_.path()[len - 1] != '/') {
+    if (req_.path().find("cgi-bin/") != std::string::npos) {
         std::cout << "|!|IN SCRIPT|!|" << std::endl;
 
-        try{
-			Script script(resp_configs[0], req_);
-			msg = script.exec();
-			if (write(fd(), msg.c_str(), msg.length()) < 0){
-				throw Exception("Error fatal, write");
-			}
-		} catch(const std::exception& ex){
-			std::cout << ex.what() << std::endl;
-			Response response(req_, resp_configs);
-			std::string exec_msg("Error fatal, execve\n");
-			std::string ext_msg("Error: No script extention found\n");
-			if (exec_msg.compare(ex.what()) == 0 || ext_msg.compare(ex.what()) == 0){
-				response.setStatusCode(404);
-			}
-			else{
-				response.setStatusCode(500);
-			}
-          	response.checkErrorCode();
-          	response.setHtmlHeader();
-          	msg = response.header + response.body;
-			write(fd(), msg.c_str(), msg.length());
-	}
-	Script script(resp_configs[0], req_);
-	msg = script.exec();
-	std::cout << "PRITING SCRIPT OUTPUT: \n" << msg << std::endl;
+        Script script(resp_configs[0], req_);
+        msg = script.exec();
+
         std::cout << "|!|OUT OF SCRIPT|!|" << std::endl;
     } else {
         std::cout << "|!|IN FILE RESPONSE|!|" << std::endl;
@@ -112,48 +89,15 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
         }
 
         Response response(req_, resp_configs);
-        /*
-        if (response.has_return_redirect())
-        {
-          response.redirect();
-        }
-        */
-        if (response.getMethod() == GET)
-        {
-          if (response.method_allowed(GET) == false)
-          {
-            std::cerr << "===GET method not allowed===" << std::endl;
-            response.setStatusCode(405);
-          }
-          else
-            response.setHtmlBody();
-          response.checkErrorCode();
-          response.setHtmlHeader();
-          response.full_content = response.header + response.body;
-        }
-        else if (response.getMethod() == DELETE)
-        {
-          if (response.method_allowed(DELETE) == false)
-          {
-            std::cerr << "===DELETE method not allowed===" << std::endl;
-            response.setStatusCode(405);
-          }
-          else
-          {
-            response.remove_file();
-            //response.setHtmlBody();
-          }
-          response.checkErrorCode();
-          response.setHtmlHeader();
-          response.full_content = response.header + response.body;
-        }
+        response.setHtmlBody();
+        response.setHtmlHeader();
 
         msg = response.full_content;
-		write(fd(), msg.c_str(), msg.length()); // TODO: check err and if all bytes were sent
+
         std::cout << "|!|FILE RESPONSE BUILT|!|" << std::endl;
     }
 
-    // send(fd(), msg.c_str(), msg.length(), 0);
+    send(fd(), msg.c_str(), msg.length(), 0);
     // TODO: check err and if all bytes were sent
 }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParser.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:07:03 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/18 15:18:26 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/16 14:13:31 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ class ConfigParser
 public:
     ConfigParser(const std::string& config_file);
     ~ConfigParser();
-    unsigned int nbserver() const;
+    unsigned int nbServer() const;
 
 public:
     class Exception : public ExceptionBase
@@ -31,15 +31,15 @@ public:
     };
 
 private:
-    std::string get_content(std::fstream& file);
-    void create_config();
-    void find_server_start(std::string::iterator& start);
-    std::string::iterator find_server_end(std::string::iterator start, std::string::iterator end);
+    std::string getContent(std::fstream& file);
+    void createConfig();
+    void findServerStart(std::string::iterator& start);
+    std::string::iterator findServerEnd(std::string::iterator start, std::string::iterator end);
 
 private:
-    bool min_server_;
-    std::string file_content_;
-    unsigned int nb_server_;
+    bool min_server;
+    std::string file_content;
+    unsigned int nb_server;
 
 public:
     std::vector<ServerParser> serverparser;

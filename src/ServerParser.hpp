@@ -24,8 +24,8 @@ public:
     ServerParser(std::string::iterator beg, std::string::iterator end);
     ~ServerParser(){};
 
-    void print_content() const;
-    void print_location() const;
+    void printContent() const;
+    void printLocation() const;
     void generate_fake_config();
     void init_server_vars();
     void parse_server_vars();
@@ -45,13 +45,14 @@ public:
     };
 
 private:
-    void build_location();
-    std::size_t find_loc_start(std::size_t i);
-    std::size_t find_loc_end(std::size_t i, std::size_t end);
+    void buildContent();
+    void buildLocation();
+    std::size_t findLocStart(std::size_t i);
+    std::size_t findLocEnd(std::size_t i, std::size_t end);
 
-    std::vector<std::string> server_content_;
-    std::vector<LocationContent> location_;
-    std::string str_content_;
+    std::vector<std::string> server_content;
+    std::vector<LocationContent> location;
+    std::string str_content;
 
 public:
     Config config;
