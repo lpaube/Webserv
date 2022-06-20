@@ -34,10 +34,6 @@ Response::Response(const Request& request, std::vector<Config>& response_configs
   init_response(response_configs[0]);
   this->root = config.root;
   full_path = this->root + req.path();
-
-  std::cerr << "Req path: " << req.path() << std::endl;
-  std::cerr << "Root path: " << this->root << std::endl;
-  std::cerr << "FULL path: " << full_path << std::endl;
 }
 
 void Response::init_response(Config og_config)
@@ -166,12 +162,10 @@ void Response::checkErrorCode()
       {
         if (status_code == *it_code)
         {
-          std::cout << "checkErrorCode: Status code match!" << std::endl;
           //if (access((it->uri).c_str(), F_OK | R_OK) == 0)
           //{
             //std::cout << "checkErrorCode: Error code file access good!" << std::endl;
             requested_path = it->uri;
-            std::cout << "CheckErrorCode root: " << config.root << std::endl;
             init_response(config);
             //full_path = root + it->uri;
             setHtmlBody();
@@ -253,10 +247,6 @@ void Response::setHtmlBody()
   std::ifstream requested_file;
 
   body.clear();
-  std::cerr << "location_path: " << location_path << std::endl;
-  std::cerr << "has_return_redirect: " << has_return_redirect() << std::endl;
-  std::cerr << "#### code: " << config.return_redirect.code << std::endl;
-  //config.print_config();
   if (has_return_redirect())
   {
     status_code = config.return_redirect.code;
@@ -268,7 +258,6 @@ void Response::setHtmlBody()
    */
   if (access(full_path.c_str(), F_OK | R_OK) != 0)
   {
-    std::cout << "(setHtmlBody): OH NO CANT ACCESS PATH: " << full_path << std::endl;
     status_code = 404;
     return;
   }
@@ -287,7 +276,6 @@ void Response::setHtmlBody()
     if (path_extension == "jpeg" || path_extension == "jpg" ||
         path_extension == "png" || path_extension == "gif")
     {
-      std::cerr << "IN IMAGE THIS SHould be working" << std::endl;
       file_type = "IMAGE";
       requested_file.open(full_path.c_str(), std::ios_base::in | std::ios_base::binary);
     }
@@ -297,12 +285,10 @@ void Response::setHtmlBody()
 
   if (!requested_file.is_open()) {
     setStatusCode(400);
-    std::cerr << "(setHtmlBody): There was an error when trying to open the html file." << std::endl;
   } else {
     // body.clear();
     if (file_type == "IMAGE")
     {
-      std::cerr << "setHtmlBody: This is an image" << std::endl;
       body_stream << requested_file.rdbuf();
     }
     else
@@ -337,8 +323,6 @@ void Response::setContentType()
     content_type = "text/javascript";
   else if (path_extension == "md")
     content_type = "text/markdown";
-
-  std::cout << "this is content_type: " << content_type << std::endl;
 }
 
 void Response::setDate()

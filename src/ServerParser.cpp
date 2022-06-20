@@ -319,7 +319,6 @@ void ServerParser::parse_location_vars()
         throw("In new_location file: Not enough arguments provided");
       }
     }
-      std::cerr << "NEW LOCATION:=======" << std::endl;
       config.location.push_back(new_location);
   }
 }

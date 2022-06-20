@@ -1,11 +1,19 @@
 
 
 
-
+import cgi
 import sys
+import os
 from unicodedata import name
 
+form = cgi.FieldStorage()
 data = sys.stdin.readlines()
+
+type = os.getenv("CONTENT_TYPE")
+index = type.find("boundary=")
+index = index + 9
+boundary = type[index:]
+boundary = "--" + boundary + "--"
 
 #filename
 i = 0
@@ -36,7 +44,7 @@ f = open(filename, flags)
 #body-
 start = 4
 while True:
-	if data[start + 1].find("-----------------------------") >= 0:
+	if data[start + 1].find(boundary) >= 0:
 		break
 	else:
 		if filetype == "text":

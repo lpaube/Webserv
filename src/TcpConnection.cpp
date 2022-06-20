@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/18 16:38:22 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/20 11:32:10 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,7 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
 	}
 	Script script(resp_configs[0], req_);
 	msg = script.exec();
+	std::cout << "PRITING SCRIPT OUTPUT: \n" << msg << std::endl;
         std::cout << "|!|OUT OF SCRIPT|!|" << std::endl;
     } else {
         std::cout << "|!|IN FILE RESPONSE|!|" << std::endl;
@@ -126,7 +127,6 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
           }
           else
             response.setHtmlBody();
-          std::cerr << "THIS IS BODY: " << response.body << std::endl;
           response.checkErrorCode();
           response.setHtmlHeader();
           response.full_content = response.header + response.body;

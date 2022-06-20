@@ -45,7 +45,27 @@
 
     var redirection = document.getElementById("redirection");
     redirection.onclick = () =>	{
-      fetch("/Error/special_path", {
+      fetch("/42_test/special_directory/special_path/", {
+        method: "GET"
+      }).then(response => response.text())
+        .then((content) => {
+          document.write(content);
+        });
+    }
+
+    var index_test = document.getElementById("index_test");
+    index_test.onclick = () =>	{
+      fetch("/42_test/index_directory/", {
+        method: "GET"
+      }).then(response => response.text())
+        .then((content) => {
+          document.write(content);
+        });
+    }
+
+    var autoindex_test = document.getElementById("autoindex_test");
+    autoindex_test.onclick = () =>	{
+      fetch("/42_test/autoindex_directory/", {
         method: "GET"
       }).then(response => response.text())
         .then((content) => {
