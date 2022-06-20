@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Script.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:01 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/17 16:49:37 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/16 16:20:10 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,15 +30,15 @@ public:
     std::string exec();
 
 private:
-    void build_cmd(const std::string& path, const Config& config);
+    void buildCmd(const std::string& path, const Config& config);
     std::string get_ext(const std::string& path);
-    void build_env(Method method, const Config& config);
-    void print_env() const;
+    void buildEnv(Method method, const Config& config);
+    void printEnv() const;
 
 private:
-    std::vector<std::string> v_env_;
-    char** envp_;
-    char** cmd_;
-    std::size_t envp_size_;
-    const Request& request_;
+    std::vector<std::string> v_env;
+    char** envp;
+    char** cmd;
+    std::size_t envp_size;
+    const Request& request;
 };
