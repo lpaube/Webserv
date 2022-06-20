@@ -111,7 +111,11 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
         }
 
         Response response(req_, resp_configs);
-        if (response.getMethod() == GET)
+        if (response.has_return_redirect())
+        {
+          response.redirect();
+        }
+        else if (response.getMethod() == GET)
         {
           if (response.method_allowed(GET) == false)
           {

@@ -31,11 +31,7 @@ Response::Response(const Request& request, std::vector<Config>& response_configs
   this->content_type = "text/html";
   this->method = req.method();
 
-  std::cout << "=====PRINTING CONFIG PRE======" << std::endl;
-  response_configs[0].print_config();
   init_response(response_configs[0]);
-  std::cout << "=====PRINTING CONFIG POST======" << std::endl;
-  config.print_config();
   this->root = config.root;
   full_path = this->root + req.path();
 
@@ -46,8 +42,6 @@ Response::Response(const Request& request, std::vector<Config>& response_configs
 
 void Response::init_response(Config og_config)
 {
-  std::cout << "=====PRINTING CONFIG INIT RESPONSE======" << std::endl;
-  og_config.print_config();
 
   config = getSingularConfig(og_config);
   this->root = config.root;
@@ -97,12 +91,10 @@ Config::Location Response::getSingularLocation(std::vector<Config::Location> loc
   int slash_count;
   int curr_count;
   
-  //config.print_config();
   for (std::vector<Config::Location>::iterator it = locations.begin();
       it != locations.end();
       ++it)
   {
-    //it->print_location();
     curr_count = 0;
     slash_count = 0;
     std::cerr << "=====getSingularLocation: it->location: " <<
@@ -200,6 +192,61 @@ void Response::checkErrorCode()
   }
 }
 
+int Response::generate_autoindex(std::ifstream& requested_file, std::stringstream& body_stream)
+{
+  for (std::vector<std::string>::iterator it = config.index.begin();
+      it != config.index.end();
+      ++it)
+  {
+    requested_file.open((full_path + *it).c_str());
+    if (requested_file.is_open())
+    {
+      full_path += *it;
+      break;
+    }
+  }
+  /*
+   * Making the files hierarchy for autoindex
+   */
+  if (config.autoindex == true && !requested_file.is_open())
+  {
+    DIR *dir;
+
+    body_stream << "<h1>Listing files in directory (autoindex=on)</h1>\r\n"
+      << "<ul>\r\n";
+    struct dirent *ent;
+    if ((dir = opendir(full_path.c_str())) != NULL)
+    {
+      while ((ent = readdir(dir)) != NULL)
+      {
+        body_stream << "<li>" << ent->d_name << "</li>" << "\r\n";
+      }
+      closedir(dir);
+    }
+    body_stream << "</ul>\r\n";
+    // Can probably avoid repeat with below
+    body_stream << "\r\n";
+    body = body_stream.str();
+    body_size = body.size();
+    if (body_size > getConfig().client_max_body_size)
+      setStatusCode(413);
+    return 1;
+  }
+  return 0;
+}
+
+void Response::redirect()
+{
+  
+}
+
+bool Response::has_return_redirect()
+{
+  if (config.return_redirect.code != -1)
+    return true;
+  return false;
+}
+
 void Response::setHtmlBody()
 {
   std::string line;
@@ -222,44 +269,8 @@ void Response::setHtmlBody()
    */
   if (*(full_path.end() - 1) == '/')
   {
-    for (std::vector<std::string>::iterator it = config.index.begin();
-        it != config.index.end();
-        ++it)
-    {
-      requested_file.open((full_path + *it).c_str());
-      if (requested_file.is_open())
-      {
-        full_path += *it;
-        break;
-      }
-    }
-    /*
-     * Making the files hierarchy for autoindex
-     */
-    if (config.autoindex == true && !requested_file.is_open())
-    {
-      DIR *dir;
-
-      body_stream << "<h1>Listing files in directory (autoindex=on)</h1>\r\n"
-        << "<ul>\r\n";
-      struct dirent *ent;
-      if ((dir = opendir(full_path.c_str())) != NULL)
-      {
-        while ((ent = readdir(dir)) != NULL)
-        {
-          body_stream << "<li>" << ent->d_name << "</li>" << "\r\n";
-        }
-        closedir(dir);
-      }
-      body_stream << "</ul>\r\n";
-      // Can probably avoid repeat with below
-      body_stream << "\r\n";
-      body = body_stream.str();
-      body_size = body.size();
-      if (body_size > getConfig().client_max_body_size)
-        setStatusCode(413);
+    if (generate_autoindex(requested_file, body_stream))
       return;
-    }
   }
   else
   {
@@ -267,6 +278,7 @@ void Response::setHtmlBody()
     if (path_extension == "jpeg" || path_extension == "jpg" ||
         path_extension == "png" || path_extension == "gif")
     {
+      std::cerr << "IN IMAGE THIS SHould be working" << std::endl;
       file_type = "IMAGE";
       requested_file.open(full_path.c_str(), std::ios_base::in | std::ios_base::binary);
     }

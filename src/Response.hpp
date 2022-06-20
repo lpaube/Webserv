@@ -54,6 +54,8 @@ public:
     void setHtmlBody();
     void setHtmlHeader();
     Method getMethod() {return method;};
+    bool has_return_redirect();
+    void redirect();
     std::string get_full_path() {return full_path;}
     void remove_file();
     bool method_allowed(Method method);
@@ -64,6 +66,7 @@ private:
     void setContentType();
     void setDate();
     void setHost();
+    int generate_autoindex(std::ifstream& requested_file, std::stringstream& body_stream);
     int setAllow();
     Config getSingularConfig(Config og_config);
     Config::Location getSingularLocation(std::vector<Config::Location> locations, bool& has_location);

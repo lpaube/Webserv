@@ -4,7 +4,7 @@ server{
   client_max_body_size 80m;
   error_page    404  /Error/error404.html;
   error_page    405 504 505 /Error/default.html;
-  index web_page/42_test/index.html;
+  index random;
   autoindex on;
  
   cgi_ext		.sh /bin/bash;
@@ -14,13 +14,11 @@ server{
 	location / {
     root ./web_page/42_test;
     client_max_body_size 800m;
-    index index.html;
     limit_except GET;
 	}
 
   location /Error {
     root ./web_page;
-    index index.html;
   }
 
 }

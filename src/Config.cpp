@@ -7,6 +7,7 @@ Config& Config::operator=(const Config& other)
   error_page = other.error_page;
   client_max_body_size = other.client_max_body_size;
   limit_except = other.limit_except;
+  return_redirect = other.return_redirect;
   root = other.root;
   autoindex = other.autoindex;
   index = other.index;
