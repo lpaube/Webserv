@@ -26,6 +26,7 @@ Response::Response(const Request& request, const std::vector<Config>& response_c
   , server("Anginex/1.0")
   , location_path("")
 {
+  std::cerr << "THIS IS req.path(): " << req.path() << std::endl;
   if (response_configs.size() == 0) {
     std::cerr << "NO CONFIG MATCH" << std::endl;
     throw "No config matches the request";
@@ -207,7 +208,7 @@ int Response::generate_autoindex(std::ifstream& requested_file, std::stringstrea
     {
       while ((ent = readdir(dir)) != NULL)
       {
-        body_stream << "<li>" << ent->d_name << "</li>" << "\r\n";
+        body_stream << "<li><a href=\"" << requested_path + ent->d_name << "\">" << ent->d_name << "</a></li>" << "\r\n";
       }
       closedir(dir);
     }

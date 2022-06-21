@@ -127,6 +127,8 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
           }
           else
             response.setHtmlBody();
+          std::cerr << "===REQUESTED PATH BEFORE ERROR_CHECK: " << response.get_full_path() << std::endl;
+          std::cerr << "===FULL PATH BEFORE ERROR_CHECK: " << response.get_full_path() << std::endl;
           response.checkErrorCode();
           response.setHtmlHeader();
           response.full_content = response.header + response.body;
@@ -143,10 +145,12 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
             response.remove_file();
             //response.setHtmlBody();
           }
+          std::cerr << "===FULL PATH BEFORE ERROR_CHECK: " << response.get_full_path() << std::endl;
           response.checkErrorCode();
           response.setHtmlHeader();
           response.full_content = response.header + response.body;
         }
+        std::cerr << "===THIS IS FULL PATH BEFORE WRITE: " << response.get_full_path() << std::endl;
 
         msg = response.full_content;
 		write(fd(), msg.c_str(), msg.length()); // TODO: check err and if all bytes were sent
