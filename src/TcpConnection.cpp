@@ -101,7 +101,7 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
 	}
 	Script script(resp_configs[0], req_);
 	msg = script.exec();
-	std::cout << "PRITING SCRIPT OUTPUT: \n" << msg << std::endl;
+	std::cout << "PRINTING SCRIPT OUTPUT: \n" << msg << std::endl;
         std::cout << "|!|OUT OF SCRIPT|!|" << std::endl;
     } else {
         std::cout << "|!|IN FILE RESPONSE|!|" << std::endl;
@@ -128,9 +128,6 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
           else
             response.set_html_body();
 
-          std::cerr << "===LOCATION PATH BEFORE ERROR_CHECK: " << response.get_location_path() << std::endl;
-          std::cerr << "===REQUESTED PATH BEFORE ERROR_CHECK: " << response.get_full_path() << std::endl;
-          std::cerr << "===FULL PATH BEFORE ERROR_CHECK: " << response.get_full_path() << std::endl;
           response.check_error_code();
           response.set_html_header();
           response.full_content = response.header + response.body;
@@ -145,15 +142,11 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
           else
           {
             response.remove_file();
-            //response.setHtmlBody();
           }
-          std::cerr << "===FULL PATH BEFORE ERROR_CHECK: " << response.get_full_path() << std::endl;
           response.check_error_code();
           response.set_html_header();
           response.full_content = response.header + response.body;
         }
-        std::cerr << "===THIS IS FULL PATH BEFORE WRITE: " << response.get_full_path() << std::endl;
-
         msg = response.full_content;
 		write(fd(), msg.c_str(), msg.length()); // TODO: check err and if all bytes were sent
         std::cout << "|!|FILE RESPONSE BUILT|!|" << std::endl;

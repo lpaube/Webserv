@@ -84,13 +84,14 @@ void Response::remove_file()
 {
   if (std::remove(full_path_.c_str()) != 0)
   {
-    std::cout << "Could not delete the file: " << full_path_ << std::endl;
-    status_code_ = 404;
-
+    status_code_ = 204;
   }
   else
   {
-    std::cout << "Deleted file: " << full_path_ << std::endl;
+    status_code_ = 200;
+    body = "<h1>The file has been deleted: " + full_path_ + "</h1>\r\n";
+    body_size_ = body.size();
+    full_path_ = "delete_message.html";
   }
 }
 
@@ -165,7 +166,7 @@ void Response::set_status_code(int code)
 
 void Response::check_error_code()
 {
-  if (status_code_ < 200 || status_code_ >= 400)
+  if (status_code_ >= 300 && status_code_ < 600)
   {
     for (std::vector<Config::Error_page>::iterator it = config_.error_page.begin();
         it != config_.error_page.end();
@@ -177,25 +178,12 @@ void Response::check_error_code()
       {
         if (status_code_ == *it_code)
         {
-          //if (access((it->uri).c_str(), F_OK | R_OK) == 0)
-          //{
-            //std::cout << "checkErrorCode: Error code file access good!" << std::endl;
-            requested_path_ = it->uri;
-            generate_singular_config();
-            //init_response(config);
-            set_html_body();
-            return;
-          //}
-          //std::cout << "checkErrorCode: Error code file access bad!" << std::endl;
+          requested_path_ = it->uri;
+          generate_singular_config();
+          set_html_body();
+          return;
         }
       }
-    }
-    if (status_code_ >= 300 && status_code_ < 600)
-    {
-      std::stringstream body_stream;
-
-      body.clear();
-      body_stream << "<h1>Error " << status_code_ << "</h1>\n\r\n\r";
     }
   }
 }
