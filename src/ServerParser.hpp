@@ -29,7 +29,6 @@ public:
     void generate_fake_config();
     void init_server_vars();
     void parse_server_vars();
-    void init_location_vars(Config::Location& new_location);
     void parse_location_vars();
 
     class NoSepException : public std::exception

@@ -18,29 +18,57 @@
 #include <stdio.h>
 
 Response::Response(const Request& request, const std::vector<Config>& response_configs)
-  : req(request)
-  , status_code(200)
-  , method(req.method())
-  , requested_path(req.path())
-  , content_type("text/html")
-  , server("Anginex/1.0")
-  , location_path("")
+  : req_(request)
+  , status_code_(200)
+  , method_(req_.method())
+  , requested_path_(req_.path())
+  , content_type_("text/html")
+  , server_("Anginex/1.0")
+  , location_path_("")
 {
-  std::cerr << "THIS IS req.path(): " << req.path() << std::endl;
   if (response_configs.size() == 0) {
-    std::cerr << "NO CONFIG MATCH" << std::endl;
     throw "No config matches the request";
   }
-  config = response_configs[0];
-  getSingularConfig();
+  config_ = response_configs[0];
+  generate_singular_config();
 }
 
-bool Response::method_allowed(Method method)
+Config Response::get_config() const
 {
-  if (config.limit_except.empty())
+  return config_;
+}
+
+int Response::get_status_code() const
+{
+  return status_code_;
+}
+
+std::string Response::get_status_code_msg() const
+{
+  return status_code_msg_;
+}
+
+std::string Response::get_location_path() const
+{
+  return location_path_;
+}
+
+std::string Response::get_full_path() const
+{
+  return full_path_;
+}
+
+Method Response::get_method() const
+{
+  return method_;
+}
+
+bool Response::method_allowed(Method method) const
+{
+  if (config_.limit_except.empty())
     return true;
-  for (std::vector<std::string>::iterator it = config.limit_except.begin();
-      it != config.limit_except.end();
+  for (std::vector<std::string>::const_iterator it = config_.limit_except.begin();
+      it != config_.limit_except.end();
       ++it)
   {
     if ((method == GET && *it == "GET") ||
@@ -54,19 +82,19 @@ bool Response::method_allowed(Method method)
 
 void Response::remove_file()
 {
-  if (std::remove(full_path.c_str()) != 0)
+  if (std::remove(full_path_.c_str()) != 0)
   {
-    std::cout << "Could not delete the file: " << full_path << std::endl;
-    status_code = 404;
+    std::cout << "Could not delete the file: " << full_path_ << std::endl;
+    status_code_ = 404;
 
   }
   else
   {
-    std::cout << "Deleted file: " << full_path << std::endl;
+    std::cout << "Deleted file: " << full_path_ << std::endl;
   }
 }
 
-Config::Location Response::getSingularLocation(const std::vector<Config::Location>& locations, bool& has_location)
+Config::Location Response::generate_singular_location(const std::vector<Config::Location>& locations, bool& has_location)
 {
   /*
    * Counts the number of directory matches in 
@@ -91,12 +119,12 @@ Config::Location Response::getSingularLocation(const std::vector<Config::Locatio
         i < it->location_path.size() /* && requested_path[i] == it->location_path[i] */;
         ++i)
     {
-      if (requested_path[i] != it->location_path[i])
+      if (requested_path_[i] != it->location_path[i])
       {
         curr_count = 0;
         break;
       }
-      if (requested_path[i] == '/')
+      if (requested_path_[i] == '/')
         slash_count++;
       curr_count++;
     }
@@ -113,111 +141,102 @@ Config::Location Response::getSingularLocation(const std::vector<Config::Locatio
   return single_location;
 }
 
-void Response::getSingularConfig()
+void Response::generate_singular_config()
 {
   bool has_location = false;
   Config::Location single_location;
 
 
-  single_location = getSingularLocation(config.location, has_location);
+  single_location = generate_singular_location(config_.location, has_location);
   if (has_location)
   {
-    location_path = single_location.location_path;
-
-    //config = single_location;
-    config.error_page = single_location.error_page;
-    config.client_max_body_size = single_location.client_max_body_size;
-    config.limit_except = single_location.limit_except;
-    config.root = single_location.root;
-    config.autoindex = single_location.autoindex;
-    config.index = single_location.index;
-    config.cgi_ext = single_location.cgi_ext;
-    config.return_redirect = single_location.return_redirect;
+    location_path_ = single_location.location_path;
+    config_ = single_location;
   }
-  root = config.root;
-  full_path = root + requested_path;
+  root_ = config_.root;
+  full_path_ = root_ + requested_path_;
 }
 
-void Response::setStatusCode(int code)
+void Response::set_status_code(int code)
 {
-  this->status_code = code;
-  this->status_code_msg = StatusCode::get_code_msg(code);
+  this->status_code_ = code;
+  this->status_code_msg_ = StatusCode::get_code_msg(code);
 }
 
-void Response::checkErrorCode()
+void Response::check_error_code()
 {
-  if (status_code < 200 || status_code >= 400)
+  if (status_code_ < 200 || status_code_ >= 400)
   {
-    for (std::vector<Config::Error_page>::iterator it = config.error_page.begin();
-        it != config.error_page.end();
+    for (std::vector<Config::Error_page>::iterator it = config_.error_page.begin();
+        it != config_.error_page.end();
         ++it)
     {
       for (std::vector<int>::iterator it_code = it->code.begin();
           it_code != it->code.end();
           ++it_code)
       {
-        if (status_code == *it_code)
+        if (status_code_ == *it_code)
         {
           //if (access((it->uri).c_str(), F_OK | R_OK) == 0)
           //{
             //std::cout << "checkErrorCode: Error code file access good!" << std::endl;
-            requested_path = it->uri;
-            getSingularConfig();
+            requested_path_ = it->uri;
+            generate_singular_config();
             //init_response(config);
-            setHtmlBody();
+            set_html_body();
             return;
           //}
           //std::cout << "checkErrorCode: Error code file access bad!" << std::endl;
         }
       }
     }
-    if (status_code >= 300 && status_code < 600)
+    if (status_code_ >= 300 && status_code_ < 600)
     {
       std::stringstream body_stream;
 
       body.clear();
-      body_stream << "<h1>Error " << status_code << "</h1>\n\r\n\r";
+      body_stream << "<h1>Error " << status_code_ << "</h1>\n\r\n\r";
     }
   }
 }
 
 int Response::generate_autoindex(std::ifstream& requested_file, std::stringstream& body_stream)
 {
-  for (std::vector<std::string>::iterator it = config.index.begin();
-      it != config.index.end();
+  for (std::vector<std::string>::iterator it = config_.index.begin();
+      it != config_.index.end();
       ++it)
   {
-    requested_file.open((full_path + *it).c_str());
+    requested_file.open((full_path_ + *it).c_str());
     if (requested_file.is_open())
     {
-      full_path += *it;
+      full_path_ += *it;
       break;
     }
   }
   /*
    * Making the files hierarchy for autoindex
    */
-  if (config.autoindex == true && !requested_file.is_open())
+  if (config_.autoindex == true && !requested_file.is_open())
   {
     DIR *dir;
 
     body_stream << "<h1>Listing files in directory (autoindex=on)</h1>\r\n"
       << "<ul>\r\n";
     struct dirent *ent;
-    if ((dir = opendir(full_path.c_str())) != NULL)
+    if ((dir = opendir(full_path_.c_str())) != NULL)
     {
       while ((ent = readdir(dir)) != NULL)
       {
-        body_stream << "<li><a href=\"" << requested_path + ent->d_name << "\">" << ent->d_name << "</a></li>" << "\r\n";
+        body_stream << "<li><a href=\"" << requested_path_ + ent->d_name << "\">" << ent->d_name << "</a></li>" << "\r\n";
       }
       closedir(dir);
     }
     body_stream << "</ul>\r\n";
     body_stream << "\r\n";
     body = body_stream.str();
-    body_size = body.size();
-    if (body_size > getConfig().client_max_body_size)
-      setStatusCode(413);
+    body_size_ = body.size();
+    if (body_size_ > get_config().client_max_body_size)
+      set_status_code(413);
     return 1;
   }
   return 0;
@@ -225,17 +244,17 @@ int Response::generate_autoindex(std::ifstream& requested_file, std::stringstrea
 
 void Response::redirect()
 {
-  status_code = config.return_redirect.code;
+  status_code_ = config_.return_redirect.code;
 }
 
-bool Response::has_return_redirect()
+bool Response::has_return_redirect() const
 {
-  if (config.return_redirect.code != -1)
+  if (config_.return_redirect.code != -1)
     return true;
   return false;
 }
 
-void Response::setHtmlBody()
+void Response::set_html_body()
 {
   std::string line;
   std::stringstream body_stream;
@@ -244,45 +263,50 @@ void Response::setHtmlBody()
   body.clear();
   if (has_return_redirect())
   {
-    status_code = config.return_redirect.code;
-    requested_path = config.return_redirect.url;
-    full_path = root + "/" + requested_path;
+    status_code_ = config_.return_redirect.code;
+    requested_path_ = config_.return_redirect.url;
+    full_path_ = root_ + "/" + requested_path_;
   }
   /*
    * Check path access
    */
-  if (access(full_path.c_str(), F_OK | R_OK) != 0)
+  if (access(full_path_.c_str(), F_OK | R_OK) != 0)
   {
-    status_code = 404;
+    status_code_ = 404;
     return;
   }
 
   /*
    * Handle directives index and autoindex
    */
-  if (*(full_path.end() - 1) == '/')
+  if (*(full_path_.end() - 1) == '/')
   {
     if (generate_autoindex(requested_file, body_stream))
       return;
   }
   else
   {
-    std::string path_extension = full_path.substr(full_path.find_last_of(".") + 1);
+    size_t ext_pos = full_path_.find_last_of(".");
+    if (ext_pos == std::string::npos)
+    {
+      throw("Big error in finding extension position");
+    }
+    std::string path_extension = full_path_.substr(ext_pos + 1);
     if (path_extension == "jpeg" || path_extension == "jpg" ||
         path_extension == "png" || path_extension == "gif")
     {
-      file_type = "IMAGE";
-      requested_file.open(full_path.c_str(), std::ios_base::in | std::ios_base::binary);
+      file_type_ = "IMAGE";
+      requested_file.open(full_path_.c_str(), std::ios_base::in | std::ios_base::binary);
     }
     else
-      requested_file.open(full_path.c_str());
+      requested_file.open(full_path_.c_str());
   }
 
   if (!requested_file.is_open()) {
-    setStatusCode(400);
+    set_status_code(400);
   } else {
     // body.clear();
-    if (file_type == "IMAGE")
+    if (file_type_ == "IMAGE")
     {
       body_stream << requested_file.rdbuf();
     }
@@ -295,84 +319,93 @@ void Response::setHtmlBody()
     requested_file.close();
     body_stream << "\r\n";
     body = body_stream.str();
-    body_size = body.size();
-    if (body_size > getConfig().client_max_body_size)
-      setStatusCode(413);
+    body_size_ = body.size();
+    if (body_size_ > get_config().client_max_body_size)
+      set_status_code(413);
   }
 }
 
-void Response::setContentType()
+void Response::set_content_type()
 {
-  std::string path_extension = full_path.substr(full_path.find_last_of(".") + 1);
+  size_t ext_pos = full_path_.find_last_of(".");
+  if (ext_pos == std::string::npos)
+  {
+    throw("Big error in finding extension position");
+  }
+  std::string path_extension = full_path_.substr(ext_pos + 1);
   if (path_extension == "jpg" || path_extension == "jpeg")
-    content_type = "image/jpeg";
+    content_type_ = "image/jpeg";
   else if (path_extension == "png")
-    content_type = "image/png";
+    content_type_ = "image/png";
   else if (path_extension == "gif")
-    content_type = "image/gif";
+    content_type_ = "image/gif";
   else if (path_extension == "mp4")
-    content_type = "video/mp4";
+    content_type_ = "video/mp4";
   else if (path_extension == "css")
-    content_type = "text/css";
+    content_type_ = "text/css";
   else if (path_extension == "js")
-    content_type = "text/javascript";
+    content_type_ = "text/javascript";
   else if (path_extension == "md")
-    content_type = "text/markdown";
+    content_type_ = "text/markdown";
 }
 
-void Response::setDate()
+void Response::set_date()
 {
   char buf[1000];
 
   time_t now = time(0);
   struct tm tm = *gmtime(&now);
   strftime(buf, sizeof buf, "%a, %d %b %Y %H:%S %Z", &tm);
-  date_now = std::string(buf);
+  date_now_ = std::string(buf);
 }
 
-void Response::setHost()
+void Response::set_host()
 {
-  Request::header_iterator it = req.find_header("host");
-  host = it->second;
+  Request::header_iterator it = req_.find_header("host");
+  if (it != req_.headers_end())
+    host_ = it->second;
+  else
+    host_ = "";
 }
 
-int Response::setAllow()
+int Response::set_allow()
 {
-  if (config.limit_except.size() == 0)
+  if (config_.limit_except.size() == 0)
     return 0;
-  allow = config.limit_except[0];
-  for (std::vector<std::string>::iterator it = config.limit_except.begin() + 1;
-      it != config.limit_except.end();
+  allow_ = config_.limit_except[0];
+  for (std::vector<std::string>::iterator it = config_.limit_except.begin() + 1;
+      it != config_.limit_except.end();
       ++it)
   {
-    allow += ", ";
-    allow += *it;
+    allow_ += ", ";
+    allow_ += *it;
   }
   return 1;
 }
 
-void Response::setHtmlHeader()
+void Response::set_html_header()
 {
   std::stringstream header_stream;
 
-  setContentType();
-  setDate();
-  setHost();
-  header_stream << "HTTP/1.1 " << status_code << " " << StatusCode::get_code_msg(status_code)
+  set_content_type();
+  set_date();
+  set_host();
+  header_stream << "HTTP/1.1 " << status_code_ << " " << StatusCode::get_code_msg(status_code_)
     << "\r\n"
     << "Access-Control-Allow-Origin: *\r\n";
-  header_size = header_stream.str().size();
-  header_stream << "Date: " << date_now << "\r\n";
-  header_stream << "Host: " << host << "\r\n";
-  if (setAllow())
+  header_size_ = header_stream.str().size();
+  header_stream << "Date: " << date_now_ << "\r\n";
+  header_stream << "Host: " << host_ << "\r\n";
+  if (set_allow())
   {
-    header_stream << "Allow: " << allow << "\r\n";
+    header_stream << "Allow: " << allow_ << "\r\n";
   }
-  header_stream << "Content-Length: " << body_size << "\r\n";
-  header_stream << "Content-Type: " << content_type << "\r\n";
+  header_stream << "Content-Length: " << body_size_ << "\r\n";
+  header_stream << "Content-Type: " << content_type_ << "\r\n";
   header_stream << "Accept-Ranges: bytes" << "\r\n";
-  header_stream << "Server: " << server << "\r\n";
+  header_stream << "Server: " << server_ << "\r\n";
   header_stream << "\r\n";
   header = header_stream.str();
   full_content = header + body;
 }
+

@@ -192,17 +192,6 @@ std::string clean_spaces(std::string str)
   return new_str;
 }
 
-void ServerParser::init_location_vars(Config::Location& new_location)
-{
-  new_location.error_page = config.error_page;
-  new_location.client_max_body_size = config.client_max_body_size;
-  new_location.return_redirect = config.return_redirect;
-  new_location.root = config.root;
-  new_location.autoindex = config.autoindex;
-  new_location.index = config.index;
-  new_location.cgi_ext = config.cgi_ext;
-}
-
 void ServerParser::parse_location_vars()
 {
   for (std::vector<LocationContent>::iterator location_it = location_.begin();
@@ -211,7 +200,7 @@ void ServerParser::parse_location_vars()
     
     //Adding path to location_path of location
     new_location.location_path = location_it->path;
-    this->init_location_vars(new_location);
+    new_location = config;
     for (std::vector<std::string>::iterator it = location_it->loc_content.begin();
         it != location_it->loc_content.end(); ++it) {
       std::string tmp_str = clean_spaces(*it);
