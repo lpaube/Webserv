@@ -26,7 +26,7 @@ public:
     {
     }
 
-    Response(const Request& request, std::vector<Config>& configs);
+    Response(const Request& request, const std::vector<Config>& response_configs);
 
     ~Response()
     {
@@ -68,9 +68,8 @@ private:
     void setHost();
     int generate_autoindex(std::ifstream& requested_file, std::stringstream& body_stream);
     int setAllow();
-    Config getSingularConfig(Config og_config);
-    Config::Location getSingularLocation(std::vector<Config::Location> locations, bool& has_location);
-    void init_response(Config og_config);
+    void getSingularConfig();
+    Config::Location getSingularLocation(const std::vector<Config::Location>& locations, bool& has_location);
 
 public:
     std::string body;

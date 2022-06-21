@@ -58,7 +58,6 @@ public:
     std::vector<std::string> index;
     std::vector<Cgi_ext> cgi_ext;
     std::vector<Location> location;
-    Config& operator=(const Config& other);
 
     void print_config();
 };

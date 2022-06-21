@@ -17,30 +17,21 @@
 #include <dirent.h>
 #include <stdio.h>
 
-Response::Response(const Request& request, std::vector<Config>& response_configs)
+Response::Response(const Request& request, const std::vector<Config>& response_configs)
+  : req(request)
+  , status_code(200)
+  , method(req.method())
+  , requested_path(req.path())
+  , content_type("text/html")
+  , server("Anginex/1.0")
+  , location_path("")
 {
   if (response_configs.size() == 0) {
     std::cerr << "NO CONFIG MATCH" << std::endl;
     throw "No config matches the request";
   }
-  this->req = request;
-  this->requested_path = req.path();
-  this->location_path = "";
-  this->status_code = 200;
-  this->server = "Anginex/1.0";
-  this->content_type = "text/html";
-  this->method = req.method();
-
-  init_response(response_configs[0]);
-  this->root = config.root;
-  full_path = this->root + req.path();
-}
-
-void Response::init_response(Config og_config)
-{
-  config = getSingularConfig(og_config);
-  this->root = config.root;
-  full_path = this->root + requested_path;
+  config = response_configs[0];
+  getSingularConfig();
 }
 
 bool Response::method_allowed(Method method)
@@ -65,6 +56,8 @@ void Response::remove_file()
   if (std::remove(full_path.c_str()) != 0)
   {
     std::cout << "Could not delete the file: " << full_path << std::endl;
+    status_code = 404;
+
   }
   else
   {
@@ -72,7 +65,7 @@ void Response::remove_file()
   }
 }
 
-Config::Location Response::getSingularLocation(std::vector<Config::Location> locations, bool& has_location)
+Config::Location Response::getSingularLocation(const std::vector<Config::Location>& locations, bool& has_location)
 {
   /*
    * Counts the number of directory matches in 
@@ -86,7 +79,7 @@ Config::Location Response::getSingularLocation(std::vector<Config::Location> loc
   int slash_count;
   int curr_count;
   
-  for (std::vector<Config::Location>::iterator it = locations.begin();
+  for (std::vector<Config::Location>::const_iterator it = locations.begin();
       it != locations.end();
       ++it)
   {
@@ -119,27 +112,29 @@ Config::Location Response::getSingularLocation(std::vector<Config::Location> loc
   return single_location;
 }
 
-Config Response::getSingularConfig(Config og_config)
+void Response::getSingularConfig()
 {
   bool has_location = false;
   Config::Location single_location;
 
 
-  single_location = getSingularLocation(og_config.location, has_location);
+  single_location = getSingularLocation(config.location, has_location);
   if (has_location)
   {
     location_path = single_location.location_path;
 
-    og_config.error_page = single_location.error_page;
-    og_config.client_max_body_size = single_location.client_max_body_size;
-    og_config.limit_except = single_location.limit_except;
-    og_config.root = single_location.root;
-    og_config.autoindex = single_location.autoindex;
-    og_config.index = single_location.index;
-    og_config.cgi_ext = single_location.cgi_ext;
-    og_config.return_redirect = single_location.return_redirect;
+    //config = single_location;
+    config.error_page = single_location.error_page;
+    config.client_max_body_size = single_location.client_max_body_size;
+    config.limit_except = single_location.limit_except;
+    config.root = single_location.root;
+    config.autoindex = single_location.autoindex;
+    config.index = single_location.index;
+    config.cgi_ext = single_location.cgi_ext;
+    config.return_redirect = single_location.return_redirect;
   }
-  return og_config;
+  root = config.root;
+  full_path = root + requested_path;
 }
 
 void Response::setStatusCode(int code)
@@ -166,8 +161,8 @@ void Response::checkErrorCode()
           //{
             //std::cout << "checkErrorCode: Error code file access good!" << std::endl;
             requested_path = it->uri;
-            init_response(config);
-            //full_path = root + it->uri;
+            getSingularConfig();
+            //init_response(config);
             setHtmlBody();
             return;
           //}
@@ -217,7 +212,6 @@ int Response::generate_autoindex(std::ifstream& requested_file, std::stringstrea
       closedir(dir);
     }
     body_stream << "</ul>\r\n";
-    // Can probably avoid repeat with below
     body_stream << "\r\n";
     body = body_stream.str();
     body_size = body.size();
