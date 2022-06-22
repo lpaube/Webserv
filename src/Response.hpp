@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 15:56:58 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/16 14:10:54 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/22 15:59:58 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 class Response
 {
 public:
-    Response(const Request& request, const std::vector<Config>& response_configs);
+    Response(const Request& request, const Config& response_configs);
     Config get_config() const;
     int get_status_code() const;
     std::string get_status_code_msg() const;

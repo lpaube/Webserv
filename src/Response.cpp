@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 15:57:07 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/22 14:42:55 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/22 16:00:08 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <dirent.h>
 #include <stdio.h>
 
-Response::Response(const Request& request, const std::vector<Config>& response_configs)
+Response::Response(const Request& request, const Config& response_configs)
   : req_(request)
   , status_code_(200)
   , method_(req_.method())
@@ -26,10 +26,7 @@ Response::Response(const Request& request, const std::vector<Config>& response_c
   , server_("Anginex/1.0")
   , location_path_("")
 {
-  if (response_configs.size() == 0) {
-    throw "Temporary throw until we get a single config from MAFORT";
-  }
-  config_ = response_configs[0];
+  config_ = response_configs;
   generate_singular_config();
 }
 

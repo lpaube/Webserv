@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 19:31:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/22 15:05:30 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/22 16:02:02 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,8 @@ private:
     void request_line_done(bool& done);
     void headers_done(bool& done);
     void add_header(ParseState next_state);
-	void send_response(const std::string& msg) const;
-    std::vector<Config> get_response_configs(const std::vector<Config>& server_configs) const;
+	int send_response(const std::string& msg, std::size_t start) const;
+    const Config& get_response_configs(const std::vector<Config>& server_configs) const;
 
 private:
     int listener_fd_;
@@ -68,4 +68,6 @@ private:
     void (TcpConnection::*request_handler)();
     size_t req_size_;
     Request req_;
+	std::string msg;
+	int byte_sent;
 };
