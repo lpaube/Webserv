@@ -235,7 +235,7 @@ void ServerParser::parse_location_vars()
           std::string tmp_str;
 
           if (directives.size() != 2) {
-            throw("client_max_body_size: wrong args number");
+            throw BadLocationDirective();
           }
           for (std::string::iterator it = directives[1].begin();
               it != directives[1].end(); ++it) {
@@ -246,7 +246,7 @@ void ServerParser::parse_location_vars()
               std::istringstream(tmp_str) >> x;
               new_location.client_max_body_size = x * BYTES_IN_MB;
             } else {
-              throw("client_max_body_size not a valid input");
+              throw BadLocationDirective();
             }
           }
         } else if (directives[0] == "limit_except") {
@@ -269,23 +269,23 @@ void ServerParser::parse_location_vars()
 
           } else {
             std::cerr << "LP ERROR 3" << std::endl;
-            throw("return_redirect: error..");
+              throw BadLocationDirective();
           }
         } else if (directives[0] == "root") {
           if (directives.size() != 2) {
-            throw("root: wrong number of args");
+              throw BadLocationDirective();
           }
           new_location.root = directives[1];
         } else if (directives[0] == "autoindex") {
           if (directives.size() != 2) {
-            throw("autoindex: wrong number of args");
+              throw BadLocationDirective();
           }
           if (directives[1] == "on")
             new_location.autoindex = true;
           else if (directives[1] == "off")
             new_location.autoindex = false;
           else {
-            throw("autoindex: invalid argument");
+              throw BadLocationDirective();
           }
         } else if (directives[0] == "index") {
           new_location.index.clear();
@@ -295,17 +295,17 @@ void ServerParser::parse_location_vars()
           }
         } else if (directives[0] == "cgi_ext") {
           if (directives.size() != 3) {
-            throw("cgi_ext: wrong number of args");
+              throw BadLocationDirective();
           }
           Config::Cgi_ext tmp_cgi;
           tmp_cgi.extension = directives[1];
           tmp_cgi.bin_path = directives[2];
           new_location.cgi_ext.push_back(tmp_cgi);
         } else {
-          throw("new_location file: there is an invalid directive");
+          throw BadLocationDirective();
         }
       } else {
-        throw("In new_location file: Not enough arguments provided");
+        throw BadLocationDirective();
       }
     }
       config.location.push_back(new_location);
@@ -348,114 +348,123 @@ void ServerParser::parse_server_vars()
     }
     directives.push_back(tmp_str);
 
-      /*
-       * Parsing directives
-       */
-      if (directives.size() > 1) {
-        if (directives[0] == "listen") {
-          if (directives.size() != 2)
-            throw("Listen: wrong arg number");
-          if (directives[1].find(":") == std::string::npos)
-            throw("Listen: no port number");
-          config.listen.combined = directives[1];
-          config.listen.address = directives[1].substr(0, directives[1].find(":"));
-          std::string tmp_str = directives[1].substr(directives[1].find(":") + 1);
-          int x;
-          std::istringstream(tmp_str) >> x;
-          config.listen.port = x;
-        } else if (directives[0] == "server_name") {
-          for (std::vector<std::string>::size_type i = 1; i < directives.size(); ++i) {
-            config.server_name.push_back(directives[i]);
-          }
-        } else if (directives[0] == "error_page") {
-          Config::Error_page tmp_page;
-
-          std::vector<std::string>::size_type i = 1;
-          for (; i < directives.size() - 1; ++i) {
-            size_t x;
-            std::istringstream(directives[i]) >> x;
-            tmp_page.code.push_back(x);
-          }
-          tmp_page.uri = directives[i];
-          config.error_page.push_back(tmp_page);
-        } else if (directives[0] == "client_max_body_size") {
-          std::string tmp_str;
-
-          if (directives.size() != 2)
-            throw("client_max_body_size: wrong args number");
-          for (std::string::iterator it = directives[1].begin(); it != directives[1].end();
-              ++it) {
-            if (isdigit(*it))
-              tmp_str.push_back(*it);
-            else if ((*it == 'm' || *it == 'M') && it + 1 == directives[1].end()) {
-              unsigned long x;
-              std::istringstream(tmp_str) >> x;
-              config.client_max_body_size = x * BYTES_IN_MB;
-            } else
-              throw("client_max_body_size not a valid input");
-          }
-        } else if (directives[0] == "limit_except") {
-          //throw("Should not be limit_except in server context");
-          for (std::string::size_type j = 1; j < directives.size(); ++j) {
-            config.limit_except.push_back(directives[j]);
-          }
-        } else if (directives[0] == "return") {
-          /*
-          if (directives.size() == 2)
-            config.return_redirect.url = directives[1];
-            */
-          if (directives.size() == 3) {
-            int x;
-            std::cerr << "Shouldn't be Config" << std::endl;
-            std::istringstream(directives[1]) >> x;
-            if (x < 0)
-              std::cerr << "Error: return_redirect code is smaller than 0" << std::endl;
-            config.return_redirect.code = x;
-            config.return_redirect.url = directives[2];
-            //config.return_redirect.is_active = true;
-          } else
-            throw("return_redirect: error..");
-        } else if (directives[0] == "root") {
-          if (directives.size() != 2)
-            throw("root: wrong number of args");
-          config.root = directives[1];
-        } else if (directives[0] == "autoindex") {
-          if (directives.size() != 2)
-            throw("autoindex: wrong number of args");
-          if (directives[1] == "on")
-            config.autoindex = true;
-          else if (directives[1] == "off")
-            config.autoindex = false;
-          else
-            throw("autoindex: invalid argument");
-        } else if (directives[0] == "index") {
-          config.index.clear();
-          for (std::vector<std::string>::iterator it = directives.begin() + 1;
-              it != directives.end(); ++it) {
-            config.index.push_back(*it);
-          }
-        } else if (directives[0] == "cgi_ext") {
-          if (directives.size() != 3)
-            throw("cgi_ext: wrong number of args");
-
-          Config::Cgi_ext tmp_cgi;
-          tmp_cgi.extension = directives[1];
-          tmp_cgi.bin_path = directives[2];
-          config.cgi_ext.push_back(tmp_cgi);
-        } else {
-          throw("config file: there is an invalid directive");
+    /*
+     * Parsing directives
+     */
+    if (directives.size() > 1) {
+      if (directives[0] == "listen") {
+        if (directives.size() != 2)
+          throw BadDirective();
+        if (directives[1].find(":") == std::string::npos)
+          throw BadDirective();
+        config.listen.combined = directives[1];
+        config.listen.address = directives[1].substr(0, directives[1].find(":"));
+        std::string tmp_str = directives[1].substr(directives[1].find(":") + 1);
+        int x;
+        std::istringstream(tmp_str) >> x;
+        config.listen.port = x;
+      } else if (directives[0] == "server_name") {
+        for (std::vector<std::string>::size_type i = 1; i < directives.size(); ++i) {
+          config.server_name.push_back(directives[i]);
         }
-      } else
-        throw("In config file: Not enough arguments provided");
-    }
-  }
+      } else if (directives[0] == "error_page") {
+        Config::Error_page tmp_page;
 
-  const char* ServerParser::NoSepException::what() const throw()
-  {
-    return ("Error: No ';' found after value\n");
-  }
+        std::vector<std::string>::size_type i = 1;
+        for (; i < directives.size() - 1; ++i) {
+          size_t x;
+          std::istringstream(directives[i]) >> x;
+          tmp_page.code.push_back(x);
+        }
+        tmp_page.uri = directives[i];
+        config.error_page.push_back(tmp_page);
+      } else if (directives[0] == "client_max_body_size") {
+        std::string tmp_str;
 
-  const char* ServerParser::SyntaxException::what() const throw()
-  {
-    return ("Error: Syntax error in config file\n");
+        if (directives.size() != 2)
+          throw BadDirective();
+        for (std::string::iterator it = directives[1].begin(); it != directives[1].end();
+            ++it) {
+          if (isdigit(*it))
+            tmp_str.push_back(*it);
+          else if ((*it == 'm' || *it == 'M') && it + 1 == directives[1].end()) {
+            unsigned long x;
+            std::istringstream(tmp_str) >> x;
+            config.client_max_body_size = x * BYTES_IN_MB;
+          } else
+            throw BadDirective();
+        }
+      } else if (directives[0] == "limit_except") {
+        for (std::string::size_type j = 1; j < directives.size(); ++j) {
+          config.limit_except.push_back(directives[j]);
+        }
+      } else if (directives[0] == "return") {
+        /*
+           if (directives.size() == 2)
+           config.return_redirect.url = directives[1];
+           */
+        if (directives.size() == 3) {
+          int x;
+          std::cerr << "Shouldn't be Config" << std::endl;
+          std::istringstream(directives[1]) >> x;
+          if (x < 0)
+            std::cerr << "Error: return_redirect code is smaller than 0" << std::endl;
+          config.return_redirect.code = x;
+          config.return_redirect.url = directives[2];
+          //config.return_redirect.is_active = true;
+        } else
+          throw BadDirective();
+      } else if (directives[0] == "root") {
+        if (directives.size() != 2)
+          throw BadDirective();
+        config.root = directives[1];
+      } else if (directives[0] == "autoindex") {
+        if (directives.size() != 2)
+          throw BadDirective();
+        if (directives[1] == "on")
+          config.autoindex = true;
+        else if (directives[1] == "off")
+          config.autoindex = false;
+        else
+          throw BadDirective();
+      } else if (directives[0] == "index") {
+        config.index.clear();
+        for (std::vector<std::string>::iterator it = directives.begin() + 1;
+            it != directives.end(); ++it) {
+          config.index.push_back(*it);
+        }
+      } else if (directives[0] == "cgi_ext") {
+        if (directives.size() != 3)
+          throw BadDirective();
+
+        Config::Cgi_ext tmp_cgi;
+        tmp_cgi.extension = directives[1];
+        tmp_cgi.bin_path = directives[2];
+        config.cgi_ext.push_back(tmp_cgi);
+      } else {
+        throw BadDirective();
+      }
+    } else
+      throw BadDirective();
   }
+}
+
+const char* ServerParser::NoSepException::what() const throw()
+{
+  return ("Error: No ';' found after value\n");
+}
+
+const char* ServerParser::SyntaxException::what() const throw()
+{
+  return ("Error: Syntax error in config file\n");
+}
+
+const char* ServerParser::BadLocationDirective::what() const throw()
+{
+  return ("Error: Directive error in a location context of the config file\n");
+}
+
+const char* ServerParser::BadDirective::what() const throw()
+{
+  return ("Error: Directive error in the config file\n");
+}

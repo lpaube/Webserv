@@ -38,6 +38,13 @@ public:
     void check_error_code();
     void redirect();
     void remove_file();
+    void generate_response_html();
+
+    class ExtensionException : public std::exception
+    {
+    public:
+      virtual const char* what() const throw();
+    };
 
 private:
     void create_code_msg();

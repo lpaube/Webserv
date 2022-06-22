@@ -43,6 +43,18 @@ public:
         virtual const char* what() const throw();
     };
 
+    class BadLocationDirective : public std::exception
+    {
+    public:
+        virtual const char* what() const throw();
+    };
+
+    class BadDirective : public std::exception
+    {
+    public:
+        virtual const char* what() const throw();
+    };
+
 private:
     void build_location();
     std::size_t find_loc_start(std::size_t i);

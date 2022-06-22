@@ -110,39 +110,14 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
         if (stat(req_.path().c_str(), &info) < 0) {
             // TODO: Error case
         }
-
         Response response(req_, resp_configs);
-        /*
-        if (response.has_return_redirect())
-        {
-          response.redirect();
+        try {
+          response.generate_response_html();
         }
-        */
-        if (response.get_method() == GET)
+        catch(const std::exception& ex)
         {
-          if (response.method_allowed(GET) == false)
-          {
-            std::cerr << "===GET method not allowed===" << std::endl;
-            response.set_status_code(405);
-          }
-          else
-            response.set_html_body();
-
-          response.check_error_code();
-          response.set_html_header();
-          response.full_content = response.header + response.body;
-        }
-        else if (response.get_method() == DELETE)
-        {
-          if (response.method_allowed(DELETE) == false)
-          {
-            std::cerr << "===DELETE method not allowed===" << std::endl;
-            response.set_status_code(405);
-          }
-          else
-          {
-            response.remove_file();
-          }
+          std::cerr << ex.what() << std::endl;
+          response.set_status_code(404);
           response.check_error_code();
           response.set_html_header();
           response.full_content = response.header + response.body;

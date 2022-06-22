@@ -27,7 +27,7 @@ Response::Response(const Request& request, const std::vector<Config>& response_c
   , location_path_("")
 {
   if (response_configs.size() == 0) {
-    throw "No config matches the request";
+    throw "Temporary throw until we get a single config from MAFORT";
   }
   config_ = response_configs[0];
   generate_singular_config();
@@ -102,7 +102,6 @@ Config::Location Response::generate_singular_location(const std::vector<Config::
    * the req.path compared to location path
    * And returns the highest.
    */
-
   Config::Location single_location;
   int best_count = 0;
   int best_slash_count = 0;
@@ -277,7 +276,7 @@ void Response::set_html_body()
     size_t ext_pos = full_path_.find_last_of(".");
     if (ext_pos == std::string::npos)
     {
-      throw("Big error in finding extension position");
+      throw ExtensionException();
     }
     std::string path_extension = full_path_.substr(ext_pos + 1);
     if (path_extension == "jpeg" || path_extension == "jpg" ||
@@ -293,7 +292,6 @@ void Response::set_html_body()
   if (!requested_file.is_open()) {
     set_status_code(400);
   } else {
-    // body.clear();
     if (file_type_ == "IMAGE")
     {
       body_stream << requested_file.rdbuf();
@@ -317,9 +315,7 @@ void Response::set_content_type()
 {
   size_t ext_pos = full_path_.find_last_of(".");
   if (ext_pos == std::string::npos)
-  {
-    throw("Big error in finding extension position");
-  }
+    throw ExtensionException();
   std::string path_extension = full_path_.substr(ext_pos + 1);
   if (path_extension == "jpg" || path_extension == "jpeg")
     content_type_ = "image/jpeg";
@@ -397,3 +393,38 @@ void Response::set_html_header()
   full_content = header + body;
 }
 
+void Response::generate_response_html()
+{
+  if (get_method() == GET)
+  {
+    if (method_allowed(GET) == false)
+    {
+      set_status_code(405);
+    }
+    else
+      set_html_body();
+
+    check_error_code();
+    set_html_header();
+    full_content = header + body;
+  }
+  else if (get_method() == DELETE)
+  {
+    if (method_allowed(DELETE) == false)
+    {
+      set_status_code(405);
+    }
+    else
+    {
+      remove_file();
+    }
+    check_error_code();
+    set_html_header();
+    full_content = header + body;
+  }
+}
+
+const char* Response::ExtensionException::what() const throw()
+{
+  return ("Error: Extension missing in path of request (Response class)\n");
+}

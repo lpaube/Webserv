@@ -75,4 +75,14 @@
         });
     }
 
+    var test_button = document.getElementById("test_button");
+    test_button.onclick = () =>	{
+      fetch("/42_test/fasdfafsa", {
+        method: "GET"
+      }).then(response => response.text())
+        .then((content) => {
+          document.write(content);
+        });
+    }
+
   })();
