@@ -23,7 +23,6 @@ public:
 public:
     ExceptionBase(const std::string& msg);
 
-public:
     virtual const char* what() const throw();
 
 private:

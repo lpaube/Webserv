@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/18 18:13:32 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/22 14:42:40 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ Server::Server(const std::vector<Config>& blocks)
 
 void Server::run()
 {
+	std::cerr << "IN RUN\n" << std::endl;
     signal(SIGINT, &stop_server);
 
     while (running) {

@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 19:31:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/18 18:10:47 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/22 15:05:30 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,8 @@ public:
 public:
     TcpConnection(int listener_fd);
 
-public:
     virtual SocketType type() const;
 
-public:
     template <typename Iter>
     void append_data(Iter first, Iter last)
     {
@@ -57,6 +55,7 @@ private:
     void request_line_done(bool& done);
     void headers_done(bool& done);
     void add_header(ParseState next_state);
+	void send_response(const std::string& msg) const;
     std::vector<Config> get_response_configs(const std::vector<Config>& server_configs) const;
 
 private:

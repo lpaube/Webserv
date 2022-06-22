@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerParser.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: laube <louis-philippe.aube@hotmail.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/01 10:47:58 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/18 15:09:30 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/18 22:04:42 by laube            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,10 +146,6 @@ void ServerParser::generate_fake_config()
   // client_max_body_size
   config.client_max_body_size = 8000000;
 
-  // return
-  config.return_redirect.code = 404;
-  config.return_redirect.url = "/error404";
-
   // root
   config.root = "/data/w5";
 
@@ -196,23 +192,15 @@ std::string clean_spaces(std::string str)
   return new_str;
 }
 
-void ServerParser::init_location_vars(Config::Location& new_location)
-{
-  new_location.error_page = config.error_page;
-  new_location.client_max_body_size = config.client_max_body_size;
-  new_location.return_redirect = config.return_redirect;
-  new_location.root = config.root;
-  new_location.autoindex = config.autoindex;
-  new_location.index = config.index;
-  new_location.cgi_ext = config.cgi_ext;
-}
-
 void ServerParser::parse_location_vars()
 {
   for (std::vector<LocationContent>::iterator location_it = location_.begin();
       location_it != location_.end(); ++location_it) {
     Config::Location new_location;
-    this->init_location_vars(new_location);
+    
+    //Adding path to location_path of location
+    new_location.location_path = location_it->path;
+    new_location = config;
     for (std::vector<std::string>::iterator it = location_it->loc_content.begin();
         it != location_it->loc_content.end(); ++it) {
       std::string tmp_str = clean_spaces(*it);
@@ -247,7 +235,7 @@ void ServerParser::parse_location_vars()
           std::string tmp_str;
 
           if (directives.size() != 2) {
-            throw("client_max_body_size: wrong args number");
+            throw BadLocationDirective();
           }
           for (std::string::iterator it = directives[1].begin();
               it != directives[1].end(); ++it) {
@@ -258,7 +246,7 @@ void ServerParser::parse_location_vars()
               std::istringstream(tmp_str) >> x;
               new_location.client_max_body_size = x * BYTES_IN_MB;
             } else {
-              throw("client_max_body_size not a valid input");
+              throw BadLocationDirective();
             }
           }
         } else if (directives[0] == "limit_except") {
@@ -266,31 +254,38 @@ void ServerParser::parse_location_vars()
             new_location.limit_except.push_back(directives[j]);
           }
         } else if (directives[0] == "return") {
+          /*
           if (directives.size() == 2)
             new_location.return_redirect.url = directives[1];
-          else if (directives.size() == 3) {
+            */
+          if (directives.size() == 3) {
             int x;
             std::istringstream(directives[1]) >> x;
+            if (x < 0)
+              std::cerr << "Error: new_location.return_redirect code is smaller than 0" << std::endl;
             new_location.return_redirect.code = x;
             new_location.return_redirect.url = directives[2];
+            //new_location.return_redirect.is_active = true;
+
           } else {
-            throw("return_redirect: error..");
+            std::cerr << "LP ERROR 3" << std::endl;
+              throw BadLocationDirective();
           }
         } else if (directives[0] == "root") {
           if (directives.size() != 2) {
-            throw("root: wrong number of args");
+              throw BadLocationDirective();
           }
           new_location.root = directives[1];
         } else if (directives[0] == "autoindex") {
           if (directives.size() != 2) {
-            throw("autoindex: wrong number of args");
+              throw BadLocationDirective();
           }
           if (directives[1] == "on")
             new_location.autoindex = true;
-          else if (directives[1] == "on")
+          else if (directives[1] == "off")
             new_location.autoindex = false;
           else {
-            throw("autoindex: invalid argument");
+              throw BadLocationDirective();
           }
         } else if (directives[0] == "index") {
           new_location.index.clear();
@@ -300,34 +295,36 @@ void ServerParser::parse_location_vars()
           }
         } else if (directives[0] == "cgi_ext") {
           if (directives.size() != 3) {
-            throw("cgi_ext: wrong number of args");
+              throw BadLocationDirective();
           }
-
           Config::Cgi_ext tmp_cgi;
           tmp_cgi.extension = directives[1];
           tmp_cgi.bin_path = directives[2];
           new_location.cgi_ext.push_back(tmp_cgi);
         } else {
-          throw("new_location file: there is an invalid directive");
+          throw BadLocationDirective();
         }
-      } else
-        throw("In new_location file: Not enough arguments provided");
+      } else {
+        throw BadLocationDirective();
+      }
     }
-    config.location.push_back(new_location);
+      config.location.push_back(new_location);
   }
 }
 
-void ServerParser::init_server_vars()
-{
-  config.listen.port = -1;
-  // config.server_name.push_back("");
-  config.client_max_body_size = 1000;
-  config.return_redirect.code = -1;
-  config.root = "";
-  config.autoindex = false;
-  config.index.push_back("index.html");
-  //config.limit_except.push_back("GET");
-}
+  void ServerParser::init_server_vars()
+  {
+    config.listen.port = -1;
+    // config.server_name.push_back("");
+    config.client_max_body_size = 1000;
+    //config.return_redirect.is_active = false;
+    config.return_redirect.code = -1;
+    config.return_redirect.url = "";
+    config.root = "";
+    config.autoindex = false;
+    config.index.push_back("index.html");
+    //config.limit_except.push_back("GET");
+  }
 
 void ServerParser::parse_server_vars()
 {
@@ -357,9 +354,9 @@ void ServerParser::parse_server_vars()
     if (directives.size() > 1) {
       if (directives[0] == "listen") {
         if (directives.size() != 2)
-          throw("Listen: wrong arg number");
+          throw BadDirective();
         if (directives[1].find(":") == std::string::npos)
-          throw("Listen: no port number");
+          throw BadDirective();
         config.listen.combined = directives[1];
         config.listen.address = directives[1].substr(0, directives[1].find(":"));
         std::string tmp_str = directives[1].substr(directives[1].find(":") + 1);
@@ -385,7 +382,7 @@ void ServerParser::parse_server_vars()
         std::string tmp_str;
 
         if (directives.size() != 2)
-          throw("client_max_body_size: wrong args number");
+          throw BadDirective();
         for (std::string::iterator it = directives[1].begin(); it != directives[1].end();
             ++it) {
           if (isdigit(*it))
@@ -395,60 +392,60 @@ void ServerParser::parse_server_vars()
             std::istringstream(tmp_str) >> x;
             config.client_max_body_size = x * BYTES_IN_MB;
           } else
-            throw("client_max_body_size not a valid input");
+            throw BadDirective();
         }
-        } else if (directives[0] == "limit_except") {
-          //throw("Should not be limit_except in server context");
-          for (std::string::size_type j = 1; j < directives.size(); ++j) {
-            config.limit_except.push_back(directives[j]);
-          }
+      } else if (directives[0] == "limit_except") {
+        for (std::string::size_type j = 1; j < directives.size(); ++j) {
+          config.limit_except.push_back(directives[j]);
+        }
       } else if (directives[0] == "return") {
-        if (directives.size() == 2)
-          config.return_redirect.url = directives[1];
-        else if (directives.size() == 3) {
+        /*
+           if (directives.size() == 2)
+           config.return_redirect.url = directives[1];
+           */
+        if (directives.size() == 3) {
           int x;
+          std::cerr << "Shouldn't be Config" << std::endl;
           std::istringstream(directives[1]) >> x;
+          if (x < 0)
+            std::cerr << "Error: return_redirect code is smaller than 0" << std::endl;
           config.return_redirect.code = x;
           config.return_redirect.url = directives[2];
+          //config.return_redirect.is_active = true;
         } else
-          throw("return_redirect: error..");
+          throw BadDirective();
       } else if (directives[0] == "root") {
         if (directives.size() != 2)
-          throw("root: wrong number of args");
+          throw BadDirective();
         config.root = directives[1];
       } else if (directives[0] == "autoindex") {
         if (directives.size() != 2)
-          throw("autoindex: wrong number of args");
+          throw BadDirective();
         if (directives[1] == "on")
           config.autoindex = true;
-        else if (directives[1] == "on")
+        else if (directives[1] == "off")
           config.autoindex = false;
         else
-          throw("autoindex: invalid argument");
+          throw BadDirective();
       } else if (directives[0] == "index") {
         config.index.clear();
         for (std::vector<std::string>::iterator it = directives.begin() + 1;
             it != directives.end(); ++it) {
           config.index.push_back(*it);
         }
-      } else if (directives[0] == "index") {
-        for (std::vector<std::string>::iterator it = directives.begin() + 1;
-            it != directives.end(); ++it) {
-          config.index.push_back(*it);
-        }
       } else if (directives[0] == "cgi_ext") {
         if (directives.size() != 3)
-          throw("cgi_ext: wrong number of args");
+          throw BadDirective();
 
         Config::Cgi_ext tmp_cgi;
         tmp_cgi.extension = directives[1];
         tmp_cgi.bin_path = directives[2];
         config.cgi_ext.push_back(tmp_cgi);
       } else {
-        throw("config file: there is an invalid directive");
+        throw BadDirective();
       }
     } else
-      throw("In config file: Not enough arguments provided");
+      throw BadDirective();
   }
 }
 
@@ -460,4 +457,14 @@ const char* ServerParser::NoSepException::what() const throw()
 const char* ServerParser::SyntaxException::what() const throw()
 {
   return ("Error: Syntax error in config file\n");
+}
+
+const char* ServerParser::BadLocationDirective::what() const throw()
+{
+  return ("Error: Directive error in a location context of the config file\n");
+}
+
+const char* ServerParser::BadDirective::what() const throw()
+{
+  return ("Error: Directive error in the config file\n");
 }

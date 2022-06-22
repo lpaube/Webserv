@@ -1,14 +1,30 @@
 #include "Config.hpp"
 
+Config& Config::operator=(const Config::Location other_location)
+{
+  error_page = other_location.error_page;
+  client_max_body_size = other_location.client_max_body_size;
+  limit_except = other_location.limit_except;
+  root = other_location.root;
+  autoindex = other_location.autoindex;
+  index = other_location.index;
+  cgi_ext = other_location.cgi_ext;
+  return_redirect = other_location.return_redirect;
+  return *this;
+}
+
 void Config::Location::print_location()
 {
+  // location_path
+    std::cout << "===== location_path =====" << std::endl;
+    std::cout << location_path << std::endl;
     // error_page
     std::cout << "===== error_page =====" << std::endl;
     int i = 0;
     for (std::vector<Error_page>::iterator it = error_page.begin(); it != error_page.end();
          ++it, ++i) {
         std::cout << "--- error_page: " << i << " ---" << std::endl;
-        for (std::vector<size_t>::iterator it_code = it->code.begin(); it_code != it->code.end();
+        for (std::vector<int>::iterator it_code = it->code.begin(); it_code != it->code.end();
              ++it_code) {
             std::cout << "code: " << *it_code << std::endl;
         }
@@ -86,7 +102,7 @@ void Config::print_config()
     for (std::vector<Error_page>::iterator it = error_page.begin(); it != error_page.end();
          ++it, ++i) {
         std::cout << "--- error_page: " << i << " ---" << std::endl;
-        for (std::vector<size_t>::iterator it_code = it->code.begin(); it_code != it->code.end();
+        for (std::vector<int>::iterator it_code = it->code.begin(); it_code != it->code.end();
              ++it_code) {
             std::cout << "code: " << *it_code << std::endl;
         }
@@ -142,4 +158,16 @@ void Config::print_config()
         loc_it->print_location();
     }
     std::cout << std::endl;
+}
+
+Config::Location& Config::Location::operator=(const Config config)
+{
+  error_page = config.error_page;
+  client_max_body_size = config.client_max_body_size;
+  return_redirect = config.return_redirect;
+  root = config.root;
+  autoindex = config.autoindex;
+  index = config.index;
+  cgi_ext = config.cgi_ext;
+  return *this;
 }

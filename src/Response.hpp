@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
 #include "Config.hpp"
 #include "Request.hpp"
 #include <string>
@@ -22,46 +21,41 @@
 class Response
 {
 public:
-    Response(/* args */)
+    Response(const Request& request, const std::vector<Config>& response_configs);
+    Config get_config() const;
+    int get_status_code() const;
+    std::string get_status_code_msg() const;
+    std::string get_location_path() const;
+    std::string get_full_path() const;
+    Method get_method() const;
+    bool has_return_redirect() const;
+    bool method_allowed(Method method) const;
+
+    void set_status_code(int code);
+    void set_html_body();
+    void set_html_header();
+
+    void check_error_code();
+    void redirect();
+    void remove_file();
+    void generate_response_html();
+
+    class ExtensionException : public std::exception
     {
-    }
-
-    Response(const Request& request, std::vector<Config>& configs);
-
-    ~Response()
-    {
-    }
-
-    Config getConfig() const
-    {
-        return config;
-    }
-
-    void setStatusCode(size_t code);
-
-    size_t getStatusCode() const
-    {
-        return status_code;
-    }
-
-    std::string getStatusCodeMsg() const
-    {
-        return status_code_msg;
-    }
-
-    void checkErrorCode();
-
-    void setHtmlBody();
-    void setHtmlHeader();
-    Method getMethod() {return method;};
+    public:
+      virtual const char* what() const throw();
+    };
 
 private:
-    void createCodeMsg();
-    void buildHeaderString();
-    void setContentType();
-    void setDate();
-    void setHost();
-    int setAllow();
+    void create_code_msg();
+    void build_header_string();
+    void set_content_type();
+    void set_date();
+    void set_host();
+    int set_allow();
+    int generate_autoindex(std::ifstream& requested_file, std::stringstream& body_stream);
+    void generate_singular_config();
+    Config::Location generate_singular_location(const std::vector<Config::Location>& locations, bool& has_location);
 
 public:
     std::string body;
@@ -69,22 +63,21 @@ public:
     std::string full_content;
 
 private:
-    // std::map<int, std::string> codeList;
-    Config config;
-    Request req;
-    size_t body_size;
-    size_t header_size;
-    size_t status_code;
-    Method method;
-    std::string status_code_msg;
-    std::string root;
-    std::string full_path;
-    std::string content_type;
-    std::string date_now;
-    std::string host;
-    std::string allow;
-    std::string server;
-    // std::string location;
-    // std::string headerString;
-    // std::string codeMsg;
+    Config config_;
+    Request req_;
+    size_t body_size_;
+    size_t header_size_;
+    int status_code_;
+    Method method_;
+    std::string status_code_msg_;
+    std::string root_;
+    std::string requested_path_;
+    std::string full_path_;
+    std::string content_type_;
+    std::string date_now_;
+    std::string host_;
+    std::string allow_;
+    std::string server_;
+    std::string location_path_;
+    std::string file_type_;
 };
