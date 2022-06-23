@@ -86,8 +86,6 @@ void Server::run()
                     case TCP_LISTENER:
                         try {
                             accept_connection(static_cast<TcpListener*>(s));
-                        } catch (const Request::Exception& ex) {
-
                         } catch (const std::exception& ex) {
                             std::cerr << ex.what() << std::endl;
                         }
@@ -96,6 +94,8 @@ void Server::run()
                         TcpConnection* c = static_cast<TcpConnection*>(s);
                         try {
                             c->handle_read_event();
+                        } catch (const Request::Exception& ex) {
+                            // TODO: bad request
                         } catch (const std::exception& ex) {
                             std::cerr << ex.what() << std::endl;
                             to_close.push_back(c->fd());
@@ -114,7 +114,7 @@ void Server::run()
                 } catch (const std::exception& ex) {
                     std::cerr << ex.what() << std::endl;
                 }
-                if (sent == true) {
+                if (sent) {
                     to_close.push_back(c->fd());
                 }
             }
