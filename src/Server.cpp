@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/22 14:42:40 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/23 15:04:37 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,6 @@ void Server::run()
 {
 	std::cerr << "IN RUN\n" << std::endl;
     signal(SIGINT, &stop_server);
-
     while (running) {
         int nevents = poll(sockets_.pfds(), sockets_.size(), -1);
         if (nevents < 0) {
@@ -108,14 +107,16 @@ void Server::run()
 
             if ((pfd.revents & POLLOUT) && (s->state() == S_WRITE)) {
                 found = true;
+				bool	sent = false;
                 TcpConnection* c = static_cast<TcpConnection*>(s);
                 try {
-                    c->handle_write_event(configs_);
+                    sent = c->handle_write_event(configs_);
                 } catch (const std::exception& ex) {
                     std::cerr << ex.what() << std::endl;
                 }
-                // TODO: better write handling
-                to_close.push_back(c->fd());
+                if (sent == true){
+                	to_close.push_back(c->fd());
+				}
             }
 
             if (found) {

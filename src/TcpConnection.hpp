@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 19:31:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/22 16:02:02 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/23 15:01:36 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ public:
     }
 
     void handle_read_event();
-    void handle_write_event(const std::vector<Config>& server_configs);
+    bool handle_write_event(const std::vector<Config>& server_configs);
     const Request& request() const;
 	void set_addr(in_addr addr);
 	void set_port(uint16_t port);
@@ -55,7 +55,7 @@ private:
     void request_line_done(bool& done);
     void headers_done(bool& done);
     void add_header(ParseState next_state);
-	int send_response(const std::string& msg, std::size_t start) const;
+	bool send_response();
     const Config& get_response_configs(const std::vector<Config>& server_configs) const;
 
 private:

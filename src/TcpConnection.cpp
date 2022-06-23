@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/22 16:01:55 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/23 15:13:18 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include "Request.hpp"
 
 #define BUF_SIZE (1024 * 8)
 
@@ -70,19 +71,12 @@ void TcpConnection::handle_read_event()
     (this->*request_handler)();
 }
 
-void TcpConnection::handle_write_event(const std::vector<Config>& server_configs)
+bool TcpConnection::handle_write_event(const std::vector<Config>& server_configs)
 {
     std::cout << "|!|IN_CONNECTION_WRITE_EVENT|!|" << std::endl;
-	if (byte_sent < msg.length())
-	{
-		int ret = send_response(msg, byte_sent);
-		if (ret == -1){
-			throw Exception("Fatal, write fail\n");
-		}
-		byte_sent += ret;
-		return ;
+	if (byte_sent != 0){
+		return send_response();
 	}
-	byte_sent = 0;
 	try{
     	Config resp_configs = get_response_configs(server_configs);
 	}
@@ -92,7 +86,7 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
 		response.check_error_code();
         response.set_html_header();
         msg = response.header + response.body;
-		byte_sent = send_response(msg, 0);
+		return (send_response());
 		
 	}
 	Config resp_configs = get_response_configs(server_configs);
@@ -103,9 +97,7 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
         try{
 			Script script(resp_configs, req_);
 			msg = script.exec();
-			if (write(fd(), msg.c_str(), msg.length()) < 0){
-				throw Exception("Error fatal, write");
-			}
+			return (send_response());
 		} catch(const std::exception& ex){
 			std::cout << ex.what() << std::endl;
 			Response response(req_, resp_configs);
@@ -120,9 +112,8 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
           	response.check_error_code();
           	response.set_html_header();
           	msg = response.header + response.body;
-			write(fd(), msg.c_str(), msg.length());
+			return (send_response());
 	}
-	std::cout << "PRINTING SCRIPT OUTPUT: \n" << msg << std::endl;
         std::cout << "|!|OUT OF SCRIPT|!|" << std::endl;
     } else {
         std::cout << "|!|IN FILE RESPONSE|!|" << std::endl;
@@ -139,12 +130,9 @@ void TcpConnection::handle_write_event(const std::vector<Config>& server_configs
           response.full_content = response.header + response.body;
         }
         msg = response.full_content;
-		write(fd(), msg.c_str(), msg.length()); // TODO: check err and if all bytes were sent
-        std::cout << "|!|FILE RESPONSE BUILT|!|" << std::endl;
+		std::cout << "|!|FILE RESPONSE BUILT|!|" << std::endl;
+		return (send_response()); // TODO: check err and if all bytes were sent
     }
-
-    // send(fd(), msg.c_str(), msg.length(), 0);
-    // TODO: check err and if all bytes were sent
 }
 
 const Request& TcpConnection::request() const
@@ -223,7 +211,7 @@ void TcpConnection::parse_http_request_line()
                         check_http_version();
                         break;
                     case '\n':
-                        req_.set_state_and_value(REQ_HEADER_START, &Request::set_http_version);
+                        req_.set_state_and_value(REQ_HEADER_byte_sent, &Request::set_http_version);
                         check_http_version();
                         request_line_done(done);
                         break;
@@ -234,7 +222,7 @@ void TcpConnection::parse_http_request_line()
             } break;
             case REQ_LINE_ALMOST_DONE: {
                 if (*it == '\n') {
-                    req_.set_state_and_clear_buf(REQ_HEADER_START);
+                    req_.set_state_and_clear_buf(REQ_HEADER_byte_sent);
                     request_line_done(done);
                 } else {
                     bad_request();
@@ -245,7 +233,7 @@ void TcpConnection::parse_http_request_line()
         }
     }
     data_.erase(data_.begin(), it);
-    if (req_.parse_state() == REQ_HEADER_START) {
+    if (req_.parse_state() == REQ_HEADER_byte_sent) {
         (this->*request_handler)();
     }
 }
@@ -256,7 +244,7 @@ void TcpConnection::parse_http_request_headers()
     std::vector<char>::iterator it = data_.begin();
     for (; it != data_.end() && !done; ++it) {
         switch (req_.parse_state()) {
-            case REQ_HEADER_START: {
+            case REQ_HEADER_byte_sent: {
                 switch (*it) {
                     case '\r':
                         req_.set_state_and_clear_buf(REQ_ALL_HEADERS_ALMOST_DONE);
@@ -279,7 +267,7 @@ void TcpConnection::parse_http_request_headers()
                         add_header(REQ_HEADER_ALMOST_DONE);
                         break;
                     case '\n':
-                        add_header(REQ_HEADER_START);
+                        add_header(REQ_HEADER_byte_sent);
                         break;
                     default:
                         req_.append_buf(*it);
@@ -292,7 +280,7 @@ void TcpConnection::parse_http_request_headers()
                         add_header(REQ_HEADER_ALMOST_DONE);
                         break;
                     case '\n':
-                        add_header(REQ_HEADER_START);
+                        add_header(REQ_HEADER_byte_sent);
                         break;
                     default:
                         req_.append_buf(*it);
@@ -301,7 +289,7 @@ void TcpConnection::parse_http_request_headers()
             } break;
             case REQ_HEADER_ALMOST_DONE: {
                 if (*it == '\n') {
-                    req_.set_state_and_clear_buf(REQ_HEADER_START);
+                    req_.set_state_and_clear_buf(REQ_HEADER_byte_sent);
                 } else {
                     bad_request();
                 }
@@ -318,14 +306,14 @@ void TcpConnection::parse_http_request_headers()
         }
     }
     data_.erase(data_.begin(), it);
-    if (req_.parse_state() == REQ_BODY_START) {
+    if (req_.parse_state() == REQ_BODY_byte_sent) {
         (this->*request_handler)();
     }
 }
 
 void TcpConnection::process_http_headers()
 {
-    if (req_.parse_state() != REQ_BODY_START) {
+    if (req_.parse_state() != REQ_BODY_byte_sent) {
         throw Exception("Bad control flow");
     }
 
@@ -412,7 +400,7 @@ void TcpConnection::request_line_done(bool& done)
 
 void TcpConnection::headers_done(bool& done)
 {
-    req_.set_state_and_clear_buf(REQ_BODY_START);
+    req_.set_state_and_clear_buf(REQ_BODY_byte_sent);
     request_handler = &TcpConnection::process_http_headers;
     done = true;
 }
@@ -450,9 +438,23 @@ TcpConnection::get_response_configs(const std::vector<Config>& server_configs) c
 	if (def == -1){
 		throw Exception("No config match\n");
 	}
-	return server_configs[def];
+	return server_configs[static_cast<std::size_t>(def)];
 }
 
-int TcpConnection::send_response(const std::string& msg, std::size_t start) const{
-		return (write(fd(), msg.c_str() + start, msg.length() - start));
+bool TcpConnection::send_response(){
+
+	
+		int len = msg.length() - static_cast<std::size_t>(byte_sent);
+		byte_sent = write(fd(), msg.c_str() + byte_sent, static_cast<std::size_t>(len));
+		if (byte_sent < 0){
+			throw Exception("Fatal, write return -1");
+		}
+		if (byte_sent == len){
+			byte_sent = 0;
+			return true;
+		}
+		else{
+			return false;
+		}
 }
+
