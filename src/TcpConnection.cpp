@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/23 15:13:18 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/23 15:30:30 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "Request.hpp"
 
 #define BUF_SIZE (1024 * 8)
 
@@ -211,7 +210,7 @@ void TcpConnection::parse_http_request_line()
                         check_http_version();
                         break;
                     case '\n':
-                        req_.set_state_and_value(REQ_HEADER_byte_sent, &Request::set_http_version);
+                        req_.set_state_and_value(REQ_HEADER_START, &Request::set_http_version);
                         check_http_version();
                         request_line_done(done);
                         break;
@@ -222,7 +221,7 @@ void TcpConnection::parse_http_request_line()
             } break;
             case REQ_LINE_ALMOST_DONE: {
                 if (*it == '\n') {
-                    req_.set_state_and_clear_buf(REQ_HEADER_byte_sent);
+                    req_.set_state_and_clear_buf(REQ_HEADER_START);
                     request_line_done(done);
                 } else {
                     bad_request();
@@ -233,7 +232,7 @@ void TcpConnection::parse_http_request_line()
         }
     }
     data_.erase(data_.begin(), it);
-    if (req_.parse_state() == REQ_HEADER_byte_sent) {
+    if (req_.parse_state() == REQ_HEADER_START) {
         (this->*request_handler)();
     }
 }
@@ -244,7 +243,7 @@ void TcpConnection::parse_http_request_headers()
     std::vector<char>::iterator it = data_.begin();
     for (; it != data_.end() && !done; ++it) {
         switch (req_.parse_state()) {
-            case REQ_HEADER_byte_sent: {
+            case REQ_HEADER_START: {
                 switch (*it) {
                     case '\r':
                         req_.set_state_and_clear_buf(REQ_ALL_HEADERS_ALMOST_DONE);
@@ -267,7 +266,7 @@ void TcpConnection::parse_http_request_headers()
                         add_header(REQ_HEADER_ALMOST_DONE);
                         break;
                     case '\n':
-                        add_header(REQ_HEADER_byte_sent);
+                        add_header(REQ_HEADER_START);
                         break;
                     default:
                         req_.append_buf(*it);
@@ -280,7 +279,7 @@ void TcpConnection::parse_http_request_headers()
                         add_header(REQ_HEADER_ALMOST_DONE);
                         break;
                     case '\n':
-                        add_header(REQ_HEADER_byte_sent);
+                        add_header(REQ_HEADER_START);
                         break;
                     default:
                         req_.append_buf(*it);
@@ -289,7 +288,7 @@ void TcpConnection::parse_http_request_headers()
             } break;
             case REQ_HEADER_ALMOST_DONE: {
                 if (*it == '\n') {
-                    req_.set_state_and_clear_buf(REQ_HEADER_byte_sent);
+                    req_.set_state_and_clear_buf(REQ_HEADER_START);
                 } else {
                     bad_request();
                 }
@@ -306,14 +305,14 @@ void TcpConnection::parse_http_request_headers()
         }
     }
     data_.erase(data_.begin(), it);
-    if (req_.parse_state() == REQ_BODY_byte_sent) {
+    if (req_.parse_state() == REQ_BODY_START) {
         (this->*request_handler)();
     }
 }
 
 void TcpConnection::process_http_headers()
 {
-    if (req_.parse_state() != REQ_BODY_byte_sent) {
+    if (req_.parse_state() != REQ_BODY_START) {
         throw Exception("Bad control flow");
     }
 
@@ -400,7 +399,7 @@ void TcpConnection::request_line_done(bool& done)
 
 void TcpConnection::headers_done(bool& done)
 {
-    req_.set_state_and_clear_buf(REQ_BODY_byte_sent);
+    req_.set_state_and_clear_buf(REQ_BODY_START);
     request_handler = &TcpConnection::process_http_headers;
     done = true;
 }
