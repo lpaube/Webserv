@@ -1,6 +1,6 @@
 #include "Config.hpp"
 
-Config& Config::operator=(const Config::Location other_location)
+Config& Config::operator=(const Config::Location& other_location)
 {
   error_page = other_location.error_page;
   client_max_body_size = other_location.client_max_body_size;
@@ -160,7 +160,7 @@ void Config::print_config()
     std::cout << std::endl;
 }
 
-Config::Location& Config::Location::operator=(const Config config)
+Config::Location& Config::Location::operator=(const Config& config)
 {
   error_page = config.error_page;
   client_max_body_size = config.client_max_body_size;

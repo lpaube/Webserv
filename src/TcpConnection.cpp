@@ -27,10 +27,9 @@
 TcpConnection::TcpConnection(int listener_fd)
     : listener_fd_(listener_fd),
       request_handler(&TcpConnection::parse_http_request_line),
-      req_size_(0)
+      req_size_(0),
+      byte_sent(0)
 {
-	msg = "";
-	byte_sent = 0;
     fd_ = accept(listener_fd_, (sockaddr*)&addr_, &addrlen_);
     if (fd() == -1) {
         throw Exception("Error while accepting connection: " + std::string(strerror(errno)));
@@ -86,7 +85,6 @@ bool TcpConnection::handle_write_event(const std::vector<Config>& server_configs
         response.set_html_header();
         msg = response.header + response.body;
 		return (send_response());
-		
 	}
 	Config resp_configs = get_response_configs(server_configs);
 	std::size_t len = req_.path().length();
@@ -443,12 +441,12 @@ TcpConnection::get_response_configs(const std::vector<Config>& server_configs) c
 bool TcpConnection::send_response(){
 
 	
-		int len = msg.length() - static_cast<std::size_t>(byte_sent);
-		byte_sent = write(fd(), msg.c_str() + byte_sent, static_cast<std::size_t>(len));
+		size_t len = msg.length() - (size_t)byte_sent;
+		byte_sent = write(fd(), msg.c_str() + byte_sent, len);
 		if (byte_sent < 0){
 			throw Exception("Fatal, write return -1");
 		}
-		if (byte_sent == len){
+		if (byte_sent == (ssize_t)len){
 			byte_sent = 0;
 			return true;
 		}

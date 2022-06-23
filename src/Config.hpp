@@ -43,7 +43,7 @@ public:
         std::vector<std::string> index;
         std::vector<Cgi_ext> cgi_ext;
 
-        Location& operator=(const Config config);
+        Location& operator=(const Config& config);
         void print_location();
     };
 
@@ -59,7 +59,7 @@ public:
     std::vector<std::string> index;
     std::vector<Cgi_ext> cgi_ext;
     std::vector<Location> location;
-    Config& operator=(const Config::Location other_location);
+    Config& operator=(const Config::Location& other_location);
 
     void print_config();
 };

@@ -69,5 +69,5 @@ private:
     size_t req_size_;
     Request req_;
 	std::string msg;
-	int byte_sent;
+	ssize_t byte_sent;
 };
