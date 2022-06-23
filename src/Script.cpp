@@ -14,10 +14,10 @@
 #include <cstring>
 #include <fcntl.h>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <iostream>
 
 #define BUFFER_SIZE 50
 
@@ -32,20 +32,21 @@ Script::Script(const Config& config, const Request& request_)
       cmd_(NULL),
       request_(request_)
 {
-   build_cmd(request_.path(), config);
+    build_cmd(request_.path(), config);
     build_env(request_.method(), config);
     // print_env();
 }
 
-Script::~Script(){
+Script::~Script()
+{
 
-	for (std::size_t i = 0; i < envp_size_; i++) {
+    for (std::size_t i = 0; i < envp_size_; i++) {
         delete[] envp_[i];
     }
     delete[] envp_;
-	for (int i = 0; i < 3; i++){
-		delete[] cmd_[i];
-	}
+    for (int i = 0; i < 3; i++) {
+        delete[] cmd_[i];
+    }
     delete[] cmd_;
 }
 
@@ -54,44 +55,44 @@ std::string Script::exec()
 {
     pid_t id;
     int status;
-	int in_file;
-	
-	if (request_.method() == POST) {
-		in_file = open("in_file.tmp", O_CREAT | O_RDWR, 0777);
-		if (in_file < 0){
-			throw Exception("Error fatal, open");
-		}
-	}
-	int out_file = open("out_file.tmp", O_CREAT | O_RDWR, 0777); // Create out file for the output of the script
-	if (out_file < 0){
-		throw Exception("Error fatal, open");
-	}
+    int in_file;
+
+    if (request_.method() == POST) {
+        in_file = open("in_file.tmp", O_CREAT | O_RDWR, 0777);
+        if (in_file < 0) {
+            throw Exception("Error fatal, open");
+        }
+    }
+    int out_file = open("out_file.tmp", O_CREAT | O_RDWR,
+                        0777); // Create out file for the output of the script
+    if (out_file < 0) {
+        throw Exception("Error fatal, open");
+    }
     id = fork(); // Process to execve the script
     if (id < 0)
         throw Exception("Error fatal, fork");
     if (id == 0) {
-		if (request_.method() == POST) {
-        	if (write(in_file, request_.body().data(), request_.body().size()) < 0){
-				throw Exception("Error fatal, write");
-			}
-			close(in_file);
-			in_file = open("in_file.tmp", O_RDWR );
-			if (in_file < 0){
-				throw Exception("Error fatal, open");
-			}
-        	if (dup2(in_file, STDIN_FILENO) < 0){
-				throw Exception("Error fatal, dup2");
-			}
-		 }
-		if(dup2(out_file, STDOUT_FILENO) < 0){
-			throw Exception("Error fatal, dup2");
-		}
+        if (request_.method() == POST) {
+            if (write(in_file, request_.body().data(), request_.body().size()) < 0) {
+                throw Exception("Error fatal, write");
+            }
+            close(in_file);
+            in_file = open("in_file.tmp", O_RDWR);
+            if (in_file < 0) {
+                throw Exception("Error fatal, open");
+            }
+            if (dup2(in_file, STDIN_FILENO) < 0) {
+                throw Exception("Error fatal, dup2");
+            }
+        }
+        if (dup2(out_file, STDOUT_FILENO) < 0) {
+            throw Exception("Error fatal, dup2");
+        }
         execve(cmd_[0], cmd_, envp_);
         throw Exception("Error fatal, execve\n");
-   	}
-	else{
+    } else {
         waitpid(id, &status, 0);
-	}
+    }
     close(out_file);
     if (request_.method() == POST) { // delete the in file after script
         close(in_file);
@@ -99,8 +100,8 @@ std::string Script::exec()
     std::ifstream input_file("out_file.tmp");
     std::string script_output((std::istreambuf_iterator<char>(input_file)),
                               std::istreambuf_iterator<char>());
-	remove("in_file.tmp");
-	remove("out_file.tmp");
+    remove("in_file.tmp");
+    remove("out_file.tmp");
     return script_output;
 }
 
@@ -145,18 +146,18 @@ void Script::build_cmd(const std::string& path, const Config& config)
         i++;
     }
     std::string msg = "Error: No script extention found\n";
-    if (found == false){
+    if (found == false) {
         throw Exception(msg.c_str());
-	}
+    }
 
     // cmd_[0] = the name of the program ex: (python or bash)
     //  cmd_[1] will be the path where the script is.
     this->cmd_ = new char*[4];
     this->cmd_[0] = new char[config.cgi_ext[i].bin_path.length() + 1]();
-	this->cmd_[0] = strcpy(this->cmd_[0], config.cgi_ext[i].bin_path.c_str());
-	this->cmd_[1] = new char[path.length() + 1]();
+    this->cmd_[0] = strcpy(this->cmd_[0], config.cgi_ext[i].bin_path.c_str());
+    this->cmd_[1] = new char[path.length() + 1]();
     this->cmd_[1] = strcpy(this->cmd_[1], path.c_str() + 1);
-	this->cmd_[2] = new char[1]();
+    this->cmd_[2] = new char[1]();
     this->cmd_[3] = NULL;
 }
 
@@ -235,13 +236,13 @@ void Script::build_env(Method method, const Config& config)
     // returned is the same as the value of the CGI variable REMOTE_ADDR.
     v_env_.push_back("REMOTE_ADDR=" + config.listen.address);
 
-    // The fully-qualified name of the client that sent the request_, or the IP address of the client
-    // if the name cannot be determined
+    // The fully-qualified name of the client that sent the request_, or the IP address of the
+    // client if the name cannot be determined
     it = request_.find_header("Host");
     if (it != request_.headers_end())
         v_env_.push_back("REMOTE_HOST=" + it->second);
-    // Returns the name of the HTTP method with which this request_ was made. For example, GET, POST,
-    // or PUT.
+    // Returns the name of the HTTP method with which this request_ was made. For example, GET,
+    // POST, or PUT.
     const char* method_name = method_str(request_.method());
     std::string method_join("request__METHOD=");
     method_join += method_name;
@@ -265,7 +266,7 @@ void Script::build_env(Method method, const Config& config)
     for (std::size_t i = 0; i < envp_size_; i++) {
         envp_[i] = new char[v_env_[i].size() + 1];
         strcpy(envp_[i], v_env_[i].c_str());
-		envp_[i][v_env_[i].size()] = 0;
+        envp_[i][v_env_[i].size()] = 0;
     }
     envp_[envp_size_] = NULL;
 }

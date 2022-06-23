@@ -14,13 +14,13 @@
 #include "Response.hpp"
 #include "Script.hpp"
 #include "Utils.hpp"
+#include <arpa/inet.h>
 #include <cerrno>
 #include <cstring>
 #include <fcntl.h>
+#include <netinet/in.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 
 #define BUF_SIZE (1024 * 8)
 
@@ -72,63 +72,59 @@ void TcpConnection::handle_read_event()
 bool TcpConnection::handle_write_event(const std::vector<Config>& server_configs)
 {
     std::cout << "|!|IN_CONNECTION_WRITE_EVENT|!|" << std::endl;
-	if (byte_sent != 0){
-		return send_response();
-	}
-	try{
-    	Config resp_configs = get_response_configs(server_configs);
-	}
-	catch(const std::exception& ex){
-		Response response(req_, server_configs[0]);
-		response.set_status_code(500);
-		response.check_error_code();
+    if (byte_sent != 0) {
+        return send_response();
+    }
+    try {
+        Config resp_configs = get_response_configs(server_configs);
+    } catch (const std::exception& ex) {
+        Response response(req_, server_configs[0]);
+        response.set_status_code(500);
+        response.check_error_code();
         response.set_html_header();
         msg = response.header + response.body;
-		return (send_response());
-	}
-	Config resp_configs = get_response_configs(server_configs);
-	std::size_t len = req_.path().length();
+        return (send_response());
+    }
+    Config resp_configs = get_response_configs(server_configs);
+    std::size_t len = req_.path().length();
     if (req_.path().find("cgi-bin/") != std::string::npos && req_.path()[len - 1] != '/') {
         std::cout << "|!|IN SCRIPT|!|" << std::endl;
 
-        try{
-			Script script(resp_configs, req_);
-			msg = script.exec();
-			return (send_response());
-		} catch(const std::exception& ex){
-			std::cout << ex.what() << std::endl;
-			Response response(req_, resp_configs);
-			std::string exec_msg("Error fatal, execve\n");
-			std::string ext_msg("Error: No script extention found\n");
-			if (exec_msg.compare(ex.what()) == 0 || ext_msg.compare(ex.what()) == 0){
-				response.set_status_code(404);
-			}
-			else{
-				response.set_status_code(500);
-			}
-          	response.check_error_code();
-          	response.set_html_header();
-          	msg = response.header + response.body;
-			return (send_response());
-	}
+        try {
+            Script script(resp_configs, req_);
+            msg = script.exec();
+            return (send_response());
+        } catch (const std::exception& ex) {
+            std::cout << ex.what() << std::endl;
+            Response response(req_, resp_configs);
+            std::string exec_msg("Error fatal, execve\n");
+            std::string ext_msg("Error: No script extention found\n");
+            if (exec_msg.compare(ex.what()) == 0 || ext_msg.compare(ex.what()) == 0) {
+                response.set_status_code(404);
+            } else {
+                response.set_status_code(500);
+            }
+            response.check_error_code();
+            response.set_html_header();
+            msg = response.header + response.body;
+            return (send_response());
+        }
         std::cout << "|!|OUT OF SCRIPT|!|" << std::endl;
     } else {
         std::cout << "|!|IN FILE RESPONSE|!|" << std::endl;
         Response response(req_, resp_configs);
         try {
-          response.generate_response_html();
-        }
-        catch(const std::exception& ex)
-        {
-          std::cerr << ex.what() << std::endl;
-          response.set_status_code(404);
-          response.check_error_code();
-          response.set_html_header();
-          response.full_content = response.header + response.body;
+            response.generate_response_html();
+        } catch (const std::exception& ex) {
+            std::cerr << ex.what() << std::endl;
+            response.set_status_code(404);
+            response.check_error_code();
+            response.set_html_header();
+            response.full_content = response.header + response.body;
         }
         msg = response.full_content;
-		std::cout << "|!|FILE RESPONSE BUILT|!|" << std::endl;
-		return (send_response()); // TODO: check err and if all bytes were sent
+        std::cout << "|!|FILE RESPONSE BUILT|!|" << std::endl;
+        return (send_response()); // TODO: check err and if all bytes were sent
     }
 }
 
@@ -137,12 +133,14 @@ const Request& TcpConnection::request() const
     return req_;
 }
 
-void TcpConnection::set_addr(in_addr addr){
-	this->inaddr_ = addr;
+void TcpConnection::set_addr(in_addr addr)
+{
+    this->inaddr_ = addr;
 }
 
-void	TcpConnection::set_port(uint16_t port){
-	this->port_ = port;
+void TcpConnection::set_port(uint16_t port)
+{
+    this->port_ = port;
 }
 
 void TcpConnection::parse_http_request_line()
@@ -408,50 +406,48 @@ void TcpConnection::add_header(ParseState next_state)
     req_.set_state_and_clear_buf(next_state);
 }
 
-//Compare the adress port of the connection with the list of configs.
-//Match with the hostname, if no match found, the first adress/port match will be returned.
-const Config&
-TcpConnection::get_response_configs(const std::vector<Config>& server_configs) const
+// Compare the adress port of the connection with the list of configs.
+// Match with the hostname, if no match found, the first adress/port match will be returned.
+const Config& TcpConnection::get_response_configs(const std::vector<Config>& server_configs) const
 {
     Request::header_iterator it = req_.find_header("host");
-	int def = -1;
-    if(it == req_.headers_end())
-		throw Exception("Cannot find host");
+    int def = -1;
+    if (it == req_.headers_end())
+        throw Exception("Cannot find host");
     const std::string& host = it->second;
-	in_addr addr_config;
+    in_addr addr_config;
     for (unsigned long i = 0; i < server_configs.size(); i++) {
-		addr_config.s_addr = inet_addr(server_configs[i].listen.address.c_str());
-		if (addr_config.s_addr == this->inaddr_.s_addr && server_configs[i].listen.port == this->port_){
-			if (def == -1){
-				def = i;
-			}
-			for (std::size_t j = 0; j < server_configs[j].server_name.size(); j++){
-			if (host == server_configs[i].server_name[j]){
-				return server_configs[i];
-			}
-		}
-		}
+        addr_config.s_addr = inet_addr(server_configs[i].listen.address.c_str());
+        if (addr_config.s_addr == this->inaddr_.s_addr &&
+            server_configs[i].listen.port == this->port_) {
+            if (def == -1) {
+                def = i;
+            }
+            for (std::size_t j = 0; j < server_configs[j].server_name.size(); j++) {
+                if (host == server_configs[i].server_name[j]) {
+                    return server_configs[i];
+                }
+            }
+        }
     }
-	if (def == -1){
-		throw Exception("No config match\n");
-	}
-	return server_configs[static_cast<std::size_t>(def)];
+    if (def == -1) {
+        throw Exception("No config match\n");
+    }
+    return server_configs[static_cast<std::size_t>(def)];
 }
 
-bool TcpConnection::send_response(){
+bool TcpConnection::send_response()
+{
 
-	
-		size_t len = msg.length() - (size_t)byte_sent;
-		byte_sent = write(fd(), msg.c_str() + byte_sent, len);
-		if (byte_sent < 0){
-			throw Exception("Fatal, write return -1");
-		}
-		if (byte_sent == (ssize_t)len){
-			byte_sent = 0;
-			return true;
-		}
-		else{
-			return false;
-		}
+    size_t len = msg.length() - (size_t)byte_sent;
+    byte_sent = write(fd(), msg.c_str() + byte_sent, len);
+    if (byte_sent < 0) {
+        throw Exception("Fatal, write return -1");
+    }
+    if (byte_sent == (ssize_t)len) {
+        byte_sent = 0;
+        return true;
+    } else {
+        return false;
+    }
 }
-

@@ -60,7 +60,7 @@ void ConfigParser::create_config()
 }
 
 std::string::iterator ConfigParser::find_server_end(std::string::iterator start,
-                                                  std::string::iterator end)
+                                                    std::string::iterator end)
 {
     bool open = false;
     while (start != end) {

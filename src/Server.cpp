@@ -59,7 +59,7 @@ Server::Server(const std::vector<Config>& blocks)
 
 void Server::run()
 {
-	std::cerr << "IN RUN\n" << std::endl;
+    std::cerr << "IN RUN\n" << std::endl;
     signal(SIGINT, &stop_server);
     while (running) {
         int nevents = poll(sockets_.pfds(), sockets_.size(), -1);
@@ -107,16 +107,16 @@ void Server::run()
 
             if ((pfd.revents & POLLOUT) && (s->state() == S_WRITE)) {
                 found = true;
-				bool	sent = false;
+                bool sent = false;
                 TcpConnection* c = static_cast<TcpConnection*>(s);
                 try {
                     sent = c->handle_write_event(configs_);
                 } catch (const std::exception& ex) {
                     std::cerr << ex.what() << std::endl;
                 }
-                if (sent == true){
-                	to_close.push_back(c->fd());
-				}
+                if (sent == true) {
+                    to_close.push_back(c->fd());
+                }
             }
 
             if (found) {
@@ -138,8 +138,8 @@ void Server::accept_connection(TcpListener* socket)
     TcpConnection* c = new TcpConnection(socket->fd());
 
     sockets_.insert(std::make_pair(c->fd(), static_cast<Socket*>(c)), POLLIN | POLLOUT);
-	c->set_addr(socket->address());
-	c->set_port(socket->port());
+    c->set_addr(socket->address());
+    c->set_port(socket->port());
     std::cout << "Accepted connection: " << c->fd() << std::endl;
 }
 

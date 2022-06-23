@@ -13,8 +13,8 @@
 #include "Config.hpp"
 #include "Request.hpp"
 #include <string>
-#include <unistd.h>
 #include <time.h>
+#include <unistd.h>
 
 #pragma once
 
@@ -43,7 +43,7 @@ public:
     class ExtensionException : public std::exception
     {
     public:
-      virtual const char* what() const throw();
+        virtual const char* what() const throw();
     };
 
 private:
@@ -55,7 +55,8 @@ private:
     int set_allow();
     int generate_autoindex(std::ifstream& requested_file, std::stringstream& body_stream);
     void generate_singular_config();
-    Config::Location generate_singular_location(const std::vector<Config::Location>& locations, bool& has_location);
+    Config::Location generate_singular_location(const std::vector<Config::Location>& locations,
+                                                bool& has_location);
 
 public:
     std::string body;

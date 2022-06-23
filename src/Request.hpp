@@ -17,10 +17,8 @@
 #include <string>
 #include <unistd.h>
 #include <vector>
-#include <unistd.h>
 
-enum ParseState
-{
+enum ParseState {
     REQ_METHOD,
     REQ_PATH,
     REQ_QUERY,
@@ -35,8 +33,7 @@ enum ParseState
     REQ_BODY
 };
 
-enum Method
-{
+enum Method {
     BAD_METHOD,
     GET,
     POST,
@@ -44,8 +41,7 @@ enum Method
     OPTIONS
 };
 
-enum ChunkState
-{
+enum ChunkState {
     CNK_SIZE,
     CNK_CHUNK,
     CNK_NL

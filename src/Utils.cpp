@@ -98,7 +98,7 @@ std::vector<char>::const_iterator find_bytes(const std::vector<char>& data, cons
 }
 
 std::vector<char>::iterator find_bytes(std::vector<char>& data, const char* needle,
-                                             size_t needle_size)
+                                       size_t needle_size)
 {
     if (data.size() < needle_size) {
         return data.end();

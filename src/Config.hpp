@@ -20,7 +20,7 @@ public:
 
     struct Return_redirect {
         // code is initialized to -1
-        //bool is_active;
+        // bool is_active;
         int code;
         std::string url;
     };

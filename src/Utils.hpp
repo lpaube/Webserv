@@ -25,5 +25,5 @@ bool vectorize_content(std::vector<std::string>& content, std::string& content_s
 std::vector<char>::const_iterator find_bytes(const std::vector<char>& data, const char* needle,
                                              size_t needle_size);
 std::vector<char>::iterator find_bytes(std::vector<char>& data, const char* needle,
-                                             size_t needle_size);
+                                       size_t needle_size);
 void print_bytes(const std::vector<char>& data);

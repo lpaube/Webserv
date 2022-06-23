@@ -15,9 +15,9 @@
 #include "Config.hpp"
 #include "Request.hpp"
 #include "Socket.hpp"
+#include <netinet/in.h>
 #include <sys/socket.h>
 #include <vector>
-#include <netinet/in.h>
 
 class TcpConnection : public Socket
 {
@@ -39,8 +39,8 @@ public:
     void handle_read_event();
     bool handle_write_event(const std::vector<Config>& server_configs);
     const Request& request() const;
-	void set_addr(in_addr addr);
-	void set_port(uint16_t port);
+    void set_addr(in_addr addr);
+    void set_port(uint16_t port);
 
 private:
     void parse_http_request_line();
@@ -55,19 +55,19 @@ private:
     void request_line_done(bool& done);
     void headers_done(bool& done);
     void add_header(ParseState next_state);
-	bool send_response();
+    bool send_response();
     const Config& get_response_configs(const std::vector<Config>& server_configs) const;
 
 private:
     int listener_fd_;
     sockaddr addr_;
-	uint16_t port_;
+    uint16_t port_;
     socklen_t addrlen_;
-	in_addr inaddr_;
+    in_addr inaddr_;
     std::vector<char> data_;
     void (TcpConnection::*request_handler)();
     size_t req_size_;
     Request req_;
-	std::string msg;
-	ssize_t byte_sent;
+    std::string msg;
+    ssize_t byte_sent;
 };
