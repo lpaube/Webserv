@@ -13,6 +13,7 @@
         });
     }
 
+    /*
     var image_test = document.getElementById("image_test");
     image_test.onclick = () =>	{
       fetch("cat_test1.jpg", {
@@ -22,6 +23,7 @@
           document.write(content);
         });
     }
+    */
 
     var error_404 = document.getElementById("error_404");
     error_404.onclick = () =>	{
@@ -66,6 +68,16 @@
     var autoindex_test = document.getElementById("autoindex_test");
     autoindex_test.onclick = () =>	{
       fetch("/42_test/autoindex_directory/", {
+        method: "GET"
+      }).then(response => response.text())
+        .then((content) => {
+          document.write(content);
+        });
+    }
+
+    var test_button = document.getElementById("test_button");
+    test_button.onclick = () =>	{
+      fetch("/42_test/fasdfafsa", {
         method: "GET"
       }).then(response => response.text())
         .then((content) => {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   TcpConnection.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 19:31:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/15 23:28:53 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/23 15:01:36 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include "Socket.hpp"
 #include <sys/socket.h>
 #include <vector>
+#include <netinet/in.h>
 
 class TcpConnection : public Socket
 {
@@ -36,8 +37,10 @@ public:
     }
 
     void handle_read_event();
-    void handle_write_event(const std::vector<Config>& server_configs);
+    bool handle_write_event(const std::vector<Config>& server_configs);
     const Request& request() const;
+	void set_addr(in_addr addr);
+	void set_port(uint16_t port);
 
 private:
     void parse_http_request_line();
@@ -52,14 +55,19 @@ private:
     void request_line_done(bool& done);
     void headers_done(bool& done);
     void add_header(ParseState next_state);
-    std::vector<Config> get_response_configs(const std::vector<Config>& server_configs) const;
+	bool send_response();
+    const Config& get_response_configs(const std::vector<Config>& server_configs) const;
 
 private:
     int listener_fd_;
     sockaddr addr_;
+	uint16_t port_;
     socklen_t addrlen_;
+	in_addr inaddr_;
     std::vector<char> data_;
     void (TcpConnection::*request_handler)();
     size_t req_size_;
     Request req_;
+	std::string msg;
+	ssize_t byte_sent;
 };

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 16:55:40 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/15 23:19:58 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/06/18 17:53:34 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "Config.hpp"
 #include "Sockets.hpp"
 #include "TcpConnection.hpp"
+#include "TcpListener.hpp"
 
 class Server
 {
@@ -27,7 +28,7 @@ public:
     void run();
 
 private:
-    void accept_connection(Socket* socket);
+    void accept_connection(TcpListener* socket);
     void close_connection(Socket* c);
     void print_body(const Request& r) const;
     std::vector<Config> get_response_configs(const Request& req) const;
