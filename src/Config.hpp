@@ -44,7 +44,7 @@ public:
         std::vector<Cgi_ext> cgi_ext;
 
         Location& operator=(const Config& config);
-        void print_location();
+        void print_location() const;
     };
 
 public:
@@ -61,5 +61,5 @@ public:
     std::vector<Location> location;
     Config& operator=(const Config::Location& other_location);
 
-    void print_config();
+    void print_config() const;
 };
