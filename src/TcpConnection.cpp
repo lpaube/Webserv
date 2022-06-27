@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/23 15:30:30 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/27 15:24:43 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,8 @@ bool TcpConnection::handle_write_event(const std::vector<Config>& server_configs
     }
     Config resp_configs = get_response_configs(server_configs);
     std::size_t len = req_.path().length();
-    if (req_.path().find("cgi-bin/") != std::string::npos && req_.path()[len - 1] != '/') {
+	std::cout << "PATH = " << req_.path() << "\n";
+    if (req_.path().find("/cgi-bin/") != std::string::npos && req_.path()[len - 1] != '/') {
         std::cout << "|!|IN SCRIPT|!|" << std::endl;
 
         try {
@@ -113,6 +114,7 @@ bool TcpConnection::handle_write_event(const std::vector<Config>& server_configs
     } else {
         std::cout << "|!|IN FILE RESPONSE|!|" << std::endl;
         Response response(req_, resp_configs);
+		std::cout << "FULL PATH =" << response.get_full_path() << std::endl;
         try {
             response.generate_response_html();
         } catch (const std::exception& ex) {
@@ -440,7 +442,8 @@ bool TcpConnection::send_response()
 {
 
     size_t len = msg.length() - (size_t)byte_sent;
-    byte_sent = write(fd(), msg.c_str() + byte_sent, len);
+	std::cout << "PRINTING RESPONSE = \n" << msg.c_str() << std::endl;
+    byte_sent = send(fd(), msg.c_str() + byte_sent, len, 0);
     if (byte_sent < 0) {
         throw Exception("Fatal, write return -1");
     }

@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 19:31:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/23 15:01:36 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/27 14:33:36 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 class TcpConnection : public Socket
 {
 public:
-    static const size_t MAX_REQUEST_SIZE = 1024 * 10;
+    static const size_t MAX_REQUEST_SIZE = 1024 * 60;
 
 public:
     TcpConnection(int listener_fd);

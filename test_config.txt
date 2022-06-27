@@ -1,4 +1,42 @@
 server{
+	listen 127.0.0.1:7000;
+  server_name redxred.com www.redxred.com;
+  client_max_body_size 80m;
+  error_page    404  /Error/error404.html;
+  error_page    405 504 505 /Error/default.html;
+  index random;
+  autoindex on;
+ 
+  cgi_ext		.sh /bin/bash;
+  cgi_ext		.py /usr/bin/python3;
+  limit_except GET POST DELETE;
+
+	location / {
+    root ./web_page/42_logtime;
+    client_max_body_size 800m;
+    index index.html;
+    limit_except GET;
+	}
+
+  location /Error {
+    root ./web_page;
+    index index_test.html;
+  }
+
+  location /Error/special_path {
+    return 301 Error/redirected_path/index.html;
+    root ./web_page;
+    index redirected.html;
+  }
+
+  location /42_test/autoindex_directory {
+    autoindex on;
+    root ./web_page;
+  }
+
+}
+
+server{
 	listen 127.0.0.1:8000;
   server_name redxred.com www.redxred.com;
   client_max_body_size 80m;
