@@ -95,6 +95,8 @@ void Server::run()
                         try {
                             c->handle_read_event();
                         } catch (const Request::Exception& ex) {
+                            // 400 or 413
+                            // int code = ex.status_code();
                             // TODO: bad request
                         } catch (const std::exception& ex) {
                             std::cerr << ex.what() << std::endl;

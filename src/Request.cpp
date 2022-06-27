@@ -14,9 +14,14 @@
 #include "Utils.hpp"
 #include <sstream>
 
-Request::Exception::Exception(const std::string& msg)
-    : ExceptionBase(msg)
+Request::Exception::Exception(const std::string& msg, int code)
+    : ExceptionBase(msg), status_code_(code)
 {
+}
+
+int Request::Exception::status_code() const
+{
+    return status_code_;
 }
 
 Request::Request()
@@ -190,14 +195,14 @@ void Request::process_headers()
     if (is_content_length) {
         std::pair<iter, iter> range = headers_.equal_range("content-length");
         if (range.second->first == "content-length") {
-            throw Exception("Bad request: More than one Content-Length header");
+            throw Exception("Bad request: More than one Content-Length header", 400);
         }
 
         std::stringstream ss(it->second);
         ss >> content_length_count_;
 
         if (!ss.eof()) {
-            throw Exception("Bad request: Bad Content-Length value");
+            throw Exception("Bad request: Bad Content-Length value", 400);
         }
     }
 
@@ -211,14 +216,14 @@ void Request::process_headers()
                 if (trimmed == "chunked") {
                     is_chunked = true;
                 } else {
-                    throw Exception("Bad request: Unsupported encoding: " + trimmed);
+                    throw Exception("Bad request: Unsupported encoding: " + trimmed, 400);
                 }
             }
         }
     }
 
     if (is_content_length && is_chunked) {
-        throw Exception("Bad request: Content-Length and chunked encoding are present");
+        throw Exception("Bad request: Content-Length and chunked encoding are present", 400);
     }
 
     it = headers_.find("host");
@@ -226,7 +231,7 @@ void Request::process_headers()
         std::pair<iter, iter> range = headers_.equal_range("host");
         ++range.first;
         if (range.first != range.second) {
-            throw Exception("Bad request: Multiple Host headers are present");
+            throw Exception("Bad request: Multiple Host headers are present", 400);
         }
     }
 }
@@ -287,7 +292,7 @@ void Request::decode_raw_body()
         if (it != raw_body_.end() && it == raw_body_.begin()) {
             raw_body_.clear();
         } else {
-            throw Exception("Bad request: chunked request did not end with \\r\\n");
+            throw Exception("Bad request: chunked request did not end with \\r\\n", 400);
         }
     }
     return;
@@ -310,7 +315,7 @@ bool Request::read_chunk()
         if (raw_body_.size() >= 2) {
             const_rbody_iter it = find_bytes(raw_body_, "\r\n", 2);
             if (it == raw_body_.end() || it != raw_body_.begin()) {
-                throw Exception("Bad request: Chunk doesn't end with \\r\\n");
+                throw Exception("Bad request: Chunk doesn't end with \\r\\n", 400);
             } else {
                 raw_body_.erase(raw_body_.begin(), raw_body_.begin() + 2);
                 cnk_state_ = CNK_SIZE;
@@ -337,7 +342,7 @@ bool Request::read_chunk_size()
         ss << std::hex;
         ss >> cur_chunk_size_;
         if (!ss.eof()) {
-            throw Exception("Bad chunk size: " + chunk_size);
+            throw Exception("Bad chunk size: " + chunk_size, 400);
         }
         raw_body_.erase(raw_body_.begin(), it + 2);
         return true;

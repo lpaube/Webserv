@@ -63,7 +63,7 @@ void TcpConnection::handle_read_event()
     append_data(buf, buf + n);
 
     if (req_size_ > MAX_REQUEST_SIZE) {
-        throw Exception("Request too big");
+        throw Request::Exception("Request too big", 413);
     }
 
     (this->*request_handler)();
@@ -351,7 +351,7 @@ void TcpConnection::parse_http_request_body_content_length()
     if (n == req_.content_length_count()) {
         done = true;
     } else if (n > req_.content_length_count()) {
-        throw Request::Exception("Body larger than Content-Length");
+        throw Request::Exception("Body larger than Content-Length", 400);
     }
 
     req_.content_length_sub((size_t)n);
@@ -377,7 +377,7 @@ void TcpConnection::parse_http_request_body_chunked()
 
 void TcpConnection::bad_request() const
 {
-    throw Request::Exception("Bad request");
+    throw Request::Exception("Bad request", 400);
 }
 
 void TcpConnection::check_http_version() const

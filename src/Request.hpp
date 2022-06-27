@@ -58,7 +58,12 @@ public:
     class Exception : public ExceptionBase
     {
     public:
-        Exception(const std::string& msg);
+        Exception(const std::string& msg, int code);
+
+        int status_code() const;
+
+    private:
+        int status_code_;
     };
 
 public:
