@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/09 17:17:01 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/27 17:01:01 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/27 18:16:19 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,17 @@ function showFile(file){
 												<span class="name">${file.name} • Uploading</span>
 												<span class="percent">100%</span>
 											</div>
+											<div class = "delete">
+												<img class="del_cross" src="assets/icons8-close-48.png">
+											</div>
 											<div class="progress-bar">
 												<div class="progress" style="width:100%"></div>
 											</div>
 										</div>
 											</li>`
 	progressArea.innerHTML = progressHTML;
+	del = document.querySelector(".del_cross");
+	del.addEventListener("click", deleteFile(file, del));
 }
 
 const uploadFile = () => {
@@ -68,6 +73,25 @@ const uploadFile = () => {
 			if (content != "OK")
 				document.write(content)
 		}).catch(e => alert(e.message));
+	}
+}
+
+const deleteFile = (file, del) => {
+	console.log("IN1");
+	del.click();
+	del.onchange = () =>{
+	console.log("IN2");
+	fetch(ADD + "/cgi-bin/upload/" + file.name, {
+		method: "DELETE"
+	}).then(response => {
+		if (!response.ok){
+			console.log(response.text());
+			return response.text();
+		}
+		else{
+			del.remove();
+		}
+	}).catch(e => alert(e.message));
 	}
 }
 	/*fileInput.click();

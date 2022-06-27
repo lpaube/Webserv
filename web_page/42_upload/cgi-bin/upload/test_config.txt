@@ -110,4 +110,3 @@ server{
     root ./web_page;
   }
 
-}
