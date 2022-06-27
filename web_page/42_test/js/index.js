@@ -2,8 +2,18 @@
     const userinput = document.getElementById("input");
     const apikey = document.getElementById("apikey");
     const uid = document.getElementById("uid");
-
+	const env = document.getElementById("env");
     var get_test_html = document.getElementById("test_html");
+
+	env.onclick = () => {
+		fetch("http://127.0.0.1:9000/web_page/42_test/cgi-bin/env.sh", {
+			method: "GET"
+		  }).then(response => response.text())
+			.then((content) => {
+			  document.write(content);
+			});
+	}
+	
     get_test_html.onclick = () =>	{
       fetch("test.html", {
         method: "GET"

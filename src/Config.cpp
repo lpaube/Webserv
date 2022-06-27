@@ -50,8 +50,8 @@ void Config::Location::print_location() const
 
     // limit_except
     std::cout << "===== limit_except =====" << std::endl;
-    for (std::vector<std::string>::const_iterator it = limit_except.begin(); it != limit_except.end();
-         ++it) {
+    for (std::vector<std::string>::const_iterator it = limit_except.begin();
+         it != limit_except.end(); ++it) {
         std::cout << "allowed method: " << *it << std::endl;
     }
     std::cout << std::endl;

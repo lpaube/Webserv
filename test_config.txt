@@ -88,9 +88,9 @@ server{
   limit_except GET POST DELETE;
 
 	location / {
-    root ./web_page/42_upload;
+    root ./web_page/42_test;
     client_max_body_size 800m;
-    index upload.html;
+    index index.html;
     limit_except GET;
 	}
 

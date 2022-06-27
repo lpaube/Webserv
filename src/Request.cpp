@@ -15,7 +15,8 @@
 #include <sstream>
 
 Request::Exception::Exception(const std::string& msg, int code)
-    : ExceptionBase(msg), status_code_(code)
+    : ExceptionBase(msg),
+      status_code_(code)
 {
 }
 
