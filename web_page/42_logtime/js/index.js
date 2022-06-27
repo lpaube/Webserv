@@ -22,7 +22,7 @@ function submit() {
 			alert("Empty field!");
 			return ;
 		}
-		fetch("http://127.0.0.1:8000/cgi-bin/get_time.py?" + new URLSearchParams(
+		fetch("http://127.0.0.1:7000/web_page/42_logtime/cgi-bin/get_time.py?" + new URLSearchParams(
 			{ user: userinput.value, test: "test"}
 		), {
 			method: "GET",

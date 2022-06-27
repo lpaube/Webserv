@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/27 14:46:32 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/27 15:24:43 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,7 @@ bool TcpConnection::handle_write_event(const std::vector<Config>& server_configs
     } else {
         std::cout << "|!|IN FILE RESPONSE|!|" << std::endl;
         Response response(req_, resp_configs);
+		std::cout << "FULL PATH =" << response.get_full_path() << std::endl;
         try {
             response.generate_response_html();
         } catch (const std::exception& ex) {

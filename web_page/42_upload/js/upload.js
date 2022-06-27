@@ -6,19 +6,19 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/09 17:17:01 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/18 16:53:05 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/27 17:01:01 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
-var ADD = "http://localhost:8000";
+var ADD = "http://localhost:8000/web_page/42_upload";
 const form = document.querySelector("form");
 const check = document.querySelector(".uploaded-area");
 const body = document.querySelector("body");
 const progressArea = document.querySelector(".progress-area");
 
 const	checkFile = () => {
-	fetch("http://127.0.0.1:8000/cgi-bin/upload/", {
+	fetch("/cgi-bin/upload/", {
 		method: "GET",
 	}).then((result) => { 
 		return result.text();
@@ -53,7 +53,7 @@ const uploadFile = () => {
 	fileInput.onchange = ({target}) =>{
 		let file = target.files[0];
 		data.append("file", file);
-		fetch("http://127.0.0.1:8000/cgi-bin/upload.py", {
+		fetch(ADD + "/cgi-bin/upload.py", {
 			method: "POST",
 			body: data
 		}).then(response => {
