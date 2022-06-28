@@ -6,12 +6,13 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:08 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/18 16:09:00 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/28 17:27:47 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Script.hpp"
 #include <cstring>
+#include <exception>
 #include <fcntl.h>
 #include <fstream>
 #include <iostream>
@@ -21,33 +22,30 @@
 
 #define BUFFER_SIZE 50
 
-Script::Exception::Exception(const char* msg)
-    : ExceptionBase(msg)
-{
-}
-
 // script constructor takes 2 args, a config and a specific request_.
 Script::Script(const Config& config, const Request& request_)
-    : envp_(NULL),
+    : ext_found(false),
+      envp_(NULL),
       cmd_(NULL),
       request_(request_)
 {
     build_cmd(request_.path(), config);
-    build_env(request_.method(), config);
-    // print_env();
+    if (ext_found == true)
+        build_env(request_.method(), config);
 }
 
 Script::~Script()
 {
-
-    for (std::size_t i = 0; i < envp_size_; i++) {
-        delete[] envp_[i];
+    if (ext_found == true) {
+        for (std::size_t i = 0; i < envp_size_; i++) {
+            delete[] envp_[i];
+        }
+        delete[] envp_;
+        for (int i = 0; i < 3; i++) {
+            delete[] cmd_[i];
+        }
+        delete[] cmd_;
     }
-    delete[] envp_;
-    for (int i = 0; i < 3; i++) {
-        delete[] cmd_[i];
-    }
-    delete[] cmd_;
 }
 
 // execute the script and returns the output of the script in a string.
@@ -60,36 +58,36 @@ std::string Script::exec()
     if (request_.method() == POST) {
         in_file = open("in_file.tmp", O_CREAT | O_RDWR, 0777);
         if (in_file < 0) {
-            throw Exception("Error fatal, open");
+            throw Request::Exception("Error fatal, open", 500);
         }
     }
     int out_file = open("out_file.tmp", O_CREAT | O_RDWR,
                         0777); // Create out file for the output of the script
     if (out_file < 0) {
-        throw Exception("Error fatal, open");
+        throw Request::Exception("Error fatal, open", 500);
     }
     id = fork(); // Process to execve the script
     if (id < 0)
-        throw Exception("Error fatal, fork");
+        throw Request::Exception("Error fatal, fork", 500);
     if (id == 0) {
         if (request_.method() == POST) {
             if (write(in_file, request_.body().data(), request_.body().size()) < 0) {
-                throw Exception("Error fatal, write");
+                throw Exception();
             }
             close(in_file);
             in_file = open("in_file.tmp", O_RDWR);
             if (in_file < 0) {
-                throw Exception("Error fatal, open");
+                throw Request::Exception("Error fatal, open", 500);
             }
             if (dup2(in_file, STDIN_FILENO) < 0) {
-                throw Exception("Error fatal, dup2");
+                throw Request::Exception("Error fatal, dup2", 500);
             }
         }
         if (dup2(out_file, STDOUT_FILENO) < 0) {
-            throw Exception("Error fatal, dup2");
+            throw Request::Exception("Error fatal, dup2", 500);
         }
         execve(cmd_[0], cmd_, envp_);
-        throw Exception("Error fatal, execve\n");
+        throw Request::Exception("Error fatal, execve\n", 500);
     } else {
         waitpid(id, &status, 0);
     }
@@ -124,7 +122,7 @@ std::string Script::get_ext(const std::string& path)
             save++;
     }
     if (save == len)
-        throw Exception("Error: No script extention found\n");
+        throw Request::Exception("Error: No script extention found\n", 402);
     save++;
     ext = path.substr(save);
     return ext;
@@ -135,21 +133,17 @@ void Script::build_cmd(const std::string& path, const Config& config)
 {
     std::size_t ext_size = config.cgi_ext.size();
     std::string path_ext = "." + get_ext(path);
-    bool found = false;
     std::size_t i = 0;
     // Find the program linked to the extension in the config file. Throw if not found
     while (i < ext_size) {
         if (path_ext == config.cgi_ext[i].extension) {
-            found = true;
+            ext_found = true;
             break;
         }
         i++;
     }
-    std::string msg = "Error: No script extention found\n";
-    if (found == false) {
-        throw Exception(msg.c_str());
-    }
-
+    if (ext_found == false)
+        return;
     // cmd_[0] = the name of the program ex: (python or bash)
     //  cmd_[1] will be the path where the script is.
     this->cmd_ = new char*[4];
@@ -280,4 +274,9 @@ void Script::print_env() const
         i++;
     }
     std::cout << std::flush;
+}
+
+const char* Script::Exception::what() const throw()
+{
+    return "Error fatal, write returns -1\n";
 }

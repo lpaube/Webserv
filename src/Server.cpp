@@ -6,14 +6,16 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/23 15:04:37 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/28 18:10:16 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+#include "Response.hpp"
 #include "TcpConnection.hpp"
 #include "TcpListener.hpp"
 #include <cstring>
+#include <exception>
 #include <iostream>
 #include <signal.h>
 #include <sys/errno.h>
@@ -95,9 +97,14 @@ void Server::run()
                         try {
                             c->handle_read_event();
                         } catch (const Request::Exception& ex) {
-                            // 400 or 413
-                            // int code = ex.status_code();
-                            // TODO: bad request
+                            c->set_state(S_WRITE);
+                            c->set_response_config(configs_, "");
+                            int code = ex.status_code();
+                            Response response(c->request(), c->config());
+                            response.set_status_code(code);
+                            response.check_error_code();
+                            response.set_html_header();
+                            c->set_msg(response.header + response.body);
                         } catch (const std::exception& ex) {
                             std::cerr << ex.what() << std::endl;
                             to_close.push_back(c->fd());
@@ -111,10 +118,25 @@ void Server::run()
                 found = true;
                 bool sent = false;
                 TcpConnection* c = static_cast<TcpConnection*>(s);
+                Request::header_iterator it = c->request().find_header("host");
+                std::string host;
+                if (it == c->request().headers_end()) {
+                    host = "";
+                } else
+                    host = it->second;
+                c->set_response_config(configs_, host);
                 try {
-                    sent = c->handle_write_event(configs_);
+                    sent = c->handle_write_event();
+                } catch (const Request::Exception& ex) {
+                    int code = ex.status_code();
+                    Response response(c->request(), c->config());
+                    response.set_status_code(code);
+                    response.check_error_code();
+                    response.set_html_header();
+                    c->set_msg(response.header + response.body);
                 } catch (const std::exception& ex) {
                     std::cerr << ex.what() << std::endl;
+                    to_close.push_back(c->fd());
                 }
                 if (sent) {
                     to_close.push_back(c->fd());

@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 19:08:15 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/18 15:18:37 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/28 19:44:27 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ void ConfigParser::create_config()
         server_end = find_server_end(start, this->file_content_.end());
         ServerParser add(start, server_end);
         serverparser.push_back(add);
-        start = server_end + 2;
+        start = server_end + 1;
         std::string swap(start, this->file_content_.end());
         this->file_content_.assign(swap);
         min_server_ = true;
@@ -71,44 +71,48 @@ std::string::iterator ConfigParser::find_server_end(std::string::iterator start,
         else if (*start == '}' && open == true)
             open = false;
         else if (*start == '}')
-            return start - 1;
+            return start;
         start++;
     }
-    throw Exception("Error: Config, {} scope no closed\n");
+    throw Exception("Error: Config, {} scope not closed\n");
     return end;
 }
 
 void ConfigParser::find_server_start(std::string::iterator& start)
 {
-    std::size_t i = this->file_content_.find("server");
-    if (i == std::string::npos) {
+	std::size_t i = 0;
+	while (isspace(this->file_content_[i])){
+		i++;
+		if (this->file_content_[i] == 's')
+			break ;
+		if (i == std::string::npos || !this->file_content_[i]) {
         start = file_content_.end();
         return;
     }
-    i += 6;
+	if (!isspace(this->file_content_[i])){
+		throw Exception("Error config, wrong character out of server scope{}\n");
+	}
+	}
+	this->file_content_.erase(0, i);
+	if (start == file_content_.end())
+		return ;
+	if (this->file_content_.compare(0, 6, "server") != 0){
+		throw Exception("Error config, wrong character out of server scope{}\n");
+	}
     min_server_ = true;
-    start += static_cast<long>(i);
-    while (*start == ' ') {
+    start += 6;
+    while (isspace(*start)) {
         start++;
     }
     if (*start != '{') {
-        throw Exception("Error: Config, no opening { found after server declaration\n");
+        throw Exception("Error config, no opening { found after server declaration\n");
     } else
         start++;
 }
 
 std::string ConfigParser::get_content(std::fstream& file)
 {
-    file.seekg(0, file.end);
-    long len = file.tellg();
-    file.seekg(0, file.beg);
-    char* buf = new char[len + 1];
-    file.read(buf, len);
-    file.close();
-    buf[len] = 0;
-    std::string ret(buf);
-    delete[] buf;
-    return ret;
+    return std::string(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
 }
 
 unsigned int ConfigParser::nbserver() const

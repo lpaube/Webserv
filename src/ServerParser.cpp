@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerParser.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: laube <louis-philippe.aube@hotmail.com>    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/01 10:47:58 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/18 22:04:42 by laube            ###   ########.fr       */
+/*   Updated: 2022/06/28 18:17:39 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -270,7 +270,6 @@ void ServerParser::parse_location_vars()
                         // new_location.return_redirect.is_active = true;
 
                     } else {
-                        std::cerr << "LP ERROR 3" << std::endl;
                         throw BadLocationDirective();
                     }
                 } else if (directives[0] == "root") {

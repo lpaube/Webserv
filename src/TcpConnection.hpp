@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 19:31:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/27 14:33:36 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/28 18:04:41 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,11 +36,20 @@ public:
         data_.insert(data_.end(), first, last);
     }
 
+    class stdException : public std::exception
+    {
+    public:
+        virtual const char* what() const throw();
+    };
+
     void handle_read_event();
-    bool handle_write_event(const std::vector<Config>& server_configs);
+    bool handle_write_event();
     const Request& request() const;
     void set_addr(in_addr addr);
     void set_port(uint16_t port);
+    void set_msg(std::string set);
+    void set_response_config(const std::vector<Config>& server_configs, std::string host);
+    const Config& config() const;
 
 private:
     void parse_http_request_line();
@@ -56,7 +65,6 @@ private:
     void headers_done(bool& done);
     void add_header(ParseState next_state);
     bool send_response();
-    const Config& get_response_configs(const std::vector<Config>& server_configs) const;
 
 private:
     int listener_fd_;
@@ -68,6 +76,7 @@ private:
     void (TcpConnection::*request_handler)();
     size_t req_size_;
     Request req_;
-    std::string msg;
-    ssize_t byte_sent;
+    std::string msg_;
+    ssize_t byte_sent_;
+    Config config_;
 };
