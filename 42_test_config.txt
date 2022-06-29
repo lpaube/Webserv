@@ -7,9 +7,6 @@ server{
   index random;
   autoindex on;
 
-  fsadfafafdafasdgas asdfasdfasd;
- 
-
   cgi_ext		.sh /bin/bash;
   cgi_ext		.py /usr/bin/python3;
   limit_except GET POST DELETE;
