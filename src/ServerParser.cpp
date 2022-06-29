@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/01 10:47:58 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/28 18:17:39 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/06/29 18:46:25 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,27 +34,6 @@ ServerParser::ServerParser(std::string::iterator beg, std::string::iterator end)
         throw NoSepException();
     parse_server_vars();
     parse_location_vars();
-}
-
-void ServerParser::print_location() const
-{
-    unsigned long size = location_.size();
-    std::cout << "PRINTING LOCATION CONTENT\n";
-    for (unsigned long i = 0; i < size; i++) {
-        std::cout << "LOCATION : " << location_[i].path << '\n';
-        for (unsigned long j = 0; j < location_[i].loc_content.size(); j++) {
-            std::cout << location_[i].loc_content[j] << '\n';
-        }
-    }
-}
-
-void ServerParser::print_content() const
-{
-    int size = server_content_.size();
-    std::cout << "PRINTING SERVER CONTENT\n";
-    for (int i = 0; i < size; i++) {
-        std::cout << server_content_[static_cast<unsigned long>(i)] << std::endl;
-    }
 }
 
 std::size_t ServerParser::find_loc_start(std::size_t i)
