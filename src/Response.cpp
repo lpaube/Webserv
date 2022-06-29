@@ -230,154 +230,155 @@ void Response::set_html_body()
     /*
      * Check path access
      */
-    if (access(full_path_.c_str(), F_OK | R_OK) != 0) {
-        status_code_ = 404;
-        return;
-    }
+    if (access(full_path_.c_str(), F_OK | R_OK) != 0)
+      throw Request::Exception("File does not exist\n", 404);
 
     /*
      * Handle directives index and autoindex
      */
     if (*(full_path_.end() - 1) == '/') {
-        if (generate_autoindex(requested_file, body_stream))
-            return;
+      if (generate_autoindex(requested_file, body_stream))
+        return;
     } else {
-        size_t ext_pos = full_path_.find_last_of(".");
-        if (ext_pos == std::string::npos) {
-            throw ExtensionException();
-        }
+      size_t ext_pos = full_path_.find_last_of(".");
+      if (ext_pos != std::string::npos) {
         std::string path_extension = full_path_.substr(ext_pos + 1);
         if (path_extension == "jpeg" || path_extension == "jpg" || path_extension == "png" ||
-            path_extension == "gif") {
-            file_type_ = "IMAGE";
-            requested_file.open(full_path_.c_str(), std::ios_base::in | std::ios_base::binary);
-        } else
-            requested_file.open(full_path_.c_str());
+            path_extension == "gif")
+          file_type_ = "IMAGE";
+      }
+      if (file_type_ == "IMAGE")
+        requested_file.open(full_path_.c_str(), std::ios_base::in | std::ios_base::binary);
+      else
+        requested_file.open(full_path_.c_str());
     }
 
     if (!requested_file.is_open()) {
-        set_status_code(400);
+      throw Request::Exception("File not found\n", 404);
     } else {
-        if (file_type_ == "IMAGE") {
-            body_stream << requested_file.rdbuf();
-        } else {
-            while (getline(requested_file, line)) {
-                body_stream << line << "\r\n";
-            }
+      if (file_type_ == "IMAGE") {
+        body_stream << requested_file.rdbuf();
+      } else {
+        while (getline(requested_file, line)) {
+          body_stream << line << "\r\n";
         }
-        requested_file.close();
-        body_stream << "\r\n";
-        body = body_stream.str();
-        body_size_ = body.size();
-        if (body_size_ > get_config().client_max_body_size)
-            set_status_code(413);
+      }
+      requested_file.close();
+      body_stream << "\r\n";
+      body = body_stream.str();
+      body_size_ = body.size();
+      if (body_size_ > get_config().client_max_body_size)
+        throw Request::Exception("Size exceeds client max body size\n", 413);
     }
 }
 
 void Response::set_content_type()
 {
-    size_t ext_pos = full_path_.find_last_of(".");
-    if (ext_pos == std::string::npos)
-        throw ExtensionException();
-    std::string path_extension = full_path_.substr(ext_pos + 1);
-    if (path_extension == "jpg" || path_extension == "jpeg")
-        content_type_ = "image/jpeg";
-    else if (path_extension == "png")
-        content_type_ = "image/png";
-    else if (path_extension == "gif")
-        content_type_ = "image/gif";
-    else if (path_extension == "mp4")
-        content_type_ = "video/mp4";
-    else if (path_extension == "css")
-        content_type_ = "text/css";
-    else if (path_extension == "js")
-        content_type_ = "text/javascript";
-    else if (path_extension == "md")
-        content_type_ = "text/markdown";
+  size_t ext_pos = full_path_.find_last_of(".");
+  if (ext_pos == std::string::npos)
+    content_type_ = "text/plain";
+  else
+  {
+  std::string path_extension = full_path_.substr(ext_pos + 1);
+  if (path_extension == "jpg" || path_extension == "jpeg")
+    content_type_ = "image/jpeg";
+  else if (path_extension == "png")
+    content_type_ = "image/png";
+  else if (path_extension == "gif")
+    content_type_ = "image/gif";
+  else if (path_extension == "mp4")
+    content_type_ = "video/mp4";
+  else if (path_extension == "html")
+    content_type_ = "text/html";
+  else if (path_extension == "css")
+    content_type_ = "text/css";
+  else if (path_extension == "js")
+    content_type_ = "text/javascript";
+  else if (path_extension == "md")
+    content_type_ = "text/markdown";
+  }
 }
 
 void Response::set_date()
 {
-    char buf[1000];
+  char buf[1000];
 
-    time_t now = time(0);
-    struct tm tm = *gmtime(&now);
-    strftime(buf, sizeof buf, "%a, %d %b %Y %H:%S %Z", &tm);
-    date_now_ = std::string(buf);
+  time_t now = time(0);
+  struct tm tm = *gmtime(&now);
+  strftime(buf, sizeof buf, "%a, %d %b %Y %H:%S %Z", &tm);
+  date_now_ = std::string(buf);
 }
 
 void Response::set_host()
 {
-    Request::header_iterator it = req_.find_header("host");
-    if (it != req_.headers_end())
-        host_ = it->second;
-    else
-        host_ = "";
+  Request::header_iterator it = req_.find_header("host");
+  if (it != req_.headers_end())
+    host_ = it->second;
+  else
+    host_ = "";
 }
 
 int Response::set_allow()
 {
-    if (config_.limit_except.size() == 0)
-        return 0;
-    allow_ = config_.limit_except[0];
-    for (std::vector<std::string>::iterator it = config_.limit_except.begin() + 1;
-         it != config_.limit_except.end(); ++it) {
-        allow_ += ", ";
-        allow_ += *it;
-    }
-    return 1;
+  if (config_.limit_except.size() == 0)
+    return 0;
+  allow_ = config_.limit_except[0];
+  for (std::vector<std::string>::iterator it = config_.limit_except.begin() + 1;
+      it != config_.limit_except.end(); ++it) {
+    allow_ += ", ";
+    allow_ += *it;
+  }
+  return 1;
 }
 
 void Response::set_html_header()
 {
-    std::stringstream header_stream;
+  std::stringstream header_stream;
 
-    set_content_type();
-    set_date();
-    set_host();
-    header_stream << "HTTP/1.1 " << status_code_ << " " << StatusCode::get_code_msg(status_code_)
-                  << "\r\n"
-                  << "Access-Control-Allow-Origin: *\r\n";
-    header_size_ = header_stream.str().size();
-    header_stream << "Date: " << date_now_ << "\r\n";
-    header_stream << "Host: " << host_ << "\r\n";
-    if (set_allow()) {
-        header_stream << "Allow: " << allow_ << "\r\n";
-    }
-    header_stream << "Content-Length: " << body_size_ << "\r\n";
-    header_stream << "Content-Type: " << content_type_ << "\r\n";
-    header_stream << "Accept-Ranges: bytes"
-                  << "\r\n";
-    header_stream << "Server: " << server_ << "\r\n";
-    header_stream << "\r\n";
-    header = header_stream.str();
-    full_content = header + body;
+  set_content_type();
+  set_date();
+  set_host();
+  header_stream << "HTTP/1.1 " << status_code_ << " " << StatusCode::get_code_msg(status_code_)
+    << "\r\n"
+    << "Access-Control-Allow-Origin: *\r\n";
+  header_size_ = header_stream.str().size();
+  header_stream << "Date: " << date_now_ << "\r\n";
+  header_stream << "Host: " << host_ << "\r\n";
+  if (set_allow()) {
+    header_stream << "Allow: " << allow_ << "\r\n";
+  }
+  header_stream << "Content-Length: " << body_size_ << "\r\n";
+  header_stream << "Content-Type: " << content_type_ << "\r\n";
+  header_stream << "Accept-Ranges: bytes"
+    << "\r\n";
+  header_stream << "Server: " << server_ << "\r\n";
+  header_stream << "\r\n";
+  header = header_stream.str();
+  full_content = header + body;
+}
+
+void Response::check_method()
+{
+  config_.print_config();
+  if ((get_method() == GET && method_allowed(GET) == false)
+      || (get_method() == POST && method_allowed(POST) == false)
+      || (get_method() == DELETE && method_allowed(DELETE) == false)
+      || (get_method() == OPTIONS && method_allowed(OPTIONS) == false))
+    throw Request::Exception("Method not allowed\n", 405);
 }
 
 void Response::generate_response_html()
 {
-    if (get_method() == GET) {
-        if (method_allowed(GET) == false) {
-            set_status_code(405);
-        } else
-            set_html_body();
-
-        check_error_code();
-        set_html_header();
-        full_content = header + body;
-    } else if (get_method() == DELETE) {
-        if (method_allowed(DELETE) == false) {
-            set_status_code(405);
-        } else {
-            remove_file();
-        }
-        check_error_code();
-        set_html_header();
-        full_content = header + body;
-    }
+  if (get_method() == DELETE)
+    remove_file();
+  else
+    set_html_body();
+  check_error_code();
+  set_html_header();
+  full_content = header + body;
 }
 
 const char* Response::ExtensionException::what() const throw()
 {
-    return ("Error: Extension missing in path of request (Response class)\n");
+  return ("Error: Extension missing in path of request (Response class)\n");
 }

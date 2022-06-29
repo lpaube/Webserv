@@ -36,8 +36,9 @@ ServerParser::ServerParser(std::string::iterator beg, std::string::iterator end)
     try {
         parse_server_vars();
         parse_location_vars();
-    } catch (const char* s) {
-        std::cout << "ERROR: " << s << std::endl;
+    } catch (const ServerParser::BadDirective& ex) {
+        std::cerr << "What should I do after this catch?" << std::endl;
+        std::cout << "ERROR: " << ex.what() << std::endl;
     }
 }
 
@@ -114,59 +115,6 @@ void ServerParser::build_location()
         i = 0;
         end = str_content_.length();
     }
-}
-
-/*
- * Generating fake config
- */
-void ServerParser::generate_fake_config()
-{
-    // listen
-    config.listen.address = "127.0.0.1";
-    config.listen.port = 8000;
-
-    // server_name
-    config.server_name.push_back("example.com");
-    config.server_name.push_back("www.example.com");
-
-    // error_page
-    Config::Error_page error_page1;
-    error_page1.code.push_back(404);
-    error_page1.code.push_back(442);
-    error_page1.uri = "/40x.html";
-
-    Config::Error_page error_page2;
-    error_page2.code.push_back(505);
-    error_page2.code.push_back(506);
-    error_page2.uri = "/50x.html";
-
-    config.error_page.push_back(error_page1);
-    config.error_page.push_back(error_page2);
-
-    // client_max_body_size
-    config.client_max_body_size = 8000000;
-
-    // root
-    config.root = "/data/w5";
-
-    // autoindex
-    config.autoindex = true;
-
-    // index
-    config.index.push_back("index");
-    config.index.push_back("index.html");
-
-    // cgi_ext
-    Config::Cgi_ext cgi_ext1;
-    cgi_ext1.extension = ".php";
-    cgi_ext1.bin_path = "/usr/bin/php";
-
-    Config::Cgi_ext cgi_ext2;
-    cgi_ext2.extension = ".py";
-    cgi_ext2.bin_path = "/usr/bin/python";
-
-    config.cgi_ext.push_back(cgi_ext1);
-    config.cgi_ext.push_back(cgi_ext2);
 }
 
 /*
@@ -250,14 +198,11 @@ void ServerParser::parse_location_vars()
                         }
                     }
                 } else if (directives[0] == "limit_except") {
-                    for (std::string::size_type j = 1; j < directives.size(); ++j) {
-                        new_location.limit_except.push_back(directives[j]);
-                    }
+                  config.limit_except.clear();
+                  for (std::string::size_type j = 1; j < directives.size(); ++j) {
+                    new_location.limit_except.push_back(directives[j]);
+                  }
                 } else if (directives[0] == "return") {
-                    /*
-                    if (directives.size() == 2)
-                      new_location.return_redirect.url = directives[1];
-                      */
                     if (directives.size() == 3) {
                         int x;
                         std::istringstream(directives[1]) >> x;
@@ -267,7 +212,6 @@ void ServerParser::parse_location_vars()
                                 << std::endl;
                         new_location.return_redirect.code = x;
                         new_location.return_redirect.url = directives[2];
-                        // new_location.return_redirect.is_active = true;
 
                     } else {
                         throw BadLocationDirective();
@@ -316,15 +260,12 @@ void ServerParser::parse_location_vars()
 void ServerParser::init_server_vars()
 {
     config.listen.port = -1;
-    // config.server_name.push_back("");
     config.client_max_body_size = 1000;
-    // config.return_redirect.is_active = false;
     config.return_redirect.code = -1;
     config.return_redirect.url = "";
     config.root = "";
     config.autoindex = false;
     config.index.push_back("index.html");
-    // config.limit_except.push_back("GET");
 }
 
 void ServerParser::parse_server_vars()
@@ -355,9 +296,9 @@ void ServerParser::parse_server_vars()
         if (directives.size() > 1) {
             if (directives[0] == "listen") {
                 if (directives.size() != 2)
-                    throw BadDirective();
+                  throw BadDirective();
                 if (directives[1].find(":") == std::string::npos)
-                    throw BadDirective();
+                  throw BadDirective();
                 config.listen.combined = directives[1];
                 config.listen.address = directives[1].substr(0, directives[1].find(":"));
                 std::string tmp_str = directives[1].substr(directives[1].find(":") + 1);
@@ -383,7 +324,7 @@ void ServerParser::parse_server_vars()
                 std::string tmp_str;
 
                 if (directives.size() != 2)
-                    throw BadDirective();
+                  throw BadDirective();
                 for (std::string::iterator it = directives[1].begin(); it != directives[1].end();
                      ++it) {
                     if (isdigit(*it))
@@ -393,17 +334,14 @@ void ServerParser::parse_server_vars()
                         std::istringstream(tmp_str) >> x;
                         config.client_max_body_size = x * BYTES_IN_MB;
                     } else
-                        throw BadDirective();
+                      throw BadDirective();
                 }
             } else if (directives[0] == "limit_except") {
+              config.limit_except.clear();
                 for (std::string::size_type j = 1; j < directives.size(); ++j) {
                     config.limit_except.push_back(directives[j]);
                 }
             } else if (directives[0] == "return") {
-                /*
-                   if (directives.size() == 2)
-                   config.return_redirect.url = directives[1];
-                   */
                 if (directives.size() == 3) {
                     int x;
                     std::cerr << "Shouldn't be Config" << std::endl;
@@ -414,58 +352,59 @@ void ServerParser::parse_server_vars()
                     config.return_redirect.url = directives[2];
                     // config.return_redirect.is_active = true;
                 } else
-                    throw BadDirective();
+                  throw BadDirective();
             } else if (directives[0] == "root") {
-                if (directives.size() != 2)
-                    throw BadDirective();
-                config.root = directives[1];
-            } else if (directives[0] == "autoindex") {
-                if (directives.size() != 2)
-                    throw BadDirective();
-                if (directives[1] == "on")
-                    config.autoindex = true;
-                else if (directives[1] == "off")
-                    config.autoindex = false;
-                else
-                    throw BadDirective();
-            } else if (directives[0] == "index") {
-                config.index.clear();
-                for (std::vector<std::string>::iterator it = directives.begin() + 1;
-                     it != directives.end(); ++it) {
-                    config.index.push_back(*it);
-                }
-            } else if (directives[0] == "cgi_ext") {
-                if (directives.size() != 3)
-                    throw BadDirective();
-
-                Config::Cgi_ext tmp_cgi;
-                tmp_cgi.extension = directives[1];
-                tmp_cgi.bin_path = directives[2];
-                config.cgi_ext.push_back(tmp_cgi);
-            } else {
+              if (directives.size() != 2)
                 throw BadDirective();
+              config.root = directives[1];
+            } else if (directives[0] == "autoindex") {
+              if (directives.size() != 2)
+                throw BadDirective();
+              if (directives[1] == "on")
+                config.autoindex = true;
+              else if (directives[1] == "off")
+                config.autoindex = false;
+              else
+                throw BadDirective();
+            } else if (directives[0] == "index") {
+              config.index.clear();
+              for (std::vector<std::string>::iterator it = directives.begin() + 1;
+                  it != directives.end(); ++it) {
+                config.index.push_back(*it);
+              }
+            } else if (directives[0] == "cgi_ext") {
+              if (directives.size() != 3)
+                throw BadDirective();
+
+              Config::Cgi_ext tmp_cgi;
+              tmp_cgi.extension = directives[1];
+              tmp_cgi.bin_path = directives[2];
+              config.cgi_ext.push_back(tmp_cgi);
+            } else {
+              std::cerr << "LINE 411" << std::endl;
+              throw BadDirective();
             }
         } else
-            throw BadDirective();
+          throw BadDirective();
     }
 }
 
 const char* ServerParser::NoSepException::what() const throw()
 {
-    return ("Error: No ';' found after value\n");
+  return ("Error: No ';' found after value\n");
 }
 
 const char* ServerParser::SyntaxException::what() const throw()
 {
-    return ("Error: Syntax error in config file\n");
+  return ("Error: Syntax error in config file\n");
 }
 
 const char* ServerParser::BadLocationDirective::what() const throw()
 {
-    return ("Error: Directive error in a location context of the config file\n");
+  return ("Error: Directive error in a location context of the config file\n");
 }
 
 const char* ServerParser::BadDirective::what() const throw()
 {
-    return ("Error: Directive error in the config file\n");
+  return ("Error: Directive error in the config file\n");
 }

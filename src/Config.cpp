@@ -126,6 +126,14 @@ void Config::print_config() const
     std::cout << "root: " << root << std::endl;
     std::cout << std::endl;
 
+    // limit_except
+    std::cout << "===== limit_except =====" << std::endl;
+    for (std::vector<std::string>::const_iterator it = limit_except.begin();
+         it != limit_except.end(); ++it) {
+        std::cout << "allowed method: " << *it << std::endl;
+    }
+    std::cout << std::endl;
+
     // autoindex
     std::cout << "===== autoindex =====" << std::endl;
     std::cout << "autoindex: " << autoindex << std::endl;
@@ -164,6 +172,7 @@ Config::Location& Config::Location::operator=(const Config& config)
 {
     error_page = config.error_page;
     client_max_body_size = config.client_max_body_size;
+    limit_except = config.limit_except;
     return_redirect = config.return_redirect;
     root = config.root;
     autoindex = config.autoindex;

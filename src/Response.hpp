@@ -35,6 +35,7 @@ public:
     void set_html_body();
     void set_html_header();
 
+    void check_method();
     void check_error_code();
     void redirect();
     void remove_file();

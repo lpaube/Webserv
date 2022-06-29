@@ -7,15 +7,17 @@ server{
   index random;
   autoindex on;
  
+ fasdfasdfasfsda asfd;
+
   cgi_ext		.sh /bin/bash;
   cgi_ext		.py /usr/bin/python3;
-  limit_except GET POST;
+  limit_except GET POST DELETE;
+  limit_except GET;
 
 	location / {
     root ./web_page/42_test;
     client_max_body_size 800m;
     index index.html;
-    limit_except GET;
 	}
 
   location /42_test {
@@ -29,7 +31,6 @@ server{
 
   location /42_test/special_directory {
     root ./web_page;
-    limit_except GET POST DELETE;
   }
 
   location /42_test/special_directory/special_path {

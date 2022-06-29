@@ -76,6 +76,8 @@ bool TcpConnection::handle_write_event()
     if (byte_sent_ != 0 || msg_.size() > 0) {
         return send_response();
     }
+    Response response(req_, config_);
+    response.check_method();
     std::size_t len = req_.path().length();
     if (req_.path().find("/cgi-bin/") != std::string::npos && req_.path()[len - 1] != '/') {
         Script script(config_, req_);
@@ -84,7 +86,6 @@ bool TcpConnection::handle_write_event()
             return (send_response());
         }
     }
-    Response response(req_, config_);
     response.generate_response_html();
     msg_ = response.full_content;
     return (send_response());
@@ -406,7 +407,6 @@ bool TcpConnection::send_response()
 {
 
     size_t len = msg_.length() - (size_t)byte_sent_;
-    std::cout << "PRINTING RESPONSE = \n" << msg_.c_str() << std::endl;
     byte_sent_ = send(fd(), msg_.c_str() + byte_sent_, len, 0);
     if (byte_sent_ < 0) {
         throw stdException();
