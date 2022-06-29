@@ -149,6 +149,8 @@ void Response::set_status_code(int code)
 
 void Response::check_error_code()
 {
+  std::stringstream body_stream;
+
     if (status_code_ >= 300 && status_code_ < 600) {
         for (std::vector<Config::Error_page>::iterator it = config_.error_page.begin();
              it != config_.error_page.end(); ++it) {
@@ -162,6 +164,13 @@ void Response::check_error_code()
                 }
             }
         }
+        body.clear();
+        body_stream << "<h1>Error code: "
+                    << status_code_
+                    << " | "
+                    << StatusCode::get_code_msg(status_code_)
+                    << "\r\n";
+        body = body_stream.str();
     }
 }
 
@@ -359,7 +368,6 @@ void Response::set_html_header()
 
 void Response::check_method()
 {
-  config_.print_config();
   if ((get_method() == GET && method_allowed(GET) == false)
       || (get_method() == POST && method_allowed(POST) == false)
       || (get_method() == DELETE && method_allowed(DELETE) == false)
