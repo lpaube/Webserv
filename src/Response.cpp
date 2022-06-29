@@ -169,7 +169,7 @@ void Response::check_error_code()
                     << status_code_
                     << " | "
                     << StatusCode::get_code_msg(status_code_)
-                    << "\r\n";
+                    << "<h1>\r\n";
         body = body_stream.str();
     }
 }

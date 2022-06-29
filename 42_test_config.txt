@@ -2,7 +2,6 @@ server{
 	listen 127.0.0.1:8000;
   server_name redxred.com www.redxred.com;
   client_max_body_size 80m;
-  error_page    404  /Error/error404.html;
   error_page    405 504 505 /Error/default.html;
   index random;
   autoindex on;
