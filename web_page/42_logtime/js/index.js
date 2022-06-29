@@ -29,7 +29,7 @@ function submit() {
 			headers: {}
 		}).then(response => response.text())
 		.then((content) => {
-			alert("Nombre d'heur ce mois ci : " + content);
+			alert("Nombre d'heure(s) ce mois-ci : " + content);
 		});
 	}
   })();
