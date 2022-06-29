@@ -32,14 +32,8 @@ ServerParser::ServerParser(std::string::iterator beg, std::string::iterator end)
     }
     if (vectorize_content(this->server_content_, str_content_) == false)
         throw NoSepException();
-    // Building config
-    try {
-        parse_server_vars();
-        parse_location_vars();
-    } catch (const ServerParser::BadDirective& ex) {
-        std::cerr << "What should I do after this catch?" << std::endl;
-        std::cout << "ERROR: " << ex.what() << std::endl;
-    }
+    parse_server_vars();
+    parse_location_vars();
 }
 
 void ServerParser::print_location() const
@@ -381,7 +375,6 @@ void ServerParser::parse_server_vars()
               tmp_cgi.bin_path = directives[2];
               config.cgi_ext.push_back(tmp_cgi);
             } else {
-              std::cerr << "LINE 411" << std::endl;
               throw BadDirective();
             }
         } else

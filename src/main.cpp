@@ -10,17 +10,17 @@ int main(int argc, char** argv)
         return 1;
     }
     std::string config_file(argv[1]);
-    ConfigParser config_parser(config_file);
-
-    std::vector<Config> configs;
-    for (unsigned int i = 0; i < config_parser.nbserver(); i++) {
-        configs.push_back(config_parser.serverparser[i].config);
-    }
 
     try {
-        Server server(configs);
-        server.run();
-    } catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
+      ConfigParser config_parser(config_file);
+
+      std::vector<Config> configs;
+      for (unsigned int i = 0; i < config_parser.nbserver(); i++) {
+        configs.push_back(config_parser.serverparser[i].config);
+      }
+      Server server(configs);
+      server.run();
+    } catch (std::exception& ex) {
+      std::cerr << ex.what() << std::endl;
     }
 }

@@ -6,8 +6,9 @@ server{
   error_page    405 504 505 /Error/default.html;
   index random;
   autoindex on;
+
+  fsadfafafdafasdgas asdfasdfasd;
  
- fasdfasdfasfsda asfd;
 
   cgi_ext		.sh /bin/bash;
   cgi_ext		.py /usr/bin/python3;
