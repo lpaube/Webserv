@@ -192,10 +192,10 @@ void ServerParser::parse_location_vars()
                         }
                     }
                 } else if (directives[0] == "limit_except") {
-                  config.limit_except.clear();
-                  for (std::string::size_type j = 1; j < directives.size(); ++j) {
-                    new_location.limit_except.push_back(directives[j]);
-                  }
+                    config.limit_except.clear();
+                    for (std::string::size_type j = 1; j < directives.size(); ++j) {
+                        new_location.limit_except.push_back(directives[j]);
+                    }
                 } else if (directives[0] == "return") {
                     if (directives.size() == 3) {
                         int x;
@@ -290,9 +290,9 @@ void ServerParser::parse_server_vars()
         if (directives.size() > 1) {
             if (directives[0] == "listen") {
                 if (directives.size() != 2)
-                  throw BadDirective();
+                    throw BadDirective();
                 if (directives[1].find(":") == std::string::npos)
-                  throw BadDirective();
+                    throw BadDirective();
                 config.listen.combined = directives[1];
                 config.listen.address = directives[1].substr(0, directives[1].find(":"));
                 std::string tmp_str = directives[1].substr(directives[1].find(":") + 1);
@@ -318,7 +318,7 @@ void ServerParser::parse_server_vars()
                 std::string tmp_str;
 
                 if (directives.size() != 2)
-                  throw BadDirective();
+                    throw BadDirective();
                 for (std::string::iterator it = directives[1].begin(); it != directives[1].end();
                      ++it) {
                     if (isdigit(*it))
@@ -328,10 +328,10 @@ void ServerParser::parse_server_vars()
                         std::istringstream(tmp_str) >> x;
                         config.client_max_body_size = x * BYTES_IN_MB;
                     } else
-                      throw BadDirective();
+                        throw BadDirective();
                 }
             } else if (directives[0] == "limit_except") {
-              config.limit_except.clear();
+                config.limit_except.clear();
                 for (std::string::size_type j = 1; j < directives.size(); ++j) {
                     config.limit_except.push_back(directives[j]);
                 }
@@ -346,58 +346,58 @@ void ServerParser::parse_server_vars()
                     config.return_redirect.url = directives[2];
                     // config.return_redirect.is_active = true;
                 } else
-                  throw BadDirective();
+                    throw BadDirective();
             } else if (directives[0] == "root") {
-              if (directives.size() != 2)
-                throw BadDirective();
-              config.root = directives[1];
+                if (directives.size() != 2)
+                    throw BadDirective();
+                config.root = directives[1];
             } else if (directives[0] == "autoindex") {
-              if (directives.size() != 2)
-                throw BadDirective();
-              if (directives[1] == "on")
-                config.autoindex = true;
-              else if (directives[1] == "off")
-                config.autoindex = false;
-              else
-                throw BadDirective();
+                if (directives.size() != 2)
+                    throw BadDirective();
+                if (directives[1] == "on")
+                    config.autoindex = true;
+                else if (directives[1] == "off")
+                    config.autoindex = false;
+                else
+                    throw BadDirective();
             } else if (directives[0] == "index") {
-              config.index.clear();
-              for (std::vector<std::string>::iterator it = directives.begin() + 1;
-                  it != directives.end(); ++it) {
-                config.index.push_back(*it);
-              }
+                config.index.clear();
+                for (std::vector<std::string>::iterator it = directives.begin() + 1;
+                     it != directives.end(); ++it) {
+                    config.index.push_back(*it);
+                }
             } else if (directives[0] == "cgi_ext") {
-              if (directives.size() != 3)
-                throw BadDirective();
+                if (directives.size() != 3)
+                    throw BadDirective();
 
-              Config::Cgi_ext tmp_cgi;
-              tmp_cgi.extension = directives[1];
-              tmp_cgi.bin_path = directives[2];
-              config.cgi_ext.push_back(tmp_cgi);
+                Config::Cgi_ext tmp_cgi;
+                tmp_cgi.extension = directives[1];
+                tmp_cgi.bin_path = directives[2];
+                config.cgi_ext.push_back(tmp_cgi);
             } else {
-              throw BadDirective();
+                throw BadDirective();
             }
         } else
-          throw BadDirective();
+            throw BadDirective();
     }
 }
 
 const char* ServerParser::NoSepException::what() const throw()
 {
-  return ("Error: No ';' found after value\n");
+    return ("Error: No ';' found after value\n");
 }
 
 const char* ServerParser::SyntaxException::what() const throw()
 {
-  return ("Error: Syntax error in config file\n");
+    return ("Error: Syntax error in config file\n");
 }
 
 const char* ServerParser::BadLocationDirective::what() const throw()
 {
-  return ("Error: Directive error in a location context of the config file\n");
+    return ("Error: Directive error in a location context of the config file\n");
 }
 
 const char* ServerParser::BadDirective::what() const throw()
 {
-  return ("Error: Directive error in the config file\n");
+    return ("Error: Directive error in the config file\n");
 }

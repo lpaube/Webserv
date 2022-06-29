@@ -47,7 +47,7 @@ public:
     const Request& request() const;
     void set_addr(in_addr addr);
     void set_port(uint16_t port);
-    void set_msg(std::string set);
+    void set_msg(const std::vector<char>& set);
     void set_response_config(const std::vector<Config>& server_configs, std::string host);
     const Config& config() const;
 
@@ -76,7 +76,7 @@ private:
     void (TcpConnection::*request_handler)();
     size_t req_size_;
     Request req_;
-    std::string msg_;
+    std::vector<char> msg_;
     ssize_t byte_sent_;
     Config config_;
 };

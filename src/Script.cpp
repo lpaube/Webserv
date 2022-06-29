@@ -49,7 +49,7 @@ Script::~Script()
 }
 
 // execute the script and returns the output of the script in a string.
-std::string Script::exec()
+std::vector<char> Script::exec()
 {
     pid_t id;
     int status;
@@ -96,8 +96,9 @@ std::string Script::exec()
         close(in_file);
     }
     std::ifstream input_file("out_file.tmp");
-    std::string script_output((std::istreambuf_iterator<char>(input_file)),
-                              std::istreambuf_iterator<char>());
+    std::vector<char> script_output((std::istreambuf_iterator<char>(input_file)),
+                                    std::istreambuf_iterator<char>());
+    input_file.close();
     remove("in_file.tmp");
     remove("out_file.tmp");
     return script_output;

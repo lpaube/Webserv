@@ -28,7 +28,6 @@ TcpConnection::TcpConnection(int listener_fd)
     : listener_fd_(listener_fd),
       request_handler(&TcpConnection::parse_http_request_line),
       req_size_(0),
-      msg_(""),
       byte_sent_(0)
 {
     fd_ = accept(listener_fd_, (sockaddr*)&addr_, &addrlen_);
@@ -106,7 +105,7 @@ void TcpConnection::set_port(uint16_t port)
     this->port_ = port;
 }
 
-void TcpConnection::set_msg(std::string set)
+void TcpConnection::set_msg(const std::vector<char>& set)
 {
     this->msg_ = set;
 }
@@ -406,14 +405,14 @@ void TcpConnection::set_response_config(const std::vector<Config>& server_config
 bool TcpConnection::send_response()
 {
 
-    size_t len = msg_.length() - (size_t)byte_sent_;
-    byte_sent_ = send(fd(), msg_.c_str() + byte_sent_, len, 0);
+    size_t len = msg_.size() - (size_t)byte_sent_;
+    byte_sent_ = send(fd(), msg_.data() + byte_sent_, len, 0);
     if (byte_sent_ < 0) {
         throw stdException();
     }
     if (byte_sent_ == (ssize_t)len) {
         byte_sent_ = 0;
-        msg_ = "";
+        msg_.clear();
         return true;
     } else {
         return false;

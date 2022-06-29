@@ -60,9 +60,9 @@ private:
                                                 bool& has_location);
 
 public:
-    std::string body;
+    std::vector<char> body;
     std::string header;
-    std::string full_content;
+    std::vector<char> full_content;
 
 private:
     Config config_;

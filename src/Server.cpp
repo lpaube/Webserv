@@ -104,7 +104,9 @@ void Server::run()
                             response.set_status_code(code);
                             response.check_error_code();
                             response.set_html_header();
-                            c->set_msg(response.header + response.body);
+                            std::vector<char> msg(response.header.begin(), response.header.end());
+                            msg.insert(msg.end(), response.body.begin(), response.body.end());
+                            c->set_msg(msg);
                         } catch (std::exception& ex) {
                             std::cerr << ex.what() << std::endl;
                             to_close.push_back(c->fd());
@@ -133,7 +135,9 @@ void Server::run()
                     response.set_status_code(code);
                     response.check_error_code();
                     response.set_html_header();
-                    c->set_msg(response.header + response.body);
+                    std::vector<char> msg(response.header.begin(), response.header.end());
+                    msg.insert(msg.end(), response.body.begin(), response.body.end());
+                    c->set_msg(msg);
                 } catch (std::exception& ex) {
                     std::cerr << ex.what() << std::endl;
                     to_close.push_back(c->fd());

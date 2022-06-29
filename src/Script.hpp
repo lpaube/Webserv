@@ -29,7 +29,7 @@ public:
 public:
     Script(const Config& config, const Request& request);
     ~Script();
-    std::string exec();
+    std::vector<char> exec();
     std::string get_ext(const std::string& path);
 
 private:
