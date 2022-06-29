@@ -38,7 +38,7 @@ function showFile(file){
 												<span class="name">${file.name} • Uploading</span>
 												<span class="percent">100%</span>
 											</div>
-											<div class = "delete">
+											<div class="delete">
 												<img class="del_cross" src="assets/icons8-close-48.png">
 											</div>
 											<div class="progress-bar">
@@ -78,21 +78,21 @@ const uploadFile = () => {
 
 const deleteFile = (file, del) => {
 	console.log("IN1");
-	del.click();
 	del.onchange = () =>{
-	console.log("IN2");
-	fetch(ADD + "/cgi-bin/upload/" + file.name, {
-		method: "DELETE"
-	}).then(response => {
-		if (!response.ok){
-			console.log(response.text());
-			return response.text();
-		}
-		else{
-			del.remove();
-		}
-	}).catch(e => alert(e.message));
+		console.log("IN2");
+		fetch(ADD + "/cgi-bin/upload/" + file.name, {
+			method: "DELETE"
+		}).then(response => {
+			if (!response.ok){
+				console.log(response.text());
+				return response.text();
+			}
+			else{
+				del.remove();
+			}
+		}).catch(e => alert(e.message));
 	}
+	del.click();
 }
 	/*fileInput.click();
 	fileInput.onchange = ({target}) =>

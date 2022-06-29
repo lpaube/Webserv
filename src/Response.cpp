@@ -277,9 +277,8 @@ void Response::set_html_body()
 void Response::set_content_type()
 {
     size_t ext_pos = full_path_.find_last_of(".");
-    if (ext_pos == std::string::npos)
-        content_type_ = "text/plain";
-    else {
+    content_type_ = "text/plain";
+    if (ext_pos != std::string::npos) {
         std::string path_extension = full_path_.substr(ext_pos + 1);
         if (path_extension == "jpg" || path_extension == "jpeg")
             content_type_ = "image/jpeg";

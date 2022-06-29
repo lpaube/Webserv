@@ -22,7 +22,7 @@
 class TcpConnection : public Socket
 {
 public:
-    static const size_t MAX_REQUEST_SIZE = 1024 * 60;
+    static const size_t MAX_REQUEST_SIZE = 1024 * 1024;
 
 public:
     TcpConnection(int listener_fd);
