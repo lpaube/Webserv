@@ -20,7 +20,7 @@ int main(int argc, char** argv)
     try {
         Server server(configs);
         server.run();
-    } catch (const std::exception& ex) {
+    } catch (std::exception& ex) {
         std::cerr << ex.what() << std::endl;
     }
 }

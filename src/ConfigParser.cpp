@@ -80,25 +80,26 @@ std::string::iterator ConfigParser::find_server_end(std::string::iterator start,
 
 void ConfigParser::find_server_start(std::string::iterator& start)
 {
-	std::size_t i = 0;
-	while (isspace(this->file_content_[i])){
-		i++;
-		if (this->file_content_[i] == 's')
-			break ;
-		if (i == std::string::npos || !this->file_content_[i]) {
-        start = file_content_.end();
-        return;
+    std::size_t i = 0;
+    while (isspace(this->file_content_[i])) {
+        i++;
+        if (this->file_content_[i] == 's')
+            break;
+        if (i == std::string::npos || !this->file_content_[i]) {
+            start = file_content_.end();
+            return;
+        }
+        if (!isspace(this->file_content_[i])) {
+            throw Exception("Error config, wrong character out of server scope{}\n");
+        }
     }
-	if (!isspace(this->file_content_[i])){
-		throw Exception("Error config, wrong character out of server scope{}\n");
-	}
-	}
-	this->file_content_.erase(0, i);
-	if (start == file_content_.end())
-		return ;
-	if (this->file_content_.compare(0, 6, "server") != 0){
-		throw Exception("Error config, wrong character out of server scope{}\n");
-	}
+    this->file_content_.erase(0, i);
+    start = this->file_content_.begin();
+    if (start == file_content_.end())
+        return;
+    if (this->file_content_.compare(0, 6, "server") != 0) {
+        throw Exception("Error config, wrong character out of server scope{}\n");
+    }
     min_server_ = true;
     start += 6;
     while (isspace(*start)) {

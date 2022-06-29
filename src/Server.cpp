@@ -88,7 +88,7 @@ void Server::run()
                     case TCP_LISTENER:
                         try {
                             accept_connection(static_cast<TcpListener*>(s));
-                        } catch (const std::exception& ex) {
+                        } catch (std::exception& ex) {
                             std::cerr << ex.what() << std::endl;
                         }
                         break;
@@ -96,7 +96,7 @@ void Server::run()
                         TcpConnection* c = static_cast<TcpConnection*>(s);
                         try {
                             c->handle_read_event();
-                        } catch (const Request::Exception& ex) {
+                        } catch (Request::Exception& ex) {
                             c->set_state(S_WRITE);
                             c->set_response_config(configs_, "");
                             int code = ex.status_code();
@@ -105,7 +105,7 @@ void Server::run()
                             response.check_error_code();
                             response.set_html_header();
                             c->set_msg(response.header + response.body);
-                        } catch (const std::exception& ex) {
+                        } catch (std::exception& ex) {
                             std::cerr << ex.what() << std::endl;
                             to_close.push_back(c->fd());
                         }
@@ -127,14 +127,14 @@ void Server::run()
                 c->set_response_config(configs_, host);
                 try {
                     sent = c->handle_write_event();
-                } catch (const Request::Exception& ex) {
+                } catch (Request::Exception& ex) {
                     int code = ex.status_code();
                     Response response(c->request(), c->config());
                     response.set_status_code(code);
                     response.check_error_code();
                     response.set_html_header();
                     c->set_msg(response.header + response.body);
-                } catch (const std::exception& ex) {
+                } catch (std::exception& ex) {
                     std::cerr << ex.what() << std::endl;
                     to_close.push_back(c->fd());
                 }
