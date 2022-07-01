@@ -1,4 +1,4 @@
-server{
+ server{
 	listen 127.0.0.1:7000;
   server_name redxred.com www.redxred.com;
   client_max_body_size 80m;
@@ -47,7 +47,7 @@ server{
  
   cgi_ext		.sh /bin/bash;
   cgi_ext		.py /usr/bin/python3;
-  limit_except GET POST DELETE;
+  limit_except GET POST DELETE OPTIONS;
 
 	location / {
     root ./web_page/42_upload;
@@ -75,7 +75,9 @@ server{
 }
 
 
-server{
+
+
+server    {
 	listen 127.0.0.1:9000;
   server_name test
   client_max_body_size 80m;
@@ -93,7 +95,6 @@ server{
     index index.html;
     limit_except GET;
 	}
-
   location /Error {
     root ./web_page;
     index index_test.html;
@@ -110,3 +111,4 @@ server{
     root ./web_page;
   }
 
+}

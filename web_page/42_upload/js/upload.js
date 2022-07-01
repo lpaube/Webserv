@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/09 17:17:01 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/27 18:16:19 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/07/01 15:16:45 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,12 @@ function showFile(file){
 											</li>`
 	progressArea.innerHTML = progressHTML;
 	del = document.querySelector(".del_cross");
-	del.addEventListener("click", deleteFile(file, del));
+	del.addEventListener("click", () => deleteFile(file, del));
+	
 }
 
 const uploadFile = () => {
+	console.log("Upload file event");
 	const fileInput = document.querySelector(".file-input");
 	let data = new FormData();
 	fileInput.click();
@@ -78,9 +80,8 @@ const uploadFile = () => {
 
 const deleteFile = (file, del) => {
 	console.log("IN1");
-	del.onchange = () =>{
-		console.log("IN2");
-		fetch(ADD + "/cgi-bin/upload/" + file.name, {
+
+	fetch(ADD + "/cgi-bin/upload/" + file.name, {
 			method: "DELETE"
 		}).then(response => {
 			if (!response.ok){
@@ -92,8 +93,7 @@ const deleteFile = (file, del) => {
 			}
 		}).catch(e => alert(e.message));
 	}
-	del.click();
-}
+
 	/*fileInput.click();
 	fileInput.onchange = ({target}) =>
 	{

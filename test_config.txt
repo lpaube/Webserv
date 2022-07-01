@@ -47,7 +47,7 @@ server{
  
   cgi_ext		.sh /bin/bash;
   cgi_ext		.py /usr/bin/python3;
-  limit_except GET POST DELETE;
+  limit_except GET POST DELETE OPTIONS;
 
 	location / {
     root ./web_page/42_upload;
