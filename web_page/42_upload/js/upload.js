@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/09 17:17:01 by mafortin          #+#    #+#             */
-/*   Updated: 2022/07/01 15:16:45 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/07/04 11:37:51 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ const	checkFile = () => {
 
 
 function showFile(file){
-	let progressHTML =  `<li class="row">
+	let progressHTML =  `<li id="injected" class="row">
 										<img class="file" src="assets/icons8-file-64.png">
 										<div class="content">
 											<div class="details">
@@ -48,7 +48,8 @@ function showFile(file){
 											</li>`
 	progressArea.innerHTML = progressHTML;
 	del = document.querySelector(".del_cross");
-	del.addEventListener("click", () => deleteFile(file, del));
+	const injected = document.getElementById("injected");
+	del.addEventListener("click", () => deleteFile(file, del, injected));
 	
 }
 
@@ -80,8 +81,7 @@ const uploadFile = () => {
 
 const deleteFile = (file, del) => {
 	console.log("IN1");
-
-	fetch(ADD + "/cgi-bin/upload/" + file.name, {
+	fetch("/cgi-bin/upload/" + file.name, {
 			method: "DELETE"
 		}).then(response => {
 			if (!response.ok){
@@ -89,6 +89,7 @@ const deleteFile = (file, del) => {
 				return response.text();
 			}
 			else{
+				injected.remove();
 				del.remove();
 			}
 		}).catch(e => alert(e.message));
