@@ -28,11 +28,19 @@ int Request::Exception::status_code() const
 Request::Request()
     : state_(REQ_METHOD),
       method_(BAD_METHOD),
+      path_(),
+      query_str_(),
+      http_version_(),
+      headers_(),
+      buffer_(),
+      cur_header_name_(),
       is_content_length(false),
       content_length_count_(0),
       is_chunked(false),
       cur_chunk_size_(-1),
-      cnk_state_(CNK_SIZE)
+      cnk_state_(CNK_SIZE),
+      raw_body_(),
+      body_()
 {
 }
 

@@ -25,6 +25,7 @@
 // script constructor takes 2 args, a config and a specific request_.
 Script::Script(const Config& config, const Request& request_)
     : ext_found(false),
+      v_env_(),
       envp_(NULL),
       cmd_(NULL),
       request_(request_)

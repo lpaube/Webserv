@@ -1,3 +1,4 @@
 webserv
 .DS_Store
 obj/
+*.dSYM

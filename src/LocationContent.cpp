@@ -14,5 +14,8 @@
 #include "Utils.hpp"
 
 LocationContent::LocationContent()
+    : path(),
+      loc_content(),
+      loc_content_str()
 {
 }

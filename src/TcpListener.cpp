@@ -18,6 +18,7 @@
 
 TcpListener::TcpListener(const std::string& address, uint16_t port, int backlog)
     : addr_str_(address),
+      addr_(),
       port_(port),
       backlog_(backlog)
 {

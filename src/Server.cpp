@@ -31,6 +31,8 @@ void stop_server(int sig)
 }
 
 Server::Server(const std::vector<Config>& blocks)
+    : sockets_(),
+      configs_(blocks)
 {
     typedef std::vector<TcpListener*>::const_iterator s_iter;
 
@@ -55,14 +57,13 @@ Server::Server(const std::vector<Config>& blocks)
             std::cout << listener->port() << std::endl;
         }
     }
-
-    configs_ = blocks;
 }
 
 void Server::run()
 {
     std::cerr << "IN RUN\n" << std::endl;
     signal(SIGINT, &stop_server);
+
     while (running) {
         int nevents = poll(sockets_.pfds(), sockets_.size(), -1);
         if (nevents < 0) {

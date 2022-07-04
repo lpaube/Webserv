@@ -23,10 +23,11 @@ ConfigParser::Exception::Exception(const char* msg)
 }
 
 ConfigParser::ConfigParser(const std::string& config_file)
+    : min_server_(false),
+      file_content_(),
+      nb_server_(0)
 {
     std::fstream file;
-    min_server_ = false;
-    nb_server_ = 0;
     file.open(config_file.c_str(), std::fstream::in);
     if (file.is_open() == false)
         throw Exception("Error: Config file\n");
@@ -40,8 +41,8 @@ void ConfigParser::create_config()
     std::string::iterator start;
     std::string::iterator server_end;
 
+    start = this->file_content_.begin();
     while (start != this->file_content_.end()) {
-        start = this->file_content_.begin();
         find_server_start(start);
         if (min_server_ == false) {
             throw Exception("Error: Config, no server found\n");
@@ -52,10 +53,10 @@ void ConfigParser::create_config()
         ServerParser add(start, server_end);
         serverparser.push_back(add);
         start = server_end + 1;
-        std::string swap(start, this->file_content_.end());
-        this->file_content_.assign(swap);
+        this->file_content_.assign(start, this->file_content_.end());
         min_server_ = true;
         nb_server_++;
+        start = this->file_content_.begin();
     }
 }
 

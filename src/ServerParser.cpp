@@ -22,9 +22,12 @@
 #define BYTES_IN_MB 1000000
 
 ServerParser::ServerParser(std::string::iterator beg, std::string::iterator end)
-    : str_content_(beg, end)
+    : server_content_(),
+      location_(),
+      str_content_(beg, end),
+      config(),
+      nb_location(0)
 {
-    nb_location = 0;
     build_location();
     for (unsigned long i = 0; i < static_cast<unsigned long>(this->nb_location); i++) {
         std::string line = this->location_[i].loc_content_str;

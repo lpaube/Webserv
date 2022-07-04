@@ -15,8 +15,7 @@
 
 ExceptionBase::ExceptionBase(const std::string& msg)
 {
-    strncpy(msg_, msg.c_str(), MSG_SIZE);
-    msg_[MSG_SIZE - 1] = 0;
+    strlcpy(msg_, msg.c_str(), MSG_SIZE);
 }
 
 const char* ExceptionBase::what() const throw()

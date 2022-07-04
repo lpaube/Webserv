@@ -18,13 +18,23 @@
 #include <stdio.h>
 
 Response::Response(const Request& request, const Config& response_configs)
-    : req_(request),
+    : config_(),
+      req_(request),
+      body_size_(0),
+      header_size_(0),
       status_code_(200),
       method_(req_.method()),
+      status_code_msg_(),
+      root_(),
       requested_path_(req_.path()),
-      content_type_("text/html"),
+      full_path_(),
+      content_type_("text/plain"),
+      date_now_(),
+      host_(),
+      allow_(),
       server_("Anginex/1.0"),
-      location_path_("")
+      location_path_(""),
+      file_type_()
 {
     config_ = response_configs;
     generate_singular_config();
@@ -189,6 +199,7 @@ int Response::generate_autoindex(std::ifstream& requested_file, std::stringstrea
     if (config_.autoindex == true && !requested_file.is_open()) {
         DIR* dir;
 
+        content_type_ = "text/html";
         body_stream << "<h1>Listing files in directory (autoindex=on)</h1>\r\n"
                     << "<ul>\r\n";
         struct dirent* ent;
@@ -231,6 +242,7 @@ void Response::set_html_body()
     std::ifstream requested_file;
 
     body.clear();
+    body_stream << "<!DOCTYPE html>\r\n";
     if (has_return_redirect()) {
         status_code_ = config_.return_redirect.code;
         requested_path_ = config_.return_redirect.url;
@@ -276,6 +288,9 @@ void Response::set_html_body()
 
 void Response::set_content_type()
 {
+    if (content_type_ == "text/html") {
+        return;
+    }
     size_t ext_pos = full_path_.find_last_of(".");
     content_type_ = "text/plain";
     if (ext_pos != std::string::npos) {
@@ -306,8 +321,12 @@ void Response::set_date()
     char buf[1000];
 
     time_t now = time(0);
-    struct tm tm = *gmtime(&now);
-    strftime(buf, sizeof buf, "%a, %d %b %Y %H:%S %Z", &tm);
+    tm* tm = gmtime(&now);
+    if (!tm) {
+        date_now_ = "";
+        return;
+    }
+    strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%S %Z", tm);
     date_now_ = std::string(buf);
 }
 

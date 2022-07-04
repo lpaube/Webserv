@@ -26,9 +26,16 @@
 
 TcpConnection::TcpConnection(int listener_fd)
     : listener_fd_(listener_fd),
+      addr_(),
+      addrlen_(),
+      inaddr_(),
+      data_(),
       request_handler(&TcpConnection::parse_http_request_line),
       req_size_(0),
-      byte_sent_(0)
+      req_(),
+      msg_(),
+      byte_sent_(0),
+      config_()
 {
     fd_ = accept(listener_fd_, (sockaddr*)&addr_, &addrlen_);
     if (fd() == -1) {
@@ -380,14 +387,14 @@ void TcpConnection::set_response_config(const std::vector<Config>& server_config
     in_addr addr_config;
     int def = -1;
 
-    for (unsigned long i = 0; i < server_configs.size(); i++) {
+    for (std::size_t i = 0; i < server_configs.size(); i++) {
         addr_config.s_addr = inet_addr(server_configs[i].listen.address.c_str());
         if (addr_config.s_addr == this->inaddr_.s_addr &&
             server_configs[i].listen.port == this->port_) {
             if (def == -1) {
                 def = i;
             }
-            for (std::size_t j = 0; j < server_configs[j].server_name.size(); j++) {
+            for (std::size_t j = 0; j < server_configs[i].server_name.size(); j++) {
                 if (host == server_configs[i].server_name[j]) {
                     config_ = server_configs[i];
                     return;
