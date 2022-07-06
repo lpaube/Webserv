@@ -1,2 +1,0 @@
-# webserv
-Small web server

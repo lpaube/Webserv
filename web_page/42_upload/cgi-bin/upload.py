@@ -24,7 +24,7 @@ if start > 0:
 	filename = data[1][start:end]
 else:
 	filename = "default"
-path = "web_page/42_upload/cgi-bin/upload/"
+path = "web_page/42_upload/upload/"
 filename = path + filename
 #file type
 start = data[2].find("Content-Type:")

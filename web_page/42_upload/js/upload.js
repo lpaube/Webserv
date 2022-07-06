@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/09 17:17:01 by mafortin          #+#    #+#             */
-/*   Updated: 2022/07/04 11:37:51 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/07/06 13:18:11 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ const body = document.querySelector("body");
 const progressArea = document.querySelector(".progress-area");
 
 const	checkFile = () => {
-	fetch("/cgi-bin/upload/", {
+	fetch("/upload/", {
 		method: "GET",
 	}).then((result) => { 
 		return result.text();
@@ -81,7 +81,7 @@ const uploadFile = () => {
 
 const deleteFile = (file, del) => {
 	console.log("IN1");
-	fetch("/cgi-bin/upload/" + file.name, {
+	fetch("/upload/" + file.name, {
 			method: "DELETE"
 		}).then(response => {
 			if (!response.ok){
