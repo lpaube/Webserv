@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Config.hpp"
-#include "Request.hpp"
+#include "core/Config.hpp"
+#include "http/Request.hpp"
 #include <string>
 #include <time.h>
 #include <unistd.h>

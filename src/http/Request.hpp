@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "ExceptionBase.hpp"
+#include "core/ExceptionBase.hpp"
 #include <map>
 #include <string>
 #include <unistd.h>

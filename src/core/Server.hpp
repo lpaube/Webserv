@@ -12,10 +12,10 @@
 
 #pragma once
 
-#include "Config.hpp"
-#include "Sockets.hpp"
-#include "TcpConnection.hpp"
-#include "TcpListener.hpp"
+#include "core/Config.hpp"
+#include "socket/Sockets.hpp"
+#include "socket/TcpConnection.hpp"
+#include "socket/TcpListener.hpp"
 
 class Server
 {

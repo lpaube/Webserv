@@ -12,9 +12,9 @@
 
 #pragma once
 
-#include "Config.hpp"
-#include "Request.hpp"
-#include "Socket.hpp"
+#include "core/Config.hpp"
+#include "http/Request.hpp"
+#include "socket/Socket.hpp"
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <vector>

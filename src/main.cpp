@@ -1,5 +1,5 @@
-#include "ConfigParser.hpp"
-#include "Server.hpp"
+#include "core/ConfigParser.hpp"
+#include "core/Server.hpp"
 #include <exception>
 #include <iostream>
 

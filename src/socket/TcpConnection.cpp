@@ -11,9 +11,9 @@
 /* ************************************************************************** */
 
 #include "TcpConnection.hpp"
-#include "Response.hpp"
-#include "Script.hpp"
 #include "Utils.hpp"
+#include "http/Response.hpp"
+#include "http/Script.hpp"
 #include <arpa/inet.h>
 #include <cerrno>
 #include <cstring>

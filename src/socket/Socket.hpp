@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "ExceptionBase.hpp"
+#include "core/ExceptionBase.hpp"
 
 enum SocketType {
     TCP_LISTENER,

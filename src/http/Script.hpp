@@ -11,9 +11,10 @@
 /* ************************************************************************** */
 
 #pragma once
-#include "ExceptionBase.hpp"
-#include "Request.hpp"
-#include "ServerParser.hpp"
+
+#include "core/ExceptionBase.hpp"
+#include "core/ServerParser.hpp"
+#include "http/Request.hpp"
 
 class Script
 {

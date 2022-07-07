@@ -11,9 +11,9 @@
 /* ************************************************************************** */
 
 #include "Server.hpp"
-#include "Response.hpp"
-#include "TcpConnection.hpp"
-#include "TcpListener.hpp"
+#include "http/Response.hpp"
+#include "socket/TcpConnection.hpp"
+#include "socket/TcpListener.hpp"
 #include <cstring>
 #include <exception>
 #include <iostream>
