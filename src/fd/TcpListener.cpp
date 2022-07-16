@@ -56,9 +56,9 @@ TcpListener::TcpListener(const std::string& address, uint16_t port, int backlog)
     }
 }
 
-SocketType TcpListener::type() const
+FDType TcpListener::type() const
 {
-    return TCP_LISTENER;
+    return FD_TCP_LISTENER;
 }
 
 const std::string& TcpListener::address_str() const

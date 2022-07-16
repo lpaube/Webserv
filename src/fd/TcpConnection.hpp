@@ -14,12 +14,12 @@
 
 #include "core/Config.hpp"
 #include "http/Request.hpp"
-#include "socket/Socket.hpp"
+#include "fd/FileDescriptor.hpp"
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <vector>
 
-class TcpConnection : public Socket
+class TcpConnection : public FileDescriptor
 {
 public:
     static const size_t MAX_REQUEST_SIZE = 1024 * 1024;
@@ -27,7 +27,7 @@ public:
 public:
     TcpConnection(int listener_fd);
 
-    virtual SocketType type() const;
+    virtual FDType type() const;
 
     template <typename Iter>
     void append_data(Iter first, Iter last)

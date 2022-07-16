@@ -10,43 +10,43 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Socket.hpp"
+#include "FileDescriptor.hpp"
 #include <unistd.h>
 
-Socket::Exception::Exception(const std::string& msg)
+FileDescriptor::Exception::Exception(const std::string& msg)
     : ExceptionBase(msg)
 {
 }
 
-Socket::Socket()
+FileDescriptor::FileDescriptor()
     : fd_(-1),
       state_(S_READ)
 {
 }
 
-Socket::~Socket()
+FileDescriptor::~FileDescriptor()
 {
     if (is_init()) {
         close(fd());
     }
 }
 
-int Socket::fd() const
+int FileDescriptor::fd() const
 {
     return fd_;
 }
 
-bool Socket::is_init() const
+bool FileDescriptor::is_init() const
 {
     return fd_ != -1;
 }
 
-SocketState Socket::state() const
+FDState FileDescriptor::state() const
 {
     return state_;
 }
 
-void Socket::set_state(SocketState state)
+void FileDescriptor::set_state(FDState state)
 {
     state_ = state;
 }

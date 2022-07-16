@@ -13,9 +13,9 @@
 #pragma once
 
 #include "core/Config.hpp"
-#include "socket/Sockets.hpp"
-#include "socket/TcpConnection.hpp"
-#include "socket/TcpListener.hpp"
+#include "fd/FDList.hpp"
+#include "fd/TcpConnection.hpp"
+#include "fd/TcpListener.hpp"
 
 class Server
 {
@@ -29,11 +29,11 @@ public:
 
 private:
     void accept_connection(TcpListener* socket);
-    void close_connection(Socket* c);
+    void close_connection(FileDescriptor* c);
     void print_body(const Request& r) const;
     std::vector<Config> get_response_configs(const Request& req) const;
 
 private:
-    Sockets sockets_;
+    FDList fds_;
     std::vector<Config> configs_;
 };

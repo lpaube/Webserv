@@ -10,28 +10,28 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Sockets.hpp"
+#include "FDList.hpp"
 #include <algorithm>
 
-Sockets::~Sockets()
+FDList::~FDList()
 {
     close_all();
 }
 
-Sockets::SocketMap::mapped_type& Sockets::operator[](const int fd)
+FDList::FDMap::mapped_type& FDList::operator[](const int fd)
 {
-    return sockets_[fd];
+    return fds_[fd];
 }
 
-void Sockets::close_all()
+void FDList::close_all()
 {
-    for (iterator it = sockets_.begin(); it != sockets_.end(); ++it) {
+    for (iterator it = fds_.begin(); it != fds_.end(); ++it) {
         delete it->second;
     }
-    sockets_.clear();
+    fds_.clear();
 }
 
-size_t Sockets::erase(int fd)
+size_t FDList::erase(int fd)
 {
     for (std::vector<pollfd>::iterator it = pfds_.begin(); it != pfds_.end(); ++it) {
         if (it->fd == fd) {
@@ -39,12 +39,12 @@ size_t Sockets::erase(int fd)
             break;
         }
     }
-    return sockets_.erase(fd);
+    return fds_.erase(fd);
 }
 
-std::pair<Sockets::iterator, bool> Sockets::insert(std::pair<int, Socket*> value, int events)
+std::pair<FDList::iterator, bool> FDList::insert(std::pair<int, FileDescriptor*> value, int events)
 {
-    std::pair<Sockets::iterator, bool> ret = sockets_.insert(value);
+    std::pair<FDList::iterator, bool> ret = fds_.insert(value);
 
     if (!ret.second) {
         return ret;
@@ -60,12 +60,12 @@ std::pair<Sockets::iterator, bool> Sockets::insert(std::pair<int, Socket*> value
     return ret;
 }
 
-pollfd* Sockets::pfds()
+pollfd* FDList::pfds()
 {
     return pfds_.data();
 }
 
-size_t Sockets::size()
+size_t FDList::size()
 {
     return pfds_.size();
 }

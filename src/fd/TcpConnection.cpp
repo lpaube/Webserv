@@ -48,9 +48,9 @@ TcpConnection::TcpConnection(int listener_fd)
     }
 }
 
-SocketType TcpConnection::type() const
+FDType TcpConnection::type() const
 {
-    return TCP_CONNECTION;
+    return FD_TCP_CONNECTION;
 }
 
 void TcpConnection::handle_read_event()

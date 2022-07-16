@@ -14,17 +14,17 @@
 
 #include "core/ExceptionBase.hpp"
 
-enum SocketType {
-    TCP_LISTENER,
-    TCP_CONNECTION
+enum FDType {
+    FD_TCP_LISTENER,
+    FD_TCP_CONNECTION
 };
 
-enum SocketState {
+enum FDState {
     S_READ,
     S_WRITE
 };
 
-class Socket
+class FileDescriptor
 {
 public:
     class Exception : public ExceptionBase
@@ -34,21 +34,21 @@ public:
     };
 
 public:
-    Socket();
-    virtual ~Socket();
+    FileDescriptor();
+    virtual ~FileDescriptor();
 
-    virtual SocketType type() const = 0;
+    virtual FDType type() const = 0;
 
     int fd() const;
     bool is_init() const;
-    SocketState state() const;
-    void set_state(SocketState state);
+    FDState state() const;
+    void set_state(FDState state);
 
 protected:
     int fd_;
-    SocketState state_;
+    FDState state_;
 
 private:
-    Socket(const Socket&);
-    Socket& operator=(const Socket&);
+    FileDescriptor(const FileDescriptor&);
+    FileDescriptor& operator=(const FileDescriptor&);
 };

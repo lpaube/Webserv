@@ -12,16 +12,16 @@
 
 #pragma once
 
-#include "Socket.hpp"
+#include "FileDescriptor.hpp"
 #include <netinet/in.h>
 #include <string>
 
-class TcpListener : public Socket
+class TcpListener : public FileDescriptor
 {
 public:
     TcpListener(const std::string& address, uint16_t port, int backlog);
 
-    virtual SocketType type() const;
+    virtual FDType type() const;
 
     const std::string& address_str() const;
     in_addr address() const;

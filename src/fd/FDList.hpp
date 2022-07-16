@@ -12,32 +12,31 @@
 
 #pragma once
 
-#include "Socket.hpp"
+#include "FileDescriptor.hpp"
 #include <cstddef>
 #include <map>
 #include <poll.h>
 #include <vector>
 
-class Sockets
+class FDList
 {
 public:
-    typedef std::map<int, Socket*> SocketMap;
-    typedef SocketMap::iterator iterator;
+    typedef std::map<int, FileDescriptor*> FDMap;
+    typedef FDMap::iterator iterator;
 
 public:
-    ~Sockets();
+    ~FDList();
 
-    SocketMap::mapped_type& operator[](const int fd);
-
-    void close_all();
+    FDMap::mapped_type& operator[](const int fd);
 
 public:
     size_t erase(int fd);
-    std::pair<Sockets::iterator, bool> insert(std::pair<int, Socket*> value, int events);
+    std::pair<FDList::iterator, bool> insert(std::pair<int, FileDescriptor*> value, int events);
     pollfd* pfds();
     size_t size();
+    void close_all();
 
 private:
-    SocketMap sockets_;
+    FDMap fds_;
     std::vector<pollfd> pfds_;
 };
