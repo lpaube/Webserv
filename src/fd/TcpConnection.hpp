@@ -13,8 +13,8 @@
 #pragma once
 
 #include "core/Config.hpp"
-#include "http/Request.hpp"
 #include "fd/FileDescriptor.hpp"
+#include "http/Request.hpp"
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <vector>
@@ -50,6 +50,7 @@ public:
     void set_msg(const std::vector<char>& set);
     void set_response_config(const std::vector<Config>& server_configs, std::string host);
     const Config& config() const;
+    bool has_config() const;
 
 private:
     void parse_http_request_line();
@@ -79,4 +80,5 @@ private:
     std::vector<char> msg_;
     ssize_t byte_sent_;
     Config config_;
+    bool has_config_;
 };

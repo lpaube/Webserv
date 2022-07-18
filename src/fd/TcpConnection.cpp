@@ -35,7 +35,8 @@ TcpConnection::TcpConnection(int listener_fd)
       req_(),
       msg_(),
       byte_sent_(0),
-      config_()
+      config_(),
+      has_config_(false)
 {
     fd_ = accept(listener_fd_, (sockaddr*)&addr_, &addrlen_);
     if (fd() == -1) {
@@ -434,4 +435,9 @@ const char* TcpConnection::stdException::what() const throw()
 const Config& TcpConnection::config() const
 {
     return this->config_;
+}
+
+bool TcpConnection::has_config() const
+{
+    return has_config_;
 }

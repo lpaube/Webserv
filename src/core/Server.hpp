@@ -32,6 +32,8 @@ private:
     void close_connection(FileDescriptor* c);
     void print_body(const Request& r) const;
     std::vector<Config> get_response_configs(const Request& req) const;
+    void error_response(TcpConnection* c, int code);
+    std::string get_configuration(TcpConnection* c) const;
 
 private:
     FDList fds_;

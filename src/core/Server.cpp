@@ -11,9 +11,9 @@
 /* ************************************************************************** */
 
 #include "Server.hpp"
-#include "http/Response.hpp"
 #include "fd/TcpConnection.hpp"
 #include "fd/TcpListener.hpp"
+#include "http/Response.hpp"
 #include <cstring>
 #include <exception>
 #include <iostream>
@@ -49,7 +49,8 @@ Server::Server(const std::vector<Config>& blocks)
 
         if (add) {
             TcpListener* listener = new TcpListener(it->listen.address, it->listen.port, N_BACKLOG);
-            fds_.insert(std::make_pair(listener->fd(), static_cast<FileDescriptor*>(listener)), POLLIN);
+            fds_.insert(std::make_pair(listener->fd(), static_cast<FileDescriptor*>(listener)),
+                        POLLIN);
 
             streams.push_back(listener);
 
@@ -100,14 +101,7 @@ void Server::run()
                         } catch (Request::Exception& ex) {
                             c->set_state(S_WRITE);
                             c->set_response_config(configs_, "");
-                            int code = ex.status_code();
-                            Response response(c->request(), c->config());
-                            response.set_status_code(code);
-                            response.check_error_code();
-                            response.set_html_header();
-                            std::vector<char> msg(response.header.begin(), response.header.end());
-                            msg.insert(msg.end(), response.body.begin(), response.body.end());
-                            c->set_msg(msg);
+                            error_response(c, ex.status_code());
                         } catch (std::exception& ex) {
                             std::cerr << ex.what() << std::endl;
                             to_close.push_back(c->fd());
@@ -121,24 +115,15 @@ void Server::run()
                 found = true;
                 bool sent = false;
                 TcpConnection* c = static_cast<TcpConnection*>(s);
-                Request::header_iterator it = c->request().find_header("host");
-                std::string host;
-                if (it == c->request().headers_end()) {
-                    host = "";
-                } else
-                    host = it->second;
-                c->set_response_config(configs_, host);
+
+                if (!c->has_config()) {
+                    c->set_response_config(configs_, get_configuration(c));
+                }
+
                 try {
                     sent = c->handle_write_event();
                 } catch (Request::Exception& ex) {
-                    int code = ex.status_code();
-                    Response response(c->request(), c->config());
-                    response.set_status_code(code);
-                    response.check_error_code();
-                    response.set_html_header();
-                    std::vector<char> msg(response.header.begin(), response.header.end());
-                    msg.insert(msg.end(), response.body.begin(), response.body.end());
-                    c->set_msg(msg);
+                    error_response(c, ex.status_code());
                 } catch (std::exception& ex) {
                     std::cerr << ex.what() << std::endl;
                     to_close.push_back(c->fd());
@@ -186,4 +171,28 @@ void Server::print_body(const Request& r) const
         std::cout << *it;
     }
     std::cout << std::endl;
+}
+
+void Server::error_response(TcpConnection* c, int code)
+{
+    Response response(c->request(), c->config());
+    response.set_status_code(code);
+    response.check_error_code();
+    response.set_html_header();
+    std::vector<char> msg(response.header.begin(), response.header.end());
+    msg.insert(msg.end(), response.body.begin(), response.body.end());
+    c->set_msg(msg);
+}
+
+std::string Server::get_configuration(TcpConnection* c) const
+{
+    Request::header_iterator it = c->request().find_header("host");
+    std::string host;
+    if (it == c->request().headers_end()) {
+        host = "";
+    } else {
+        host = it->second;
+    }
+
+    return host;
 }
