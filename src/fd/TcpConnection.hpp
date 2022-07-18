@@ -6,13 +6,14 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 19:31:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/07/18 14:06:29 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/07/18 15:46:05 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #include "core/Config.hpp"
+#include "fd/FDList.hpp"
 #include "fd/FileDescriptor.hpp"
 #include "http/Request.hpp"
 #include <netinet/in.h>
@@ -37,7 +38,7 @@ public:
     }
 
     void handle_read_event();
-    bool handle_write_event();
+    bool handle_write_event(FDList& fds);
     const Request& request() const;
     void set_addr(in_addr addr);
     void set_port(uint16_t port);

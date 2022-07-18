@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/07/18 15:43:51 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/07/18 15:47:02 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ void TcpConnection::handle_read_event()
     (this->*request_handler)();
 }
 
-bool TcpConnection::handle_write_event()
+bool TcpConnection::handle_write_event(FDList& fds)
 {
     std::cout << "|!|IN_CONNECTION_WRITE_EVENT|!|" << std::endl;
     if (byte_sent_ != 0 || msg_.size() > 0) {

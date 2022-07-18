@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/07/18 14:48:49 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/07/18 15:46:19 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,7 @@ void Server::run()
                         }
 
                         try {
-                            sent = c->handle_write_event();
+                            sent = c->handle_write_event(fds_);
                         } catch (Request::Exception& ex) {
                             error_response(c, ex.status_code());
                         } catch (std::exception& ex) {
