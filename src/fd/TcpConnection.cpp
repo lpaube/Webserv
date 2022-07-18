@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   TcpConnection.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/07/18 15:47:02 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/07/18 16:17:30 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "TcpConnection.hpp"
+#include "File.hpp"
 #include "Utils.hpp"
 #include "http/Response.hpp"
 #include "http/Script.hpp"
@@ -36,7 +37,8 @@ TcpConnection::TcpConnection(int listener_fd)
       msg_(),
       byte_sent_(0),
       config_(),
-      has_config_(false)
+      has_config_(false),
+      file_(NULL)
 {
     fd_ = accept(listener_fd_, (sockaddr*)&addr_, &addrlen_);
     if (fd() == -1) {
@@ -87,10 +89,19 @@ bool TcpConnection::handle_write_event(FDList& fds)
     response.check_method();
     std::size_t len = req_.path().length();
     if (req_.path().find("/cgi-bin/") != std::string::npos && req_.path()[len - 1] != '/') {
-        Script script(config_, req_);
-        if (script.ext_found == true) {
-            msg_ = script.exec();
-            return (send_response());
+
+        if (file_ == NULL) {
+            file_ = new File(TMPFILE_NAME, S_WRITE);
+            fds.insert(std::make_pair(file_->fd(), static_cast<FileDescriptor*>(file_)), POLLOUT);
+        } else if (file_->write_done()) {
+            Script script(config_, req_);
+            if (script.ext_found == true) {
+                delete file_;
+                script.exec(TMPFILE_NAME, fd());
+                return (true);
+            }
+        } else {
+            return false;
         }
     }
     response.generate_response_html();

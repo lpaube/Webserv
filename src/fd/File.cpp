@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   File.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/18 14:10:03 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/07/18 15:41:45 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/07/18 16:20:21 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,10 @@ File::File(const std::string& filepath, FDState mode)
 {
     switch (mode) {
         case S_READ:
-            fd_ = open(TMPFILE_NAME, O_RDONLY);
+            fd_ = open(filepath.c_str(), O_RDONLY, 0777);
             break;
         case S_WRITE:
-            fd_ = open(TMPFILE_NAME, O_CREAT | O_TRUNC | O_WRONLY);
+            fd_ = open(filepath.c_str(), O_CREAT | O_TRUNC | O_WRONLY, 0777);
             break;
     }
 

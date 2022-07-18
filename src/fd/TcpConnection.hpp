@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   TcpConnection.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 19:31:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/07/18 15:46:05 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/07/18 15:51:11 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 #include "core/Config.hpp"
 #include "fd/FDList.hpp"
+#include "fd/File.hpp"
 #include "fd/FileDescriptor.hpp"
 #include "http/Request.hpp"
 #include <netinet/in.h>
@@ -76,4 +77,5 @@ private:
     ssize_t byte_sent_;
     Config config_;
     bool has_config_;
+    File* file_;
 };

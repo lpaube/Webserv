@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:08 by mafortin          #+#    #+#             */
-/*   Updated: 2022/06/29 18:45:48 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/07/18 16:17:15 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,44 +50,30 @@ Script::~Script()
 }
 
 // execute the script and returns the output of the script in a string.
-std::vector<char> Script::exec()
+void Script::exec(const std::string& file_name, const int& fd_out)
 {
     pid_t id;
     int status;
     int in_file;
 
     if (request_.method() == POST) {
-        in_file = open("in_file.tmp", O_CREAT | O_RDWR, 0777);
+        in_file = open(file_name.c_str(), O_RDWR, 0777);
         if (in_file < 0) {
             throw Request::Exception("Error fatal, open", 500);
         }
-    }
-    int out_file = open("out_file.tmp", O_CREAT | O_RDWR,
-                        0777); // Create out file for the output of the script
-    if (out_file < 0) {
-        throw Request::Exception("Error fatal, open", 500);
     }
     id = fork(); // Process to execve the script
     if (id < 0)
         throw Request::Exception("Error fatal, fork", 500);
     if (id == 0) {
         if (request_.method() == POST) {
-            if (write(in_file, request_.body().data(), request_.body().size()) < 0) {
-                throw Exception();
-            }
-            close(in_file);
-            in_file = open("in_file.tmp", O_RDWR);
-            if (in_file < 0) {
-                remove("in_file.tmp");
-                throw Request::Exception("Error fatal, open", 500);
-            }
             if (dup2(in_file, STDIN_FILENO) < 0) {
                 remove("in_file.tmp");
                 close(in_file);
                 throw Request::Exception("Error fatal, dup2", 500);
             }
         }
-        if (dup2(out_file, STDOUT_FILENO) < 0) {
+        if (dup2(fd_out, STDOUT_FILENO) < 0) {
             remove("in_file.tmp");
             close(in_file);
             throw Request::Exception("Error fatal, dup2", 500);
@@ -99,17 +85,9 @@ std::vector<char> Script::exec()
     } else {
         waitpid(id, &status, 0);
     }
-    close(out_file);
     if (request_.method() == POST) { // delete the in file after script
         close(in_file);
     }
-    std::ifstream input_file("out_file.tmp");
-    std::vector<char> script_output((std::istreambuf_iterator<char>(input_file)),
-                                    std::istreambuf_iterator<char>());
-    input_file.close();
-    remove("in_file.tmp");
-    remove("out_file.tmp");
-    return script_output;
 }
 
 std::string Script::get_ext(const std::string& path)
