@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   File.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/18 14:02:46 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/07/18 16:00:28 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/07/18 16:48:03 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 
 #include "FileDescriptor.hpp"
 #include <vector>
-
-#define TMPFILE_NAME "tmpfile.tmp"
 
 class File : public FileDescriptor
 {
@@ -27,6 +25,8 @@ public:
     const std::string& filepath() const;
     bool write_done() const;
     bool read_done() const;
+    void append_write_data(const std::vector<char>& data);
+    const std::vector<char>& get_read_data() const;
     int handle();
 
 private:

@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/07/18 16:25:11 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/07/18 16:47:39 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@
 #include <unistd.h>
 
 #define BUF_SIZE (1024 * 8)
+#define IN_TMPFILE "intmpfile.tmp"
+#define OUY_TMPFILE "outtmpfile.tmp"
 
 TcpConnection::TcpConnection(int listener_fd)
     : listener_fd_(listener_fd),
@@ -95,13 +97,13 @@ bool TcpConnection::handle_write_event(FDList& fds)
     if (req_.path().find("/cgi-bin/") != std::string::npos && req_.path()[len - 1] != '/') {
 
         if (file_ == NULL) {
-            file_ = new File(TMPFILE_NAME, S_WRITE);
+            file_ = new File(IN_TMPFILE, S_WRITE);
             fds.insert(std::make_pair(file_->fd(), static_cast<FileDescriptor*>(file_)), POLLOUT);
         } else if (file_->write_done()) {
             Script script(config_, req_);
             if (script.ext_found == true) {
                 delete file_;
-                script.exec(TMPFILE_NAME, fd());
+                script.exec(IN_TMPFILE, fd());
                 return (true);
             }
         } else {

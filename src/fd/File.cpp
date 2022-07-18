@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   File.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/18 14:10:03 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/07/18 16:20:21 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/07/18 16:48:27 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,12 +45,22 @@ const std::string& File::filepath() const
 
 bool File::write_done() const
 {
-    return write_buf_.size() == 0;
+    return state() == S_WRITE && write_buf_.size() == 0;
 }
 
 bool File::read_done() const
 {
-    return eof_;
+    return state() == S_READ && eof_;
+}
+
+void File::append_write_data(const std::vector<char>& data)
+{
+    write_buf_.insert(write_buf_.end(), data.begin(), data.end());
+}
+
+const std::vector<char>& File::get_read_data() const
+{
+    return read_buf_;
 }
 
 int File::handle()
