@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   TcpConnection.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/07/18 16:17:30 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/07/18 16:25:11 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,10 @@ void TcpConnection::handle_read_event()
 
 bool TcpConnection::handle_write_event(FDList& fds)
 {
+    if (config_.client_max_body_size < req_.body().size()) {
+        throw Request::Exception("Body too big", 413);
+    }
+
     std::cout << "|!|IN_CONNECTION_WRITE_EVENT|!|" << std::endl;
     if (byte_sent_ != 0 || msg_.size() > 0) {
         return send_response();

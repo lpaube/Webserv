@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   TcpConnection.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 19:31:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/07/18 15:51:11 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/07/18 16:25:19 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 class TcpConnection : public FileDescriptor
 {
 public:
-    static const size_t MAX_REQUEST_SIZE = 1024 * 1024;
+    static const size_t MAX_REQUEST_SIZE = 0x800000;
 
 public:
     TcpConnection(int listener_fd);
