@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   TcpConnection.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/07/18 16:47:39 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/07/18 17:05:47 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 
 #define BUF_SIZE (1024 * 8)
 #define IN_TMPFILE "intmpfile.tmp"
-#define OUY_TMPFILE "outtmpfile.tmp"
+#define OUT_TMPFILE "outtmpfile.tmp"
 
 TcpConnection::TcpConnection(int listener_fd)
     : listener_fd_(listener_fd),
@@ -51,6 +51,10 @@ TcpConnection::TcpConnection(int listener_fd)
         throw Exception("Error while setting socket to non-blocking: " +
                         std::string(strerror(errno)));
     }
+}
+
+TcpConnection::~TcpConnection(){
+	delete file_;
 }
 
 FDType TcpConnection::type() const
@@ -98,17 +102,23 @@ bool TcpConnection::handle_write_event(FDList& fds)
 
         if (file_ == NULL) {
             file_ = new File(IN_TMPFILE, S_WRITE);
+			file_->append_write_data(req_.body());
             fds.insert(std::make_pair(file_->fd(), static_cast<FileDescriptor*>(file_)), POLLOUT);
         } else if (file_->write_done()) {
-            Script script(config_, req_);
+			 delete file_;
+			 file_ = NULL;
+			 Script script(config_, req_);
             if (script.ext_found == true) {
-                delete file_;
-                script.exec(IN_TMPFILE, fd());
-                return (true);
-            }
-        } else {
-            return false;
-        }
+               script.exec(IN_TMPFILE);
+			   file_ = new File(OUT_TMPFILE, S_READ);
+			}
+		} else if( file_->read_done()){
+            msg_  = file_->get_read_data();
+			delete file_;
+			file_ = NULL;
+            return (send_response());
+		} 
+		return false;
     }
     response.generate_response_html();
     msg_ = response.full_content;

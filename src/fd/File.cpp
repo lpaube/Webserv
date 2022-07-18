@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   File.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/18 14:10:03 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/07/18 16:48:27 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/07/18 17:11:36 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ File::File(const std::string& filepath, FDState mode)
     : eof_(false),
       filepath_(filepath)
 {
+	state_ = mode;
     switch (mode) {
         case S_READ:
             fd_ = open(filepath.c_str(), O_RDONLY, 0777);

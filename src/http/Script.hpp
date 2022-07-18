@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:01 by mafortin          #+#    #+#             */
-/*   Updated: 2022/07/18 16:17:10 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/07/18 17:13:06 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ public:
 public:
     Script(const Config& config, const Request& request);
     ~Script();
-    void exec(const std::string& file_name, const int& fd_out);
+    void exec(const std::string& file_name);
     std::string get_ext(const std::string& path);
 
 private:

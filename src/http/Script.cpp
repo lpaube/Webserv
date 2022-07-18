@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:08 by mafortin          #+#    #+#             */
-/*   Updated: 2022/07/18 16:17:15 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/07/18 17:06:35 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,10 @@
 #include <sstream>
 #include <sys/wait.h>
 #include <unistd.h>
-
+#include "fd/File.hpp"
 #define BUFFER_SIZE 50
+
+#define OUT_TMPFILE "outtmpfile.tmp"
 
 // script constructor takes 2 args, a config and a specific request_.
 Script::Script(const Config& config, const Request& request_)
@@ -50,12 +52,16 @@ Script::~Script()
 }
 
 // execute the script and returns the output of the script in a string.
-void Script::exec(const std::string& file_name, const int& fd_out)
+void Script::exec(const std::string& file_name)
 {
     pid_t id;
     int status;
     int in_file;
-
+ 	int out_file = open(OUT_TMPFILE, O_CREAT | O_RDWR,
+                        0777); // Create out file for the output of the script
+    if (out_file < 0) {
+        throw Request::Exception("Error fatal, open", 500);
+	}
     if (request_.method() == POST) {
         in_file = open(file_name.c_str(), O_RDWR, 0777);
         if (in_file < 0) {
@@ -73,7 +79,7 @@ void Script::exec(const std::string& file_name, const int& fd_out)
                 throw Request::Exception("Error fatal, dup2", 500);
             }
         }
-        if (dup2(fd_out, STDOUT_FILENO) < 0) {
+        if (dup2(out_file, STDOUT_FILENO) < 0) {
             remove("in_file.tmp");
             close(in_file);
             throw Request::Exception("Error fatal, dup2", 500);
@@ -85,6 +91,7 @@ void Script::exec(const std::string& file_name, const int& fd_out)
     } else {
         waitpid(id, &status, 0);
     }
+	close(out_file);
     if (request_.method() == POST) { // delete the in file after script
         close(in_file);
     }
