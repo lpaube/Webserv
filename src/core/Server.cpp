@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/28 18:10:16 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/07/18 14:48:49 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+#include "fd/File.hpp"
 #include "fd/TcpConnection.hpp"
 #include "fd/TcpListener.hpp"
 #include "http/Response.hpp"
@@ -77,25 +78,25 @@ void Server::run()
         std::vector<int> to_close;
         for (size_t i = 0; i < fds_.size() && nevents > 0; ++i) {
             pollfd pfd = fds_.pfds()[i];
-            FileDescriptor* s = fds_[pfd.fd];
+            FileDescriptor* fd = fds_[pfd.fd];
             bool found = false;
 
             if (pfd.revents & (POLLERR | POLLHUP | POLLNVAL)) {
                 pfd.revents |= (POLLIN | POLLOUT);
             }
 
-            if ((pfd.revents & POLLIN) && (s->state() == S_READ)) {
+            if ((pfd.revents & POLLIN) && (fd->state() == S_READ)) {
                 found = true;
-                switch (s->type()) {
+                switch (fd->type()) {
                     case FD_TCP_LISTENER:
                         try {
-                            accept_connection(static_cast<TcpListener*>(s));
+                            accept_connection(static_cast<TcpListener*>(fd));
                         } catch (std::exception& ex) {
                             std::cerr << ex.what() << std::endl;
                         }
                         break;
                     case FD_TCP_CONNECTION: {
-                        TcpConnection* c = static_cast<TcpConnection*>(s);
+                        TcpConnection* c = static_cast<TcpConnection*>(fd);
                         try {
                             c->handle_read_event();
                         } catch (Request::Exception& ex) {
@@ -108,28 +109,44 @@ void Server::run()
                         }
                         break;
                     }
+                    case FD_FILE: {
+                        File* f = static_cast<File*>(fd);
+                        f->handle();
+                        break;
+                    }
                 }
             }
 
-            if ((pfd.revents & POLLOUT) && (s->state() == S_WRITE)) {
+            if ((pfd.revents & POLLOUT) && (fd->state() == S_WRITE)) {
                 found = true;
-                bool sent = false;
-                TcpConnection* c = static_cast<TcpConnection*>(s);
+                switch (fd->type()) {
+                    case FD_TCP_CONNECTION: {
+                        bool sent = false;
+                        TcpConnection* c = static_cast<TcpConnection*>(fd);
 
-                if (!c->has_config()) {
-                    c->set_response_config(configs_, get_configuration(c));
-                }
+                        if (!c->has_config()) {
+                            c->set_response_config(configs_, get_configuration(c));
+                        }
 
-                try {
-                    sent = c->handle_write_event();
-                } catch (Request::Exception& ex) {
-                    error_response(c, ex.status_code());
-                } catch (std::exception& ex) {
-                    std::cerr << ex.what() << std::endl;
-                    to_close.push_back(c->fd());
-                }
-                if (sent) {
-                    to_close.push_back(c->fd());
+                        try {
+                            sent = c->handle_write_event();
+                        } catch (Request::Exception& ex) {
+                            error_response(c, ex.status_code());
+                        } catch (std::exception& ex) {
+                            std::cerr << ex.what() << std::endl;
+                            to_close.push_back(c->fd());
+                        }
+                        if (sent) {
+                            to_close.push_back(c->fd());
+                        }
+                    } break;
+                    case FD_FILE: {
+                        File* f = static_cast<File*>(fd);
+                        f->handle();
+                    } break;
+                    case FD_TCP_LISTENER: {
+                        // Should never happen
+                    } break;
                 }
             }
 

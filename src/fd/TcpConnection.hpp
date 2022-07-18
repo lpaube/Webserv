@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   TcpConnection.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 19:31:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/28 18:04:41 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/07/18 14:06:29 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,12 +35,6 @@ public:
         req_size_ += (size_t)std::distance(first, last);
         data_.insert(data_.end(), first, last);
     }
-
-    class stdException : public std::exception
-    {
-    public:
-        virtual const char* what() const throw();
-    };
 
     void handle_read_event();
     bool handle_write_event();

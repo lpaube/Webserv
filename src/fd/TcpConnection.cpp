@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   TcpConnection.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/28 18:11:47 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/07/18 15:43:51 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -416,7 +416,7 @@ bool TcpConnection::send_response()
     size_t len = msg_.size() - (size_t)byte_sent_;
     byte_sent_ = send(fd(), msg_.data() + byte_sent_, len, 0);
     if (byte_sent_ < 0) {
-        throw stdException();
+        throw Exception("Error fatal, write returns -1");
     }
     if (byte_sent_ == (ssize_t)len) {
         byte_sent_ = 0;
@@ -425,11 +425,6 @@ bool TcpConnection::send_response()
     } else {
         return false;
     }
-}
-
-const char* TcpConnection::stdException::what() const throw()
-{
-    return "Error fatal, write returns -1\n";
 }
 
 const Config& TcpConnection::config() const
