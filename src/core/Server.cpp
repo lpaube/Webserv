@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/07/18 15:46:19 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/07/18 16:11:01 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,10 @@ void Server::run()
                     case FD_FILE: {
                         File* f = static_cast<File*>(fd);
                         f->handle();
+                        if (f->read_done()) {
+                            // Use read buffer here
+                            to_close.push_back(f->fd());
+                        }
                         break;
                     }
                 }
@@ -143,6 +147,9 @@ void Server::run()
                     case FD_FILE: {
                         File* f = static_cast<File*>(fd);
                         f->handle();
+                        if (f->write_done()) {
+                            to_close.push_back(f->fd());
+                        }
                     } break;
                     case FD_TCP_LISTENER: {
                         // Should never happen
