@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   TcpConnection.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/07/18 17:05:47 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/07/19 14:03:19 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,9 @@ TcpConnection::TcpConnection(int listener_fd)
     }
 }
 
-TcpConnection::~TcpConnection(){
-	delete file_;
+TcpConnection::~TcpConnection()
+{
+    delete file_;
 }
 
 FDType TcpConnection::type() const
@@ -99,26 +100,25 @@ bool TcpConnection::handle_write_event(FDList& fds)
     response.check_method();
     std::size_t len = req_.path().length();
     if (req_.path().find("/cgi-bin/") != std::string::npos && req_.path()[len - 1] != '/') {
-
         if (file_ == NULL) {
             file_ = new File(IN_TMPFILE, S_WRITE);
-			file_->append_write_data(req_.body());
+            file_->append_write_data(req_.body());
             fds.insert(std::make_pair(file_->fd(), static_cast<FileDescriptor*>(file_)), POLLOUT);
         } else if (file_->write_done()) {
-			 delete file_;
-			 file_ = NULL;
-			 Script script(config_, req_);
+            delete file_;
+            file_ = NULL;
+            Script script(config_, req_);
             if (script.ext_found == true) {
-               script.exec(IN_TMPFILE);
-			   file_ = new File(OUT_TMPFILE, S_READ);
-			}
-		} else if( file_->read_done()){
-            msg_  = file_->get_read_data();
-			delete file_;
-			file_ = NULL;
+                script.exec(IN_TMPFILE);
+                file_ = new File(OUT_TMPFILE, S_READ);
+            }
+        } else if (file_->read_done()) {
+            msg_ = file_->get_read_data();
+            delete file_;
+            file_ = NULL;
             return (send_response());
-		} 
-		return false;
+        }
+        return false;
     }
     response.generate_response_html();
     msg_ = response.full_content;
@@ -355,8 +355,6 @@ void TcpConnection::parse_http_request_body_content_length()
     } else if (n > req_.content_length_count()) {
         throw Request::Exception("Body larger than Content-Length", 400);
     }
-
-    req_.content_length_sub((size_t)n);
 
     if (done) {
         req_.append_raw_body(data_);

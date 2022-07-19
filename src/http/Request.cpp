@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 19:04:31 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/17 22:34:52 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/07/19 14:07:03 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -245,11 +245,6 @@ void Request::process_headers()
     }
 }
 
-void Request::content_length_sub(size_t n)
-{
-    content_length_count_ -= n;
-}
-
 void Request::append_raw_body(const std::vector<char>& data)
 {
     raw_body_.insert(raw_body_.end(), data.begin(), data.end());
@@ -295,16 +290,16 @@ void Request::decode_raw_body()
                     break;
             }
         }
-    }
-    if (all_chunks_received()) {
-        const_rbody_iter it = find_bytes(raw_body_, "\r\n", 2);
-        if (it != raw_body_.end() && it == raw_body_.begin()) {
-            raw_body_.clear();
-        } else {
-            throw Exception("Bad request: chunked request did not end with \\r\\n", 400);
+
+        if (all_chunks_received()) {
+            const_rbody_iter it = find_bytes(raw_body_, "\r\n", 2);
+            if (it != raw_body_.end() && it == raw_body_.begin()) {
+                raw_body_.clear();
+            } else {
+                throw Exception("Bad request: chunked request did not end with \\r\\n", 400);
+            }
         }
     }
-    return;
 }
 
 bool Request::read_chunk()

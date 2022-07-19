@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 17:17:57 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/06/17 22:34:29 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/07/19 14:04:02 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,6 @@ private:
     void append_buf(char c);
     void add_header(const std::string& name, const std::string& value);
     void process_headers();
-    void content_length_sub(size_t n);
     void append_raw_body(const std::vector<char>& data);
     void decode_raw_body();
     bool all_chunks_received() const;

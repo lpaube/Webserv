@@ -19,7 +19,7 @@ File::File(const std::string& filepath, FDState mode)
     : eof_(false),
       filepath_(filepath)
 {
-	state_ = mode;
+    state_ = mode;
     switch (mode) {
         case S_READ:
             fd_ = open(filepath.c_str(), O_RDONLY, 0777);

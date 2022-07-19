@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "Script.hpp"
+#include "fd/File.hpp"
 #include <cstring>
 #include <exception>
 #include <fcntl.h>
@@ -19,7 +20,6 @@
 #include <sstream>
 #include <sys/wait.h>
 #include <unistd.h>
-#include "fd/File.hpp"
 #define BUFFER_SIZE 50
 
 #define OUT_TMPFILE "outtmpfile.tmp"
@@ -57,11 +57,11 @@ void Script::exec(const std::string& file_name)
     pid_t id;
     int status;
     int in_file;
- 	int out_file = open(OUT_TMPFILE, O_CREAT | O_RDWR,
+    int out_file = open(OUT_TMPFILE, O_CREAT | O_RDWR,
                         0777); // Create out file for the output of the script
     if (out_file < 0) {
         throw Request::Exception("Error fatal, open", 500);
-	}
+    }
     if (request_.method() == POST) {
         in_file = open(file_name.c_str(), O_RDWR, 0777);
         if (in_file < 0) {
@@ -91,7 +91,7 @@ void Script::exec(const std::string& file_name)
     } else {
         waitpid(id, &status, 0);
     }
-	close(out_file);
+    close(out_file);
     if (request_.method() == POST) { // delete the in file after script
         close(in_file);
     }

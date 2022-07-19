@@ -28,7 +28,7 @@ public:
 
 public:
     TcpConnection(int listener_fd);
-	~TcpConnection();
+    ~TcpConnection();
     virtual FDType type() const;
 
     template <typename Iter>
