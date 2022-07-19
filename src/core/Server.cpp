@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 16:52:55 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/07/19 14:11:04 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/07/19 14:28:58 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,9 @@ void Server::run()
                         File* f = static_cast<File*>(fd);
                         f->handle();
                         if (f->read_done()) {
-                            to_close.push_back(f->fd());
+                            --i;
+                            fds_.erase(f->fd());
+                            continue;
                         }
                         break;
                     }
@@ -147,7 +149,9 @@ void Server::run()
                         File* f = static_cast<File*>(fd);
                         f->handle();
                         if (f->write_done()) {
-                            to_close.push_back(f->fd());
+                            --i;
+                            fds_.erase(f->fd());
+                            continue;
                         }
                     } break;
                     case FD_TCP_LISTENER: {
@@ -185,7 +189,7 @@ void Server::close_connection(FileDescriptor* c)
     close(c->fd());
     fds_.erase(c->fd());
     std::cout << "Closed connection: " << c->fd() << std::endl;
-   // delete c;
+    delete c;
 }
 
 void Server::print_body(const Request& r) const

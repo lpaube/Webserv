@@ -6,7 +6,7 @@
 /*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/07/19 14:03:19 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/07/19 14:34:21 by mleblanc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,6 +111,7 @@ bool TcpConnection::handle_write_event(FDList& fds)
             if (script.ext_found == true) {
                 script.exec(IN_TMPFILE);
                 file_ = new File(OUT_TMPFILE, S_READ);
+                fds.insert(std::make_pair(file_->fd(), static_cast<FileDescriptor*>(file_)), POLLIN);
             }
         } else if (file_->read_done()) {
             msg_ = file_->get_read_data();
