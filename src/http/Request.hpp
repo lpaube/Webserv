@@ -76,6 +76,7 @@ public:
     const std::vector<char>& body() const;
     header_iterator find_header(const std::string& name) const;
     header_iterator headers_end() const;
+    void print() const;
 
 private:
     typedef std::vector<char>::const_iterator const_rbody_iter;

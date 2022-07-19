@@ -92,7 +92,6 @@ bool TcpConnection::handle_write_event(FDList& fds)
         throw Request::Exception("Body too big", 413);
     }
 
-    std::cout << "|!|IN_CONNECTION_WRITE_EVENT|!|" << std::endl;
     if (byte_sent_ != 0 || msg_.size() > 0) {
         return send_response();
     }
@@ -111,7 +110,8 @@ bool TcpConnection::handle_write_event(FDList& fds)
             if (script.ext_found == true) {
                 script.exec(IN_TMPFILE);
                 file_ = new File(OUT_TMPFILE, S_READ);
-                fds.insert(std::make_pair(file_->fd(), static_cast<FileDescriptor*>(file_)), POLLIN);
+                fds.insert(std::make_pair(file_->fd(), static_cast<FileDescriptor*>(file_)),
+                           POLLIN);
             }
         } else if (file_->read_done()) {
             msg_ = file_->get_read_data();
@@ -344,6 +344,7 @@ void TcpConnection::parse_http_request_body_plain()
     req_.decode_raw_body();
     data_.clear();
     set_state(S_WRITE);
+    req_.print();
 }
 
 void TcpConnection::parse_http_request_body_content_length()
@@ -362,6 +363,7 @@ void TcpConnection::parse_http_request_body_content_length()
         data_.clear();
         req_.decode_raw_body();
         set_state(S_WRITE);
+        req_.print();
     }
 }
 
@@ -373,6 +375,7 @@ void TcpConnection::parse_http_request_body_chunked()
     if (req_.all_chunks_received()) {
         print_bytes(req_.body());
         set_state(S_WRITE);
+        req_.print();
     }
 }
 

@@ -32,7 +32,7 @@ $(OBJ_DIR):
 	@$(MKDIR) $(OBJ_DIR)
 
 clean:
-	@$(RM) $(OBJS)
+	@$(RM) $(OBJ_DIR)
 
 fclean:			clean
 	@$(RM) $(NAME)

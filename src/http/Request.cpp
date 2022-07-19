@@ -12,6 +12,7 @@
 
 #include "Request.hpp"
 #include "Utils.hpp"
+#include <iostream>
 #include <sstream>
 
 Request::Exception::Exception(const std::string& msg, int code)
@@ -362,4 +363,22 @@ Request::header_iterator Request::find_header(const std::string& name) const
 Request::header_iterator Request::headers_end() const
 {
     return headers_.end();
+}
+
+void Request::print() const
+{
+    std::cout << "Method: " << method_str(method_) << "\n";
+    std::cout << "Path: " << path_ << "\n";
+    std::cout << "Query string: " << query_str_ << "\n";
+    std::cout << "Http version: " << http_version_ << "\n";
+    std::cout << "=====Headers====="
+              << "\n";
+    for (header_iterator it = headers_.begin(); it != headers_.end(); ++it) {
+        std::cout << it->first << ": " << it->second << "\n";
+    }
+    std::cout << "=====Body=====\n";
+    for (std::vector<char>::const_iterator it = body_.begin(); it != body_.end(); ++it) {
+        std::cout << (char)*it;
+    }
+    std::cout << std::endl;
 }
