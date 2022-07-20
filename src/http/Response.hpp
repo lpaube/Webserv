@@ -51,7 +51,6 @@ private:
     void create_code_msg();
     void build_header_string();
     void set_content_type();
-    void set_date();
     void set_host();
     int set_allow();
     int generate_autoindex(std::ifstream& requested_file, std::stringstream& body_stream);
@@ -76,7 +75,6 @@ private:
     std::string requested_path_;
     std::string full_path_;
     std::string content_type_;
-    std::string date_now_;
     std::string host_;
     std::string allow_;
     std::string server_;
