@@ -50,3 +50,4 @@ end = data.find(boundary)
 f.write(data[start:end - 2])
 f.close()
 print ("HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\r\n")
+a

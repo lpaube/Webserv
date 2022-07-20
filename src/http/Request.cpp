@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 19:04:31 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/07/19 14:07:03 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/07/20 14:20:10 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -375,10 +375,6 @@ void Request::print() const
               << "\n";
     for (header_iterator it = headers_.begin(); it != headers_.end(); ++it) {
         std::cout << it->first << ": " << it->second << "\n";
-    }
-    std::cout << "=====Body=====\n";
-    for (std::vector<char>::const_iterator it = body_.begin(); it != body_.end(); ++it) {
-        std::cout << (char)*it;
     }
     std::cout << std::endl;
 }

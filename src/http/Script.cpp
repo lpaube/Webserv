@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:08 by mafortin          #+#    #+#             */
-/*   Updated: 2022/07/18 17:06:35 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/07/20 14:17:48 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ void Script::exec(const std::string& file_name)
     pid_t id;
     int status;
     int in_file;
-    int out_file = open(OUT_TMPFILE, O_CREAT | O_RDWR,
+    int out_file = open(OUT_TMPFILE, O_CREAT | O_RDWR | O_TRUNC,
                         0777); // Create out file for the output of the script
     if (out_file < 0) {
         throw Request::Exception("Error fatal, open", 500);
