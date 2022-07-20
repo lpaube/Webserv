@@ -82,10 +82,6 @@ void TcpConnection::handle_read_event()
 
 bool TcpConnection::handle_write_event(FDList& fds)
 {
-    if (config_.client_max_body_size < req_.body().size()) {
-        throw Request::Exception("Body too big", 413);
-    }
-
     if (byte_sent_ != 0 || msg_.size() > 0) {
         return send_response();
     }
@@ -320,6 +316,9 @@ void TcpConnection::parse_http_request_body()
     }
 
     if (req_.content_length()) {
+        if (config_.client_max_body_size < req_.content_length_count()) {
+            throw Request::Exception("Body too big", 413);
+        }
         request_handler = &TcpConnection::parse_http_request_body_content_length;
     } else if (req_.chunked()) {
         request_handler = &TcpConnection::parse_http_request_body_chunked;

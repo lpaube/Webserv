@@ -25,7 +25,7 @@
 class TcpConnection : public FileDescriptor
 {
 public:
-    static const size_t MAX_REQUEST_SIZE = 0x800000;
+    static const size_t MAX_REQUEST_SIZE = 0x8000000;
 
 public:
     TcpConnection(int listener_fd);
