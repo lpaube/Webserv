@@ -98,6 +98,9 @@ void Server::run()
                     case FD_TCP_CONNECTION: {
                         SharedPtr<TcpConnection> c = static_pointer_cast<TcpConnection>(fd);
                         try {
+                            if (!c->has_config() && c->get_config()) {
+                                c->set_response_config(configs_, get_configuration(c));
+                            }
                             c->handle_read_event();
                         } catch (Request::Exception& ex) {
                             c->set_state(S_WRITE);

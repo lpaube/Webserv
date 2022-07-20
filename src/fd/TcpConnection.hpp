@@ -47,6 +47,7 @@ public:
     void set_response_config(const std::vector<Config>& server_configs, std::string host);
     const Config& config() const;
     bool has_config() const;
+    bool get_config() const;
 
 private:
     void parse_http_request_line();
@@ -78,5 +79,7 @@ private:
     Config config_;
     bool has_config_;
     SharedPtr<File> file_;
-    bool size_checked;
+    bool size_checked_;
+    bool get_config_;
+    size_t body_bytes_;
 };

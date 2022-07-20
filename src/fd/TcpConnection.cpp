@@ -40,7 +40,9 @@ TcpConnection::TcpConnection(int listener_fd)
       config_(),
       has_config_(false),
       file_(),
-      size_checked(false)
+      size_checked_(false),
+      get_config_(false),
+      body_bytes_(0)
 {
     fd_ = accept(listener_fd_, (sockaddr*)&addr_, &addrlen_);
     if (fd() == -1) {
@@ -79,8 +81,8 @@ void TcpConnection::handle_read_event()
 
 bool TcpConnection::handle_write_event(FDList& fds)
 {
-    if (!size_checked && req_.body().size() > config_.client_max_body_size) {
-        size_checked = true;
+    if (!size_checked_ && req_.body().size() > config_.client_max_body_size) {
+        size_checked_ = true;
         throw Request::Exception("Body too big", 413);
     }
     if (byte_sent_ != 0 || msg_.size() > 0) {
@@ -316,6 +318,8 @@ void TcpConnection::parse_http_request_body()
         throw Exception("Bad control flow");
     }
 
+    get_config_ = true;
+
     if (req_.content_length()) {
         request_handler = &TcpConnection::parse_http_request_body_content_length;
     } else if (req_.chunked()) {
@@ -339,17 +343,24 @@ void TcpConnection::parse_http_request_body_plain()
 void TcpConnection::parse_http_request_body_content_length()
 {
     bool done = false;
-    size_t n = data_.size();
+    body_bytes_ += data_.size();
 
-    if (n == req_.content_length_count()) {
+    if (has_config()) {
+        if (req_.content_length_count() > config_.client_max_body_size) {
+            throw Request::Exception("Body too big", 413);
+        }
+    }
+
+    if (body_bytes_ == req_.content_length_count()) {
         done = true;
-    } else if (n > req_.content_length_count()) {
+    } else if (body_bytes_ > req_.content_length_count()) {
         throw Request::Exception("Body larger than Content-Length", 400);
     }
 
+    req_.append_raw_body(data_);
+    data_.clear();
+
     if (done) {
-        req_.append_raw_body(data_);
-        data_.clear();
         req_.decode_raw_body();
         set_state(S_WRITE);
         req_.print();
@@ -361,6 +372,13 @@ void TcpConnection::parse_http_request_body_chunked()
     req_.append_raw_body(data_);
     data_.clear();
     req_.decode_raw_body();
+
+    if (has_config()) {
+        if (req_.body().size() > config_.client_max_body_size) {
+            throw Request::Exception("Body too big", 413);
+        }
+    }
+
     if (req_.all_chunks_received()) {
         set_state(S_WRITE);
         req_.print();
@@ -415,6 +433,8 @@ void TcpConnection::set_response_config(const std::vector<Config>& server_config
             for (std::size_t j = 0; j < server_configs[i].server_name.size(); j++) {
                 if (host == server_configs[i].server_name[j]) {
                     config_ = server_configs[i];
+                    has_config_ = true;
+                    get_config_ = false;
                     return;
                 }
             }
@@ -424,6 +444,8 @@ void TcpConnection::set_response_config(const std::vector<Config>& server_config
         throw Request::Exception("No config match\n", 500);
     }
     config_ = server_configs[static_cast<std::size_t>(def)];
+    has_config_ = true;
+    get_config_ = false;
     return;
 }
 
@@ -451,4 +473,9 @@ const Config& TcpConnection::config() const
 bool TcpConnection::has_config() const
 {
     return has_config_;
+}
+
+bool TcpConnection::get_config() const
+{
+    return get_config_;
 }

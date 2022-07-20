@@ -174,7 +174,7 @@ void ServerParser::parse_location_vars()
                         }
                     }
                     if (new_location.client_max_body_size == 0)
-                      throw BadLocationDirective();
+                        throw BadLocationDirective();
                 } else if (directives[0] == "limit_except") {
                     config.limit_except.clear();
                     for (std::string::size_type j = 1; j < directives.size(); ++j) {
@@ -315,7 +315,7 @@ void ServerParser::parse_server_vars()
                         throw BadDirective();
                 }
                 if (config.client_max_body_size == 0)
-                  throw BadDirective();
+                    throw BadDirective();
             } else if (directives[0] == "limit_except") {
                 config.limit_except.clear();
                 for (std::string::size_type j = 1; j < directives.size(); ++j) {
