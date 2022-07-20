@@ -19,7 +19,7 @@
 #include <sstream>
 #include <string>
 
-#define BYTES_IN_MB 1000000
+#define BYTES_IN_MB 1048576
 
 ServerParser::ServerParser(std::string::iterator beg, std::string::iterator end)
     : server_content_(),
