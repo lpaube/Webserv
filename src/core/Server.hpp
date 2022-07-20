@@ -28,12 +28,12 @@ public:
     void run();
 
 private:
-    void accept_connection(TcpListener* socket);
-    void close_connection(FileDescriptor* c);
+    void accept_connection(SharedPtr<TcpListener> socket);
+    void close_fd(SharedPtr<FileDescriptor> c);
     void print_body(const Request& r) const;
     std::vector<Config> get_response_configs(const Request& req) const;
-    void error_response(TcpConnection* c, int code);
-    std::string get_configuration(TcpConnection* c) const;
+    void error_response(SharedPtr<TcpConnection> c, int code);
+    std::string get_configuration(SharedPtr<TcpConnection> c) const;
 
 private:
     FDList fds_;

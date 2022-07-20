@@ -13,6 +13,7 @@
 #pragma once
 
 #include "FileDescriptor.hpp"
+#include "Utils.hpp"
 #include <cstddef>
 #include <map>
 #include <poll.h>
@@ -21,7 +22,7 @@
 class FDList
 {
 public:
-    typedef std::map<int, FileDescriptor*> FDMap;
+    typedef std::map<int, SharedPtr<FileDescriptor> > FDMap;
     typedef FDMap::iterator iterator;
 
 public:
@@ -31,7 +32,8 @@ public:
 
 public:
     size_t erase(int fd);
-    std::pair<FDList::iterator, bool> insert(std::pair<int, FileDescriptor*> value, int events);
+    std::pair<FDList::iterator, bool> insert(std::pair<int, SharedPtr<FileDescriptor> > value,
+                                             int events);
     pollfd* pfds();
     size_t size();
     void close_all();

@@ -12,7 +12,6 @@
 
 #include "TcpConnection.hpp"
 #include "File.hpp"
-#include "Utils.hpp"
 #include "http/Response.hpp"
 #include "http/Script.hpp"
 #include <arpa/inet.h>
@@ -51,11 +50,6 @@ TcpConnection::TcpConnection(int listener_fd)
         throw Exception("Error while setting socket to non-blocking: " +
                         std::string(strerror(errno)));
     }
-}
-
-TcpConnection::~TcpConnection()
-{
-    delete file_;
 }
 
 FDType TcpConnection::type() const
@@ -99,24 +93,22 @@ bool TcpConnection::handle_write_event(FDList& fds)
     response.check_method();
     std::size_t len = req_.path().length();
     if (req_.path().find("/cgi-bin/") != std::string::npos && req_.path()[len - 1] != '/') {
-        if (file_ == NULL) {
-            file_ = new File(IN_TMPFILE, S_WRITE);
+        if (file_.get() == NULL) {
+            file_ = SharedPtr<File>(new File(IN_TMPFILE, S_WRITE));
             file_->append_write_data(req_.body());
-            fds.insert(std::make_pair(file_->fd(), static_cast<FileDescriptor*>(file_)), POLLOUT);
+            fds.insert(std::make_pair(file_->fd(), static_pointer_cast<FileDescriptor>(file_)),
+                       POLLOUT);
         } else if (file_->write_done()) {
-            delete file_;
-            file_ = NULL;
             Script script(config_, req_);
             if (script.ext_found == true) {
                 script.exec(IN_TMPFILE);
-                file_ = new File(OUT_TMPFILE, S_READ);
-                fds.insert(std::make_pair(file_->fd(), static_cast<FileDescriptor*>(file_)),
+                file_ = SharedPtr<File>(new File(OUT_TMPFILE, S_READ));
+                fds.insert(std::make_pair(file_->fd(), static_pointer_cast<FileDescriptor>(file_)),
                            POLLIN);
             }
         } else if (file_->read_done()) {
             msg_ = file_->get_read_data();
-            delete file_;
-            file_ = NULL;
+            file_.reset();
             return (send_response());
         }
         return false;

@@ -50,7 +50,7 @@ Server::Server(const std::vector<Config>& blocks)
 
         if (add) {
             TcpListener* listener = new TcpListener(it->listen.address, it->listen.port, N_BACKLOG);
-            fds_.insert(std::make_pair(listener->fd(), static_cast<FileDescriptor*>(listener)),
+            fds_.insert(std::make_pair(listener->fd(), SharedPtr<FileDescriptor>(listener)),
                         POLLIN);
 
             streams.push_back(listener);
@@ -78,7 +78,7 @@ void Server::run()
         std::vector<int> to_close;
         for (size_t i = 0; i < fds_.size() && nevents > 0; ++i) {
             pollfd pfd = fds_.pfds()[i];
-            FileDescriptor* fd = fds_[pfd.fd];
+            SharedPtr<FileDescriptor>& fd = fds_[pfd.fd];
             bool found = false;
 
             if (pfd.revents & (POLLERR | POLLHUP | POLLNVAL)) {
@@ -90,13 +90,13 @@ void Server::run()
                 switch (fd->type()) {
                     case FD_TCP_LISTENER:
                         try {
-                            accept_connection(static_cast<TcpListener*>(fd));
+                            accept_connection(static_pointer_cast<TcpListener>(fd));
                         } catch (std::exception& ex) {
                             std::cerr << ex.what() << std::endl;
                         }
                         break;
                     case FD_TCP_CONNECTION: {
-                        TcpConnection* c = static_cast<TcpConnection*>(fd);
+                        SharedPtr<TcpConnection> c = static_pointer_cast<TcpConnection>(fd);
                         try {
                             c->handle_read_event();
                         } catch (Request::Exception& ex) {
@@ -110,12 +110,10 @@ void Server::run()
                         break;
                     }
                     case FD_FILE: {
-                        File* f = static_cast<File*>(fd);
+                        SharedPtr<File> f = static_pointer_cast<File>(fd);
                         f->handle();
                         if (f->read_done()) {
-                            --i;
-                            fds_.erase(f->fd());
-                            continue;
+                            to_close.push_back(f->fd());
                         }
                         break;
                     }
@@ -127,7 +125,7 @@ void Server::run()
                 switch (fd->type()) {
                     case FD_TCP_CONNECTION: {
                         bool sent = false;
-                        TcpConnection* c = static_cast<TcpConnection*>(fd);
+                        SharedPtr<TcpConnection> c = static_pointer_cast<TcpConnection>(fd);
 
                         if (!c->has_config()) {
                             c->set_response_config(configs_, get_configuration(c));
@@ -146,12 +144,10 @@ void Server::run()
                         }
                     } break;
                     case FD_FILE: {
-                        File* f = static_cast<File*>(fd);
+                        SharedPtr<File> f = static_pointer_cast<File>(fd);
                         f->handle();
                         if (f->write_done()) {
-                            --i;
-                            fds_.erase(f->fd());
-                            continue;
+                            to_close.push_back(f->fd());
                         }
                     } break;
                     case FD_TCP_LISTENER: {
@@ -166,7 +162,7 @@ void Server::run()
         }
 
         for (std::vector<int>::iterator it = to_close.begin(); it != to_close.end(); ++it) {
-            close_connection(fds_[*it]);
+            close_fd(fds_[*it]);
         }
         to_close.clear();
     }
@@ -174,22 +170,20 @@ void Server::run()
     fds_.close_all();
 }
 
-void Server::accept_connection(TcpListener* socket)
+void Server::accept_connection(SharedPtr<TcpListener> socket)
 {
     TcpConnection* c = new TcpConnection(socket->fd());
 
-    fds_.insert(std::make_pair(c->fd(), static_cast<FileDescriptor*>(c)), POLLIN | POLLOUT);
+    fds_.insert(std::make_pair(c->fd(), SharedPtr<FileDescriptor>(c)), POLLIN | POLLOUT);
     c->set_addr(socket->address());
     c->set_port(socket->port());
     std::cout << "Accepted connection: " << c->fd() << std::endl;
 }
 
-void Server::close_connection(FileDescriptor* c)
+void Server::close_fd(SharedPtr<FileDescriptor> c)
 {
-    close(c->fd());
+    std::cout << "Closed fd: " << c->fd() << std::endl;
     fds_.erase(c->fd());
-    std::cout << "Closed connection: " << c->fd() << std::endl;
-    delete c;
 }
 
 void Server::print_body(const Request& r) const
@@ -200,7 +194,7 @@ void Server::print_body(const Request& r) const
     std::cout << std::endl;
 }
 
-void Server::error_response(TcpConnection* c, int code)
+void Server::error_response(SharedPtr<TcpConnection> c, int code)
 {
     Response response(c->request(), c->config());
     response.set_status_code(code);
@@ -211,7 +205,7 @@ void Server::error_response(TcpConnection* c, int code)
     c->set_msg(msg);
 }
 
-std::string Server::get_configuration(TcpConnection* c) const
+std::string Server::get_configuration(SharedPtr<TcpConnection> c) const
 {
     Request::header_iterator it = c->request().find_header("host");
     std::string host;

@@ -25,9 +25,6 @@ FDList::FDMap::mapped_type& FDList::operator[](const int fd)
 
 void FDList::close_all()
 {
-    for (iterator it = fds_.begin(); it != fds_.end(); ++it) {
-        delete it->second;
-    }
     fds_.clear();
 }
 
@@ -42,7 +39,8 @@ size_t FDList::erase(int fd)
     return fds_.erase(fd);
 }
 
-std::pair<FDList::iterator, bool> FDList::insert(std::pair<int, FileDescriptor*> value, int events)
+std::pair<FDList::iterator, bool> FDList::insert(std::pair<int, SharedPtr<FileDescriptor> > value,
+                                                 int events)
 {
     std::pair<FDList::iterator, bool> ret = fds_.insert(value);
 

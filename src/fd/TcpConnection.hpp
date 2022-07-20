@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include "Utils.hpp"
 #include "core/Config.hpp"
 #include "fd/FDList.hpp"
 #include "fd/File.hpp"
@@ -28,7 +29,6 @@ public:
 
 public:
     TcpConnection(int listener_fd);
-    ~TcpConnection();
     virtual FDType type() const;
 
     template <typename Iter>
@@ -77,5 +77,5 @@ private:
     ssize_t byte_sent_;
     Config config_;
     bool has_config_;
-    File* file_;
+    SharedPtr<File> file_;
 };
