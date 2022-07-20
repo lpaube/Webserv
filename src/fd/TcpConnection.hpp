@@ -78,4 +78,5 @@ private:
     Config config_;
     bool has_config_;
     SharedPtr<File> file_;
+    bool size_checked;
 };

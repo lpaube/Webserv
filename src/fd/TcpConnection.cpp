@@ -39,7 +39,8 @@ TcpConnection::TcpConnection(int listener_fd)
       byte_sent_(0),
       config_(),
       has_config_(false),
-      file_(NULL)
+      file_(),
+      size_checked(false)
 {
     fd_ = accept(listener_fd_, (sockaddr*)&addr_, &addrlen_);
     if (fd() == -1) {
@@ -73,15 +74,15 @@ void TcpConnection::handle_read_event()
 
     append_data(buf, buf + n);
 
-    if (req_size_ > MAX_REQUEST_SIZE) {
-        throw Request::Exception("Request too big", 413);
-    }
-
     (this->*request_handler)();
 }
 
 bool TcpConnection::handle_write_event(FDList& fds)
 {
+    if (!size_checked && req_.body().size() > config_.client_max_body_size) {
+        size_checked = true;
+        throw Request::Exception("Body too big", 413);
+    }
     if (byte_sent_ != 0 || msg_.size() > 0) {
         return send_response();
     }
@@ -316,9 +317,6 @@ void TcpConnection::parse_http_request_body()
     }
 
     if (req_.content_length()) {
-        if (config_.client_max_body_size < req_.content_length_count()) {
-            throw Request::Exception("Body too big", 413);
-        }
         request_handler = &TcpConnection::parse_http_request_body_content_length;
     } else if (req_.chunked()) {
         request_handler = &TcpConnection::parse_http_request_body_chunked;
@@ -364,7 +362,6 @@ void TcpConnection::parse_http_request_body_chunked()
     data_.clear();
     req_.decode_raw_body();
     if (req_.all_chunks_received()) {
-        print_bytes(req_.body());
         set_state(S_WRITE);
         req_.print();
     }

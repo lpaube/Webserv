@@ -323,11 +323,10 @@ void Response::set_date()
     time_t now = time(0);
     tm* tm = gmtime(&now);
     if (!tm) {
-      date_now_ = "";
-    }
-    else {
-      strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%S %Z", tm);
-      date_now_ = std::string(buf);
+        date_now_ = "";
+    } else {
+        strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%S %Z", tm);
+        date_now_ = std::string(buf);
     }
 }
 
@@ -358,13 +357,13 @@ void Response::set_html_header()
     std::stringstream header_stream;
 
     set_content_type();
-    //set_date();
+    // set_date();
     set_host();
     header_stream << "HTTP/1.1 " << status_code_ << " " << StatusCode::get_code_msg(status_code_)
                   << "\r\n"
                   << "Access-Control-Allow-Origin: *\r\n";
     header_size_ = header_stream.str().size();
-    //header_stream << "Date: " << date_now_ << "\r\n";
+    // header_stream << "Date: " << date_now_ << "\r\n";
     header_stream << "Host: " << host_ << "\r\n";
     if (set_allow()) {
         header_stream << "Allow: " << allow_ << "\r\n";
