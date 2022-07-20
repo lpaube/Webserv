@@ -441,7 +441,6 @@ void TcpConnection::set_response_config(const std::vector<Config>& server_config
 
 bool TcpConnection::send_response()
 {
-
     size_t len = msg_.size() - (size_t)byte_sent_;
     byte_sent_ = send(fd(), msg_.data() + byte_sent_, len, 0);
     if (byte_sent_ < 0) {
