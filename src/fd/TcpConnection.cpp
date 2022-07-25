@@ -131,6 +131,14 @@ bool TcpConnection::handle_write_event(FDList& fds)
             msg_ = file_->get_read_data();
             file_.reset();
             return (send_response());
+        } else if (file_->error()) {
+            Response response(request(), config());
+            response.set_status_code(500);
+            response.check_error_code();
+            response.set_html_header();
+            std::vector<char> msg(response.header.begin(), response.header.end());
+            msg.insert(msg.end(), response.body.begin(), response.body.end());
+            return send_response();
         }
         return false;
     }

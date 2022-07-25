@@ -114,8 +114,13 @@ void Server::run()
                     }
                     case FD_FILE: {
                         SharedPtr<File> f = static_pointer_cast<File>(fd);
-                        f->handle();
-                        if (f->read_done()) {
+                        try {
+                            f->handle();
+                            if (f->read_done()) {
+                                to_close.push_back(f->fd());
+                            }
+                        } catch (std::exception& ex) {
+                            std::cerr << ex.what() << std::endl;
                             to_close.push_back(f->fd());
                         }
                         break;
@@ -148,8 +153,13 @@ void Server::run()
                     } break;
                     case FD_FILE: {
                         SharedPtr<File> f = static_pointer_cast<File>(fd);
-                        f->handle();
-                        if (f->write_done()) {
+                        try {
+                            f->handle();
+                            if (f->write_done()) {
+                                to_close.push_back(f->fd());
+                            }
+                        } catch (std::exception& ex) {
+                            std::cerr << ex.what() << std::endl;
                             to_close.push_back(f->fd());
                         }
                     } break;

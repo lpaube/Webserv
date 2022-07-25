@@ -17,7 +17,9 @@
 
 File::File(const std::string& filepath, FDState mode)
     : eof_(false),
-      filepath_(filepath)
+      filepath_(filepath),
+      w_index_(0),
+      error_(false)
 {
     state_ = mode;
     switch (mode) {
@@ -64,6 +66,8 @@ const std::vector<char>& File::get_read_data() const
     return read_buf_;
 }
 
+#define BUFF_SIZE 8192
+
 int File::handle()
 {
     ssize_t n = 0;
@@ -73,25 +77,33 @@ int File::handle()
                 return 0;
             }
 
-            n = write(fd(), write_buf_.data(), write_buf_.size());
+            std::size_t size = write_buf_.size() - (std::size_t)w_index_ > BUFF_SIZE
+                                   ? BUFF_SIZE
+                                   : write_buf_.size() - (std::size_t)w_index_;
+
+            n = write(fd(), &write_buf_[(std::size_t)w_index_], size);
 
             if (n < 0) {
+                error_ = true;
                 throw Exception("Error writing to file");
             }
 
-            write_buf_.erase(write_buf_.begin(), write_buf_.begin() + n);
+            w_index_ += n;
+
+            if ((std::size_t)w_index_ == write_buf_.size()) {
+                write_buf_.clear();
+            }
         } break;
         case S_READ: {
-            static const std::size_t buf_size = 4096;
-
-            char buf[buf_size];
-            n = read(fd(), buf, buf_size);
+            char buf[BUFF_SIZE];
+            n = read(fd(), buf, BUFF_SIZE);
 
             if (n < 0) {
+                error_ = true;
                 throw Exception("Error reading file");
             }
 
-            if ((std::size_t)n < buf_size) {
+            if ((std::size_t)n < BUFF_SIZE) {
                 eof_ = true;
             }
 
@@ -100,4 +112,9 @@ int File::handle()
     }
 
     return n;
+}
+
+bool File::error() const
+{
+    return error_;
 }
