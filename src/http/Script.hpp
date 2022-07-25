@@ -32,7 +32,7 @@ public:
     ~Script();
     pid_t exec(const std::string& file_name);
     std::string get_ext(const std::string& path);
-	void	close_files(int mode);
+    void close_files(int mode);
 
 private:
     void build_cmd(const std::string& path, const Config& config);
@@ -45,6 +45,6 @@ private:
     char** cmd_;
     std::size_t envp_size_;
     const Request& request_;
-	int in_file;
-	int out_file;
+    int in_file;
+    int out_file;
 };

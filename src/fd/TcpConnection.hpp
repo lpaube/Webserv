@@ -18,18 +18,19 @@
 #include "fd/File.hpp"
 #include "fd/FileDescriptor.hpp"
 #include "http/Request.hpp"
+#include "http/Script.hpp"
 #include <netinet/in.h>
 #include <sys/socket.h>
-#include "http/Script.hpp"
 #include <vector>
 
 class TcpConnection : public FileDescriptor
 {
 public:
     static const size_t MAX_REQUEST_SIZE = 0x8000000;
-	Script *script;
+
 public:
     TcpConnection(int listener_fd);
+    ~TcpConnection();
     virtual FDType type() const;
 
     template <typename Iter>
@@ -66,6 +67,7 @@ private:
     bool send_response();
 
 private:
+    Script* script_;
     int listener_fd_;
     sockaddr addr_;
     uint16_t port_;
@@ -83,6 +85,6 @@ private:
     bool size_checked_;
     bool get_config_;
     size_t body_bytes_;
-	bool script_started;
-	pid_t	script_id;
+    bool script_started_;
+    pid_t script_id_;
 };

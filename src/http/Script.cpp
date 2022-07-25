@@ -24,7 +24,6 @@
 
 #define OUT_TMPFILE "outtmpfile.tmp"
 
-
 // script constructor takes 2 args, a config and a specific request_.
 Script::Script(const Config& config, const Request& request_)
     : ext_found(false),
@@ -57,7 +56,7 @@ pid_t Script::exec(const std::string& file_name)
 {
     pid_t id;
     out_file = open(OUT_TMPFILE, O_CREAT | O_RDWR | O_TRUNC,
-                        0777); // Create out file for the output of the script
+                    0777); // Create out file for the output of the script
     if (out_file < 0) {
         throw Request::Exception("Error fatal, open", 500);
     }
@@ -81,11 +80,12 @@ pid_t Script::exec(const std::string& file_name)
             close(in_file);
             throw Request::Exception("Error fatal, dup2", 500);
         }
-        execve(cmd_[0], cmd_, envp_);;
+        execve(cmd_[0], cmd_, envp_);
+        ;
         close(in_file);
         throw Request::Exception("Error fatal, execve\n", 500);
-    } 
-	return id;
+    }
+    return id;
 }
 
 std::string Script::get_ext(const std::string& path)
@@ -113,11 +113,12 @@ std::string Script::get_ext(const std::string& path)
     return ext;
 }
 
-void Script::close_files(int mode){
-	close(out_file);
-	if (mode == 1){
-		close(in_file);
-	}
+void Script::close_files(int mode)
+{
+    close(out_file);
+    if (mode == 1) {
+        close(in_file);
+    }
 }
 
 // build the cmd_ with the config file and the type of the script in the request_.
