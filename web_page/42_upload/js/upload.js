@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/09 17:17:01 by mafortin          #+#    #+#             */
-/*   Updated: 2022/07/25 12:47:46 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/07/25 15:04:16 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,16 @@ const uploadFile = () => {
 				console.log(content);
 				document.write(content);
 			}
-		}).catch(e => alert("Fetch Error: " + e.message));
+		}).catch(e => {
+			console.error(e);
+			fetch("error413.html", {
+				method: "GET"
+			}).then(response => {
+				return response.text();
+			}).then( content => {
+				document.write(content);
+			})
+		});
 	}
 }
 
