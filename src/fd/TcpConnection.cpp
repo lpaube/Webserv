@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   TcpConnection.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleblanc <mleblanc@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 21:52:21 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/07/19 14:34:21 by mleblanc         ###   ########.fr       */
+/*   Updated: 2022/07/25 12:56:16 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,17 @@
 #include <netinet/in.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
 
 #define BUF_SIZE (1024 * 8)
 #define IN_TMPFILE "intmpfile.tmp"
 #define OUT_TMPFILE "outtmpfile.tmp"
 
 TcpConnection::TcpConnection(int listener_fd)
-    : listener_fd_(listener_fd),
+    : script(NULL),
+      listener_fd_(listener_fd),
       addr_(),
       addrlen_(),
       inaddr_(),
@@ -42,7 +46,9 @@ TcpConnection::TcpConnection(int listener_fd)
       file_(),
       size_checked_(false),
       get_config_(false),
-      body_bytes_(0)
+      body_bytes_(0),
+	  script_started(false),
+	  script_id(0)
 {
     fd_ = accept(listener_fd_, (sockaddr*)&addr_, &addrlen_);
     if (fd() == -1) {
@@ -98,13 +104,29 @@ bool TcpConnection::handle_write_event(FDList& fds)
             fds.insert(std::make_pair(file_->fd(), static_pointer_cast<FileDescriptor>(file_)),
                        POLLOUT);
         } else if (file_->write_done()) {
-            Script script(config_, req_);
-            if (script.ext_found == true) {
-                script.exec(IN_TMPFILE);
+			if (script_started == false){
+            	script = new Script(config_, req_);
+            	if (script->ext_found == true) {
+                	script_id = script->exec(IN_TMPFILE);
+					script_started = true;
+				}
+			}
+			if (script_started == true){
+			int status;
+        	waitpid(script_id, &status, WNOHANG);
+			if ((WIFEXITED(status))){
+				int mode = 0;
+				if (req_.method() == POST){
+					mode = 1;
+				}
+				script->close_files(mode);
                 file_ = SharedPtr<File>(new File(OUT_TMPFILE, S_READ));
                 fds.insert(std::make_pair(file_->fd(), static_pointer_cast<FileDescriptor>(file_)),
                            POLLIN);
+				delete script;
+				script = NULL;
             }
+			}
         } else if (file_->read_done()) {
             msg_ = file_->get_read_data();
             file_.reset();

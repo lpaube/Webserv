@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/09 17:17:01 by mafortin          #+#    #+#             */
-/*   Updated: 2022/07/06 13:18:11 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/07/25 12:47:46 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,11 +61,14 @@ const uploadFile = () => {
 	fileInput.onchange = ({target}) =>{
 		let file = target.files[0];
 		data.append("file", file);
+		console.log("UploadFile: file data done");
 		fetch(ADD + "/cgi-bin/upload.py", {
 			method: "POST",
 			body: data
 		}).then(response => {
+			console.log("fetch response received");
 			if (!response.ok){
+				console.log("uploadfile response not ok");
 				return response.text();
 			}
 			else{
@@ -73,9 +76,11 @@ const uploadFile = () => {
 				return "OK";
 			}
 		}).then(content =>{
-			if (content != "OK")
-				document.write(content)
-		}).catch(e => alert(e.message));
+			if (content != "OK"){
+				console.log(content);
+				document.write(content);
+			}
+		}).catch(e => alert("Fetch Error: " + e.message));
 	}
 }
 

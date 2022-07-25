@@ -13,7 +13,7 @@
 
 	location / {
     root ./web_page/42_logtime;
-    client_max_body_size 800m;
+    client_max_body_size 80m;
     index index.html;
     limit_except GET;
 	}

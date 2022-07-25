@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/12 19:31:56 by mleblanc          #+#    #+#             */
-/*   Updated: 2022/07/18 17:05:34 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/07/25 11:51:54 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,14 @@
 #include "http/Request.hpp"
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include "http/Script.hpp"
 #include <vector>
 
 class TcpConnection : public FileDescriptor
 {
 public:
     static const size_t MAX_REQUEST_SIZE = 0x8000000;
-
+	Script *script;
 public:
     TcpConnection(int listener_fd);
     virtual FDType type() const;
@@ -82,4 +83,6 @@ private:
     bool size_checked_;
     bool get_config_;
     size_t body_bytes_;
+	bool script_started;
+	pid_t	script_id;
 };

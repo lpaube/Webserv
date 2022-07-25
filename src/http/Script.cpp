@@ -6,7 +6,7 @@
 /*   By: mafortin <mafortin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/02 18:39:08 by mafortin          #+#    #+#             */
-/*   Updated: 2022/07/20 14:17:48 by mafortin         ###   ########.fr       */
+/*   Updated: 2022/07/25 11:56:27 by mafortin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 #define BUFFER_SIZE 50
 
 #define OUT_TMPFILE "outtmpfile.tmp"
+
 
 // script constructor takes 2 args, a config and a specific request_.
 Script::Script(const Config& config, const Request& request_)
@@ -52,12 +53,10 @@ Script::~Script()
 }
 
 // execute the script and returns the output of the script in a string.
-void Script::exec(const std::string& file_name)
+pid_t Script::exec(const std::string& file_name)
 {
     pid_t id;
-    int status;
-    int in_file;
-    int out_file = open(OUT_TMPFILE, O_CREAT | O_RDWR | O_TRUNC,
+    out_file = open(OUT_TMPFILE, O_CREAT | O_RDWR | O_TRUNC,
                         0777); // Create out file for the output of the script
     if (out_file < 0) {
         throw Request::Exception("Error fatal, open", 500);
@@ -74,27 +73,19 @@ void Script::exec(const std::string& file_name)
     if (id == 0) {
         if (request_.method() == POST) {
             if (dup2(in_file, STDIN_FILENO) < 0) {
-                remove("in_file.tmp");
                 close(in_file);
                 throw Request::Exception("Error fatal, dup2", 500);
             }
         }
         if (dup2(out_file, STDOUT_FILENO) < 0) {
-            remove("in_file.tmp");
             close(in_file);
             throw Request::Exception("Error fatal, dup2", 500);
         }
-        execve(cmd_[0], cmd_, envp_);
-        remove("in_file.tmp");
+        execve(cmd_[0], cmd_, envp_);;
         close(in_file);
         throw Request::Exception("Error fatal, execve\n", 500);
-    } else {
-        waitpid(id, &status, 0);
-    }
-    close(out_file);
-    if (request_.method() == POST) { // delete the in file after script
-        close(in_file);
-    }
+    } 
+	return id;
 }
 
 std::string Script::get_ext(const std::string& path)
@@ -120,6 +111,13 @@ std::string Script::get_ext(const std::string& path)
     save++;
     ext = path.substr(save);
     return ext;
+}
+
+void Script::close_files(int mode){
+	close(out_file);
+	if (mode == 1){
+		close(in_file);
+	}
 }
 
 // build the cmd_ with the config file and the type of the script in the request_.
