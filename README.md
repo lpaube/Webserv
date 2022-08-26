@@ -1,5 +1,5 @@
 <!-- ![webserv logo](img/Webserv.png) -->
-<img src="img/Webserv.png" alt="" height="180" /><br />
+<img src="img/Webserv.png" alt="" width="1000" height="180" /><br />
 `webserv` is an HTTP/1.1 server written in C++98. The functionalities and configurations are heavily based on Nginx's.
 
 **Usage**
